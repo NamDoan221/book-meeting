@@ -1,0 +1,25 @@
+@each $val in $calcHeight {
+  .#{$prefixCss}calc-h-#{$val} {
+    height:calc(100#{'% - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}calc-vh-#{$val} {
+    height:calc(100#{'vh - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}max-calc-h-#{$val} {
+    max-height:calc(100#{'% - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}max-calc-vh-#{$val} {
+    max-height:calc(100#{'vh - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}min-calc-h-#{$val} {
+    min-height:calc(100#{'% - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}min-calc-vh-#{$val} {
+    min-height:calc(100#{'vh - '}#{$val}) !important;
+  }
+}

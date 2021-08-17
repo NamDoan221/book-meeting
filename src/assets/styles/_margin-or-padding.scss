@@ -1,0 +1,89 @@
+@each $val in $margin-or-padding {
+    .#{$prefixCss}m-#{$val}{
+      margin: $val !important;
+    }
+  
+    .#{$prefixCss}mr-#{$val}{
+      margin-right: $val !important;
+    }
+  
+    .#{$prefixCss}ml-#{$val}{
+      margin-left: $val !important;
+    }
+  
+    .#{$prefixCss}mb-#{$val}{
+      margin-bottom: $val !important;
+    }
+  
+    .#{$prefixCss}mt-#{$val}{
+      margin-top: $val !important;
+    }
+
+    .#{$prefixCss}mx-#{$val}{
+      margin-left: $val !important;
+      margin-right: $val !important;
+    }
+
+    .#{$prefixCss}my-#{$val}{
+      margin-top: $val !important;
+      margin-bottom: $val !important;
+    }
+  
+    .#{$prefixCss}p-#{$val}{
+      padding: $val !important;
+    }
+
+    .#{$prefixCss}px-#{$val}{
+       padding-left: $val !important;
+       padding-right: $val !important;
+    }
+
+    .#{$prefixCss}py-#{$val}{
+        padding-top: $val !important;
+        padding-bottom: $val !important;
+    }
+
+    .#{$prefixCss}pr-#{$val}{
+      padding-right: $val !important;
+    }
+  
+    .#{$prefixCss}pl-#{$val}{
+      padding-left: $val !important;
+    }
+  
+    .#{$prefixCss}pb-#{$val}{
+      padding-bottom: $val !important;
+    }
+  
+    .#{$prefixCss}pt-#{$val}{
+      padding-top: $val !important;
+    }
+}
+
+.#{$prefixCss}m-auto{
+    margin: auto !important;
+}
+
+.#{$prefixCss}mx-auto{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.#{$prefixCss}my-auto{
+  margin-top: auto !important;
+  margin-bottom: auto !important;
+}
+
+.#{$prefixCss}p-auto{
+    padding: auto !important;
+}
+
+.#{$prefixCss}px-auto{
+  padding-left: auto !important;
+  padding-right: auto !important;
+}
+
+.#{$prefixCss}py-auto{
+  padding-top: auto !important;
+  padding-bottom: auto !important;
+}

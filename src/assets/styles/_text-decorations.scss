@@ -1,0 +1,5 @@
+@each $val in $text-decorations {
+  .#{$prefixCss}text-decorations-#{$val}{
+      text-decoration: $val !important;;
+  }
+}

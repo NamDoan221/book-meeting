@@ -1,0 +1,15 @@
+@each $val in $overflows {
+    .#{$prefixCss}overflow-#{$val} {
+        overflow: $val !important;
+    }
+
+    .#{$prefixCss}overflow-y-#{$val} {
+        overflow-x: hidden !important;
+        overflow-y: $val !important;
+    }
+
+    .#{$prefixCss}overflow-x-#{$val} {
+        overflow-x: $val !important;
+        overflow-y: hidden !important;
+    }
+}

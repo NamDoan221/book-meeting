@@ -1,0 +1,8 @@
+.account-img {
+  border-radius: 50%;
+  border: 1px solid #f0f2f5;
+}
+
+:host::ng-deep .ant-upload-list {
+  display: none !important;
+}

@@ -1,0 +1,15 @@
+@each $val in $widths {
+    .#{$prefixCss}w-#{$val}{
+      width: $val !important;
+    }
+}
+
+@each $val in $percent {
+  .w-#{$val}{
+    width: $val+#{'%'} !important;
+  }
+}
+
+.#{$prefixCss}w-max-content{
+  width: max-content !important;;
+}

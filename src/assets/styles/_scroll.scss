@@ -1,0 +1,34 @@
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;  
+    cursor: default;
+}
+    
+::-webkit-scrollbar-track {
+    border-radius: 0;
+    background: #fff;
+    &:hover {
+    background: rgba(78, 78, 78, 0.05);
+    }
+
+    &:focus,&:checked {
+        background: #b3b3b3;
+    }
+}
+  
+    
+::-webkit-scrollbar-thumb {
+    border-radius: 0;
+    background: rgba(78, 78, 78, 0.15);
+    box-shadow: inset 1px 1px 2px 0 rgba(78, 78, 78, 0.3);
+
+    &:hover {
+        background: #dadada;
+        box-shadow: inset 1px 1px 2px 0 rgba(78, 78, 78, 0.3);
+    }
+
+    &:focus,&:checked {
+        background: #b3b3b3;
+        box-shadow: inset 1px 1px 2px 0 rgba(78, 78, 78, 0.3);
+    }
+}

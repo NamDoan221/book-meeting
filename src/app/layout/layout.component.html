@@ -1,0 +1,72 @@
+<nz-layout class="app-layout">
+  <nz-sider class="menu-sidebar"
+    nzCollapsible
+    nzWidth="256px"
+    nzBreakpoint="md"
+    [(nzCollapsed)]="isCollapsed"
+    [nzTrigger]="null">
+    <div class="sidebar-logo">
+      <i nz-icon
+        nzType="wechat"
+        nzTheme="outline"
+        class="hn-font-size-30px hn-color-ffffff"
+        style="color: #ffffff;"></i>
+      <h1 class=" hn-mb-12px">Live Chat</h1>
+    </div>
+    <ul nz-menu
+      nzTheme="dark"
+      nzMode="inline"
+      [nzInlineCollapsed]="isCollapsed">
+      <li nz-submenu
+        nzOpen
+        nzTitle="Dashboard"
+        nzIcon="user">
+        <ul>
+          <li nz-menu-item
+            nzMatchRouter>
+            <a routerLink="chat"
+              class="hn-text-decorations-none">Chat</a>
+          </li>
+          <li nz-menu-item
+            nzMatchRouter>
+            <a routerLink="social"
+              class="hn-text-decorations-none">Social</a>
+          </li>
+        </ul>
+      </li>
+      <li nz-submenu
+        nzOpen
+        nzTitle="Setting"
+        nzIcon="setting">
+        <ul>
+          <li nz-menu-item
+            nzMatchRouter>
+            <a routerLink="account"
+              class="hn-text-decorations-none">Account</a>
+          </li>
+          <li nz-menu-item
+            nzMatchRouter>
+            <a (click)="handlerLogout()">Logout</a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header>
+      <div class="app-header">
+        <span class="header-trigger"
+          (click)="isCollapsed = !isCollapsed">
+          <i class="trigger"
+            nz-icon
+            [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></i>
+        </span>
+      </div>
+    </nz-header>
+    <nz-content>
+      <div class="inner-content">
+        <router-outlet></router-outlet>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

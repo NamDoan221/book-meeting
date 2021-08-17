@@ -1,0 +1,56 @@
+<div class="card">
+  <div class="card-header d-flex align-items-center">
+    <div class="hn-mr-6px">
+      <nz-avatar nzSize="large"
+        nzIcon="user"
+        [nzSrc]="user?.avatar"
+        class="hn-border-general"></nz-avatar>
+    </div>
+    <div class="hn-h-32px w-100">
+      <nz-input-group [nzSuffix]="suffixTemplate"
+        class="w-100 hn-border-radius-4px">
+        <input [type]="'text'"
+          nz-input
+          placeholder="Tìm kiếm..."
+          (keyup)="searchGroup($event)" />
+      </nz-input-group>
+      <ng-template #suffixTemplate>
+        <i nz-icon
+          nzType="search"
+          nzTheme="outline"></i>
+      </ng-template>
+    </div>
+  </div>
+  <div class="card-body contacts_body">
+    <ul class="contacts"
+      *ngIf="groupsList && groupsList.length">
+      <li *ngFor="let groupItem of groupsList"
+        (click)="chooseGroup(groupItem)"
+        [ngClass]="groupItem.name === selectedGroup?.name ? 'active' : ''"
+        class="hn-cursor-pointer">
+        <div class="d-flex bd-highlight">
+          <div class="img_cont">
+            <img [src]="groupItem.image"
+              class="rounded-circle user_img">
+            <span class="online_icon"
+              [class]="groupItem.name === selectedGroup?.name ? 'online' : 'offline'"></span>
+          </div>
+          <div class="user_info">
+            <span>{{groupItem.name}}</span>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <nz-result *ngIf="!groupsList || !groupsList.length"
+      class="d-flex h-100 align-items-center justify-content-center">
+      <div nz-result-extra
+        class="d-flex flex-column">
+        <i nz-icon
+          nzType="usergroup-add"
+          nzTheme="outline"
+          class="hn-font-size-40px hn-color"></i>
+        <p>Chưa có nhóm nào. Hãy tham gia nhóm để chat cùng bạn bè</p>
+      </div>
+    </nz-result>
+  </div>
+</div>

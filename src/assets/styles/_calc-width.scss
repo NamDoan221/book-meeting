@@ -1,0 +1,25 @@
+@each $val in $calcWidth {
+  .#{$prefixCss}calc-w-#{$val} {
+    width:calc(100#{'% - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}calc-vw-#{$val} {
+    width:calc(100#{'vw - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}max-calc-w-#{$val} {
+    max-width:calc(100#{'% - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}max-calc-vw-#{$val} {
+    max-width:calc(100#{'vw - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}min-calc-w-#{$val} {
+    min-width:calc(100#{'% - '}#{$val}) !important;
+  }
+
+  .#{$prefixCss}min-calc-vw-#{$val} {
+    min-width:calc(100#{'vw - '}#{$val}) !important;
+  }
+}

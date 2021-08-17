@@ -1,0 +1,190 @@
+.#{$prefixCss}color-4e4e4e {
+  color: #4e4e4e !important;
+
+  &:before,
+  &:after {
+    color: #4e4e4e !important;
+  }
+}
+
+.#{$prefixCss}hover-4e4e4e {
+  &:hover {
+    color: #4e4e4e !important;
+
+    >div,
+    >span,
+    >i,
+    >p {
+
+      &:before,
+      &:after {
+        color: #4e4e4e !important;
+      }
+    }
+
+    &:before,
+    &:after {
+      color: #4e4e4e !important;
+    }
+  }
+}
+
+.#{$prefixCss}color-4e4e4e50 {
+  color: rgba(78, 78, 78, 0.5) !important;
+
+  &:before,
+  &:after {
+    color: rgba(78, 78, 78, 0.5) !important;
+  }
+}
+
+.#{$prefixCss}color-4e4e4e70 {
+  color: rgba(78, 78, 78, 0.7) !important;
+
+  &:before,
+  &:after {
+    color: rgba(78, 78, 78, 0.7) !important;
+  }
+}
+
+.#{$prefixCss}color-4e4e4e30 {
+  color: rgba(78, 78, 78, 0.3) !important;
+
+  &:before,
+  &:after {
+    color: rgba(78, 78, 78, 0.3) !important;
+  }
+}
+
+.#{$prefixCss}color-4e4e4e15 {
+  color: rgba(78, 78, 78, 0.15) !important;
+
+  &:before,
+  &:after {
+    color: rgba(78, 78, 78, 0.15) !important;
+  }
+}
+
+.#{$prefixCss}bg-4e4e4e50 {
+  background: rgba(78, 78, 78, 0.5) !important;
+}
+
+.#{$prefixCss}bg-4e4e4e30 {
+  background: rgba(78, 78, 78, 0.3) !important;
+}
+
+.#{$prefixCss}bg-4e4e4e15 {
+  background: rgba(78, 78, 78, 0.15) !important;
+}
+
+.#{$prefixCss}bg-4e4e4e005 {
+  background-color: rgba(78, 78, 78, 0.05);
+}
+
+.#{$prefixCss}bg-none {
+  background: none !important;
+}
+
+@each $color in $colors {
+  .#{$prefixCss}color-#{$color} {
+    color: #{'#'}+$color !important;
+
+    &:before,
+    &:after {
+      color: #{'#'}+$color !important;
+    }
+  }
+
+  .#{$prefixCss}bg-#{$color} {
+    background-color: #{'#'}+$color !important;
+  }
+
+  .#{$prefixCss}border-#{$color} {
+    border: 1px solid #{'#'}+$color !important;
+  }
+
+  .#{$prefixCss}hover-#{$color} {
+    &:hover {
+      color: #{'#'}+$color !important;
+
+      >div,
+      >span,
+      >i,
+      >p {
+
+        &:before,
+        &:after {
+          color: #{'#'}+$color !important;
+        }
+      }
+
+      &:before,
+      &:after {
+        color: #{'#'}+$color !important;
+      }
+    }
+  }
+
+  .#{$prefixCss}bg-hover-#{$color} {
+    &:hover {
+      background-color: #{'#'}+$color !important;
+
+      &:before,
+      &:after {
+        background-color: #{'#'}+$color !important;
+      }
+    }
+  }
+}
+
+@each $color in $colors-start-double-zero {
+  .#{$prefixCss}color-00#{$color} {
+    color: #{'#00'}+$color !important;
+
+    &:before,
+    &:after {
+      color: #{'#00'}+$color !important;
+    }
+  }
+
+  .#{$prefixCss}bg-00#{$color} {
+    background-color: #{'#00'}+$color !important;
+  }
+
+  .#{$prefixCss}border-00#{$color} {
+    border: 1px solid #{'#00'}+$color !important;
+  }
+
+  .#{$prefixCss}hover-00#{$color} {
+    &:hover {
+      color: #{'#00'}+$color !important;
+
+      >div,
+      >span,
+      >i,
+      >p {
+
+        &:before,
+        &:after {
+          color: #{'#00'}+$color !important;
+        }
+      }
+
+      &:before,
+      &:after {
+        color: #{'#00'}+$color !important;
+      }
+    }
+  }
+
+  .#{$prefixCss}bg-hover-00#{$color} {
+    &:hover {
+      background-color: #{'#00'}+$color !important;
+
+      &:before,
+      &:after {
+        background-color: #{'#00'}+$color !important;
+      }
+    }
+  }
+}

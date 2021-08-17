@@ -1,0 +1,18 @@
+<div [class]="'d-flex flex-column ' + classInclude">
+  <app-shared-label
+    [label]="label"
+    [description]="'hihihi'"
+  ></app-shared-label>
+  <!-- <input #input
+    [class]="'app-shared-input'"
+    [placeholder]="placeholder | translate"
+    [value]="(item[field] | NumberValuePipe:valueType:parseFixed:notPipeFormatNumber:emptyValue0)"
+    (blur)="handlerOnBlur($event)"
+    (focus)="handlerOnFocus($event)"
+    (change)="handlerChange(input.value, type)"
+    (keydown)="handlerKeyDown($event, input.value)"
+    (keyup)="handlerKeyUp($event, input.value)"
+  /> -->
+</div>
+
+<button (click)="onClick()">{{'Focus' | translate}}</button>

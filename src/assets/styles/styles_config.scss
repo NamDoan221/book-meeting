@@ -1,0 +1,128 @@
+$prefixCss: hn-;
+$border-radius: 50em 0 3px 4px 5px 6px 7px 8px 10px 11px 12px 13px 14px 15px 16px 20px 22px 30px 32px 50px;
+$border: none;
+$margin-or-padding: auto -20px -12px -10px -6px -4px 0 1px 2px 3px 4px 5px 6px 7px 8px 9px 10px 12px 13px 14px 15px 16px 17px 18px 20px 22px 23px 24px 26px 28px 29px 30px 32px 34px 36px 37px 38px 40px 42px 43px 45px 46px 48px 49px 50px 52px 54px 56px 58px 60px 64px 65px 66px 68px 70px 72px 79px 80px 82px 86px 90px 93px 95px 100px 103px 113px 120px 124px 137px 172px 198px 226px 472px;
+$distance:-54px -35px -30px -20px -12px -4px 0 2px 4px 5px 6px 7px 8px 10px 12px 14px 15px 16px 20px 22px 28px 30px 36px 40px 44px 46px 50px 55px 64px 60px 80px 120px;
+$text-align: left center right start end inherit initial justify unset;
+$heights: auto normal inherit 0px 1px 4px 6px 8px 10px 12px 14px 16px 18px 20px 21px 24px 26px 28px 30px 32px 34px 35px 36px 37px 38px 40px 43px 44px 45px 46px 48px 50px 51px 54px 56px 57px 60px 60vh 64px 70px 72px 73px 74px 75px 78px 80vh 85px 88px 91px 92px 95px 96px 98px 100px 104px 113px 120px 126px 128px 132px 140px 142px 146px 150px 158px 160px 168px 175px 212px 230px 260px 262px 275px 285px 300px 327px 332px 335px 340px 350px 360px 407px 414px 432px 438px 487px 497px 507px 508px 519px 525px 540px 585px;
+$max-min-heights: auto 16px 18px 30px 35px 43px 45px 72px 78px 104px 132px 150px 160px 200px 212px 234px 280px 419px 450px 468px;
+$widths: auto 1px 6px 8px 10px 12px 14px 16px 18px 20px 22px 24px 28px 30px 32px 35px 36px 38px 40px 48px 50px 54px 60px 70px 72px 75px 82px 80vw 90vw 96px 100px 104px 112px 128px 130px 140px 150px 160px 165px 170px 176px 180px 190px 200px 205px 214px 216px 226px 250px 265px 268px 276px 277px 282px 290px 302px 303px 304px 320px 330px 338px 348px 360px 364px 370px 380px 384px 398px 400px 412px 419px 426px 432px 440px 450px 460px 464px 470px 490px 500px 510px 520px 549px 604px 643px 657px 681px 732px 756px 762px 795px 800px 838px 890px 1066px;
+$max-min-widths: auto 30px 35px 104px 110px 130px 160px 168px 200px 220px 255px 257px 260px 290px 300px 302px 320px 348px 395px 400px 577px 600px 670px 708px 800px 894px 981px 1066px 1336px;
+$box-shadow-block: 0 1px 2px 0 rgba(78, 78, 78, 0.3);
+$flex-justify-content: baseline center end start left right stretch space-between;
+$flex-align-items: baseline center end start left right unset;
+$flex-direction: column row;
+$colors: eee ff5454 4a4a4a 29c7cc 5db200 ffffff 6fd100 4cb7ff fbb107 c4c4c4 e6e8ed e6eef5 ebf1fa f7f8fa e5e5e5 f44336 f57c00 fbc02d 7ed321 5cae22 7b4eff 6de01b 2e92ff 007dff f8fcff 8657ff ebf0f5 ffc500 5ece0d ff5667 8358cb 4a6da7 f2f4f8 ff6e6e 4d70a9 f2f5f7 19344a 008547 606060 f1f0f0 f9fbfc f85061 6F44E9 c9c9c9 10a4b3 000;
+$colors-start-double-zero: baa4 9cdb b7ff;
+$cursor: pointer default text move copy help none;
+$word-breaks: break-word;
+$fontSize: 8px 10px 11px 12px 14px 16px 18px 19px 20px 21px 22px 24px 25px 30px 36px 40px 46px 50px 60px 75px 85px 100px 140px 150px 160px 190px 218px;
+$zIndex: 0 1 2 3 4 5 6 7 8 9 10 11 1000 1200;
+$text-decorations: none underline;
+$white-space: normal nowrap;
+$overflows: hidden overlay visible auto initial unset;
+$calcWidth: 12px 14px 18px 22px 28px 35px 36px 40px 42px 45px 50px 55px 60px 70px 75px 80px 90px 96px 100px 115px 120px 130px 180px 200px 220px 222px 225px 236px 240px 247px 250px 320px 419px 432px 450px 490px 510px 531px 561px;
+$calcHeight: 4px 5px 16px 20px 24px 27px 32px 35px 36px 40px 42px 43px 45px 48px 50px 52px 53px 54px 55px 56px 60px 62px 64px 68px 70px 71px 75px 78px 84px 87px 94px 95px 96px 100px 104px 107px 115px 125px 133px 135px 140px 147px 150px 153px 156px 158px 161px 164px 165px 167px 170px 172px 173px 174px 175px 180px 202px 204px 206px 212px 216px 217px 220px 221px 222px 224px 226px 228px 230px 235px 240px 247px 248px 255px 269px 277px 278px 280px 285px 286px 287px 288px 290px 294px 295px 304px 315px 318px 320px 324px 328px 330px 333px 340px 341px 347px 360px 366px 370px 385px 410px 422px 431px 435px 490px 500px 511px 516px 532px 550px;
+
+$percent: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 90 100;
+$pointer-events: all fill none painted stroke visible visibleFill visiblePainted visibleStroke initial inherit unset;
+$rotates: 45deg 90deg 180deg 270deg;
+$text-transform: uppercase lowercase;
+
+@import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+@import '../node_modules/ngx-toastr/toastr.css';
+@import './scroll';
+@import './font';
+@import './margin-or-padding';
+@import './cursor';
+@import './position';
+@import './border';
+@import './calc-height';
+@import './calc-width';
+@import './color';
+@import './height';
+@import './width';
+@import './max-min-height';
+@import './max-min-width';
+@import './overflow';
+@import './daterangepicker';
+@import './placeholder';
+@import './body';
+@import './opacity';
+@import './shadow';
+@import './toast-custom';
+@import './rotate';
+@import './text-decorations';
+
+.#{$prefixCss}disable {
+  pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+  opacity: 0.5;
+}
+
+.#{$prefixCss}readonly {
+  background: rgba(78, 78, 78, 0.15) !important;
+  pointer-events: none !important;
+  cursor: default !important;
+}
+
+.#{$prefixCss}bg-list-hover {
+  &:hover {
+    background-color: #ebf0f5;
+  }
+}
+
+.#{$prefixCss}ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: normal;
+}
+
+.#{$prefixCss}message-error {
+  color: #ff5454 !important;
+  font-size: 12px !important;
+  font-weight: normal;
+}
+
+.#{$prefixCss}container {
+  overflow: auto;
+  width: 100%;
+}
+
+.#{$prefixCss}full-container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  overflow: auto;
+  background-color: #fff;
+}
+
+@each $val in $pointer-events {
+  .#{$prefixCss}pointer-events-#{$val} {
+    pointer-events: $val !important;
+  }
+}
+
+.a-color-picker {
+  box-shadow: none !important;
+}
+
+.#{$prefixCss}tag-html-a {
+  color: inherit !important;
+  width: 100%;
+
+  &:hover {
+    color: inherit !important;
+    text-decoration: none;
+  }
+}
+
+@each $val in $text-transform {
+  .#{$prefixCss}text-transform-#{$val} {
+    text-transform: $val !important;
+  }
+}

@@ -1,0 +1,19 @@
+@each $val in $max-min-heights {
+  .#{$prefixCss}max-height-#{$val} {
+    max-height: $val !important;
+  }
+
+  .#{$prefixCss}min-height-#{$val} {
+    min-height: $val !important;
+  }
+}
+
+@each $val in $percent {
+  .mo-percent-min-height-#{$val} {
+    min-height: $val#{'%'} !important;
+  }
+
+  .mo-percent-max-height-#{$val} {
+    max-height: $val#{'%'} !important;
+  }
+}

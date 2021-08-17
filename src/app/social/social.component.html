@@ -1,0 +1,24 @@
+<div class="w-100 h-100 hn-bg-ffffff d-flex flex-column hn-pt-20px hn-pl-20px">
+  <div class="hn-h-30px w-30 ">
+    <nz-input-group [nzSuffix]="suffixTemplate"
+      class="w-100 hn-border-radius-4px">
+      <input [type]="'text'"
+        nz-input
+        placeholder="Tìm kiếm bạn bè..."
+        (keyup)="searchFriend($event)" />
+    </nz-input-group>
+    <ng-template #suffixTemplate>
+      <i nz-icon
+        nzType="search"
+        nzTheme="outline"></i>
+    </ng-template>
+  </div>
+  <div class="hn-mt-12px hn-calc-h-42px w-30"
+    *ngIf="users && users.length">
+    <div *ngFor="let user of users"
+      class="hn-p-6px hn-border-general hn-mb-4px d-flex justify-content-between">
+      <div>{{user.name}}</div>
+      <div (click)="addFriend(user)">+</div>
+    </div>
+  </div>
+</div>

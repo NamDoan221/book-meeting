@@ -1,0 +1,15 @@
+.hn-card-header{
+  background-color: #e6eef5;
+  height: 35px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.hn-card-body{
+  background: white;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}

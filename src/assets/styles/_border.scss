@@ -1,0 +1,126 @@
+.#{$prefixCss}border-general{
+  border: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-top-general{
+  border-top: solid 1px #e6e8ed !important;
+}
+
+
+.#{$prefixCss}border-right-general{
+  border-right: solid 1px #e6e8ed !important;
+}
+
+
+.#{$prefixCss}border-bottom-general{
+  border-bottom: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-left-general{
+  border-left: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-x-general{
+  border-left: solid 1px #e6e8ed !important;
+  border-right: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-y-general{
+  border-top: solid 1px #e6e8ed !important;
+  border-bottom: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-error-general {
+  border: solid 1px #ff5454 !important;
+}
+
+.#{$prefixCss}border-left-top-general{
+  border-left: solid 1px #e6e8ed !important;
+  border-top: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-left-bottom-general{
+  border-left: solid 1px #e6e8ed !important;
+  border-bottom: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-right-top-general{
+  border-right: solid 1px #e6e8ed !important;
+  border-top: solid 1px #e6e8ed !important;
+}
+
+.#{$prefixCss}border-right-bottom-general{
+  border-right: solid 1px #e6e8ed !important;
+  border-bottom: solid 1px #e6e8ed !important;
+}
+
+@each $val in $border {
+  .#{$prefixCss}border-bottom-#{$val} {
+    border-bottom: $val !important;
+  }
+
+  .#{$prefixCss}border-top-#{$val} {
+    border-top: $val !important;
+  }
+
+  .#{$prefixCss}border-left-#{$val} {
+    border-left: $val !important;
+  }
+
+  .#{$prefixCss}border-right-#{$val} {
+    border-right: $val !important;
+  }
+
+  .#{$prefixCss}border-#{$val} {
+    border: $val !important;
+  }
+}
+
+
+.#{$prefixCss}border-radius-none {
+  border-radius: 0px !important;
+  border-bottom-left-radius: 0px !important;
+  border-bottom-right-radius: 0px !important;
+  border-top-left-radius: 0px !important;
+  border-top-right-radius: 0px !important;
+}
+
+@each $val in $border-radius {
+  .#{$prefixCss}border-radius-#{$val} {
+    border-radius: $val !important;
+  }
+
+  .#{$prefixCss}border-radius-left-#{$val} {
+    border-radius: $val 0 0 $val !important;
+  }
+
+  .#{$prefixCss}border-radius-right-#{$val} {
+    border-radius: 0 $val $val 0 !important;
+  }
+
+  .#{$prefixCss}border-radius-top-left-#{$val} {
+    border-top-left-radius: $val !important;
+  }
+
+  .#{$prefixCss}border-radius-top-right-#{$val} {
+    border-top-right-radius: $val !important;
+  }
+
+  .#{$prefixCss}border-radius-bottom-left-#{$val} {
+    border-bottom-left-radius: $val !important;
+  }
+
+  .#{$prefixCss}border-radius-bottom-right-#{$val} {
+    border-bottom-right-radius: $val !important;
+  }
+
+  .#{$prefixCss}border-radius-top-#{$val} {
+    border-top-left-radius: $val !important;
+    border-top-right-radius: $val !important;
+  }
+
+  .#{$prefixCss}border-radius-bottom-#{$val} {
+    border-bottom-left-radius: $val !important;
+    border-bottom-right-radius: $val !important;
+  }
+}

@@ -1,0 +1,53 @@
+.position-absolute{
+    position: absolute !important;
+}
+
+.position-relative{
+    position: relative !important;
+}
+
+.position-fixed {
+  position: fixed !important;
+}
+
+@each $val in $distance {
+    .#{$prefixCss}top-#{$val}{
+      top: $val !important;
+    }
+
+    .#{$prefixCss}right-#{$val}{
+        right: $val !important;
+    }
+
+    .#{$prefixCss}left-#{$val}{
+        left: $val !important;
+    }
+
+    .#{$prefixCss}bottom-#{$val}{
+      bottom: $val !important;
+    }
+}
+
+@each $val in $percent {
+  .#{$prefixCss}top-#{$val}{
+    top: $val+#{'%'} !important;
+  }
+
+  .#{$prefixCss}right-#{$val}{
+      right: $val+#{'%'} !important
+  }
+
+  .#{$prefixCss}left-#{$val}{
+      left: $val+#{'%'} !important
+  }
+
+  .#{$prefixCss}bottom-#{$val}{
+    bottom: $val+#{'%'} !important
+  }
+}
+
+@each $val in $zIndex {
+  .#{$prefixCss}z-index-#{$val}{
+    z-index: $val !important;
+  }
+}

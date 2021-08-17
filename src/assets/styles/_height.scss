@@ -1,0 +1,18 @@
+@each $val in $heights {
+    .#{$prefixCss}h-#{$val}{
+      height: $val !important;
+    }
+  }
+
+@each $val in $heights {
+  .#{$prefixCss}line-height-#{$val}{
+    line-height: $val !important;
+  }
+}
+
+
+@each $val in $percent {
+  .h-#{$val}{
+    height: $val+#{'%'} !important;
+  }
+}

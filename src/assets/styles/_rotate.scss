@@ -1,0 +1,5 @@
+@each $val in $rotates {
+    .#{$prefixCss}rotate-#{$val}{
+        transform: rotate($val) !important;;
+    }
+}
