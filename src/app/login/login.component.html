@@ -1,32 +1,79 @@
-
 <div class="d-flex h-100 w-100 justify-content-center align-items-center">
-  <div class="hn-bg-ffffff hn-w-681px container">
-    <div class="hn-my-20px">
-      <div class="d-flex justify-content-center align-items-center flex-column">
-        <i nz-icon nzType="wechat" nzTheme="outline" class="hn-font-size-100px hn-color-4cb7ff"></i>
-        <p class="hn-font-size-20px hn-m-0">Live Chat</p>
+  <div class="bm-bg-ffffff bm-w-704px bm-border-radius-4px bm-border-general d-flex">
+    <div class="bm-px-32px bm-w-284px bm-bg-009cdb bm-color-ffffff">
+      <div class="d-flex justify-content-center align-items-center bm-py-24px">
+        <i nz-icon
+          nzType="fire"
+          nzTheme="outline"
+          class="bm-font-size-40px"></i>
+        <div class="bm-font-size-12px bm-ml-8px">
+          <div>Book Meeting</div>
+          <div>Solution</div>
+        </div>
+      </div>
+      <div class="bm-font-head-5s">Bạn chưa có tài khoản?</div>
+      <div class="bm-my-16px">Đăng ký ngay hôm nay để trải nghiệm dịch vụ</div>
+      <div>
+        <button nz-button
+          nzType="default"
+          (click)="handlerSignUp()">Đăng ký ngay</button>
       </div>
     </div>
-    <div class="d-flex justify-content-start align-items-center hn-my-20px flex-column">
-      <span class="hn-mb-4px w-70">Tên tài khoản</span>
-      <nz-input-group [nzPrefix]="prefixTemplateUser" class="w-70 hn-border-radius-4px">
-        <input type="text" nz-input placeholder="Nhập tên tài khoản" [(ngModel)]="user.email"/>
-      </nz-input-group>
-      <ng-template #prefixTemplateUser><i nz-icon nzType="user" class="hn-mr-5px"></i></ng-template>
-    </div>
-    <div class="d-flex justify-content-start align-items-center hn-my-20px flex-column">
-      <span class="hn-mb-4px w-70">Mật khẩu</span>
-      <nz-input-group [nzPrefix]="prefixTemplatePassword" [nzSuffix]="suffixTemplate" class="w-70 hn-border-radius-4px">
-        <input [type]="passwordVisible ? 'text' : 'password'" nz-input placeholder="Nhập mật khẩu" [(ngModel)]="user.password" />
-      </nz-input-group>
-      <ng-template #prefixTemplatePassword><i nz-icon nzType="unlock" class="hn-mr-5px"></i></ng-template>
-      <ng-template #suffixTemplate>
-        <i nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" (click)="onChangeViewPassword()"></i>
-      </ng-template>
-    </div>
-    <div class="d-flex justify-content-center align-items-center hn-my-30px">
-      <button nz-button nzType="primary" [nzLoading]="onLogin" (click)="handlerLogin()">Login</button>
-      <button nz-button nzType="primary" class="hn-ml-20px" (click)="handlerSignUp()">Sign up</button>
+    <div class="bm-px-42px bm-py-20px bm-w-420px d-flex align-items-center">
+      <div class="w-100">
+        <div class="bm-font-head-2s">ĐĂNG NHẬP</div>
+        <div class="bm-mt-8px bm-mb-20px">Bạn hãy điền tên tài khoản và mật khẩu để đăng nhập nhé.</div>
+        <form nz-form
+          [formGroup]="loginForm">
+          <nz-form-item class="bm-mb-0">
+            <nz-form-control nzErrorTip="Tài khoản không thể để trống!">
+              <nz-input-group [nzPrefix]="prefixUser">
+                <input type="text"
+                  nz-input
+                  formControlName="userName"
+                  placeholder="Tài khoản">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control nzErrorTip="Mật khẩu không thể để trống!">
+              <nz-input-group [nzPrefix]="prefixLock"
+                [nzSuffix]="suffixTemplate">
+                <input [type]="passwordVisible ? 'text' : 'password'"
+                  nz-input
+                  formControlName="password"
+                  placeholder="Mật khẩu">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control>
+              <div class="d-flex align-items-center justify-content-between">
+                <button nz-button
+                  [nzType]="'primary'"
+                  [nzLoading]="!!loading"
+                  (click)="handlerLogin()">Đăng Nhập<i nz-icon
+                    nzType="login"></i></button>
+                <button nz-button
+                  nzType="primary"
+                  (click)="handlerLoginGoogle()">
+                  <i nz-icon
+                    nzType="google"
+                    nzTheme="outline"></i>Đăng nhập bằng google</button>
+              </div>
+            </nz-form-control>
+          </nz-form-item>
+        </form>
+        <ng-template #prefixUser><i nz-icon
+            nzType="user"></i></ng-template>
+        <ng-template #prefixLock><i nz-icon
+            nzType="lock"></i></ng-template>
+        <ng-template #suffixTemplate>
+          <i nz-icon
+            [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+            (click)="onChangeViewPassword()"></i>
+        </ng-template>
+      </div>
     </div>
   </div>
 </div>

@@ -1,4 +1,6 @@
 {
   "name_placeHolder": "Vui lòng nhập tên",
-  "Focus": "Chọn"
+  "Focus": "Chọn",
+  "i18n_notification_manipulation_success": "Thao tác thành công.",
+  "i18n_notification_manipulation_not_success": "Thao tác không thành công."
 }

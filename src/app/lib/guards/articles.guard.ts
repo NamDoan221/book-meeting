@@ -17,13 +17,10 @@ import { CheckDeactivate } from '../deactivate/check-deactivate';
 @Injectable({
   providedIn: 'root',
 })
-export class ArticlesGuard
-  implements
-    CanActivate,
-    CanActivateChild,
-    CanLoad,
-    CanDeactivate<CheckDeactivate> {
-  constructor(private readonly authService: AuthService) {}
+export class ArticlesGuard implements CanActivate, CanActivateChild, CanLoad, CanDeactivate<CheckDeactivate> {
+
+  constructor(private readonly authService: AuthService) { }
+
   canDeactivate(
     component: CheckDeactivate,
     currentRoute: ActivatedRouteSnapshot,

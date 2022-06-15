@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { io } from 'socket.io-client';
 import { Observable } from 'rxjs';
 import { Message } from '../api/message';
-import { DOMAIN_SITE } from 'src/app/shared/services/base-url.define';
+import { DOMAIN_SITE } from 'src/app/lib/services/base-url.define';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { IFilter } from '../api/filter';
 
@@ -85,7 +85,7 @@ export class HnChatService {
   getGroupInfo(groupIds: string): Promise<any> {
     const params = new HttpParams({ fromString: `groups=${groupIds}` });
     return new Promise((resolve, reject) => {
-      this.http.get(`${DOMAIN_SITE()}groups/`, { params }).subscribe(result => {
+      this.http.get(`${DOMAIN_SITE()}groups`, { params }).subscribe(result => {
         resolve(result);
       }, err => {
         reject(err);
@@ -108,6 +108,16 @@ export class HnChatService {
     const params = new HttpParams({ fromString: `name=${name}` });
     return new Promise((resolve, reject) => {
       this.http.get(`${DOMAIN_SITE()}users`, { params }).subscribe(result => {
+        resolve(result);
+      }, err => {
+        reject(err);
+      });
+    });
+  }
+
+  createGroup(body: any): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(`${DOMAIN_SITE()}groups`, body).subscribe(result => {
         resolve(result);
       }, err => {
         reject(err);

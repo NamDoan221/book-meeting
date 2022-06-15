@@ -32,34 +32,35 @@
   }
 }
 
-body{
-    background-color: #f2f4f8;
-    color: #4e4e4e;
-    font-family: SFUIText-Regular,Helvetica,Arial,sans-serif;
-    font-size: 14px;
-    font-weight: normal;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    min-width: 1366px;
+body {
+  background-color: #f2f4f8;
+  color: #4e4e4e;
+  font-family: SFUIText-Regular, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  font-weight: normal;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 1366px;
 
-    #mo-animation-loading {
-      position: absolute;
-      -webkit-animation: mo-frame-loading 1s linear infinite;
-      animation: mo-frame-loading 1s linear infinite;
-      width: 220px;
-      height: 220px;
-      top: calc(50% - 110px);
-      left: calc(50% - 110px);
-      border-radius: 50%;
-      box-shadow: 0 8px 0 0 #20a8d8;
-      -webkit-transform-origin: 110px 114px;
-      transform-origin: 110px 114px;
+  #mo-animation-loading {
+    position: absolute;
+    -webkit-animation: mo-frame-loading 1s linear infinite;
+    animation: mo-frame-loading 1s linear infinite;
+    width: 220px;
+    height: 220px;
+    top: calc(50% - 110px);
+    left: calc(50% - 110px);
+    border-radius: 50%;
+    box-shadow: 0 8px 0 0 #20a8d8;
+    -webkit-transform-origin: 110px 114px;
+    transform-origin: 110px 114px;
   }
 }
 
 .#{$prefixCss}page {
-  .row,[class*="col-"] {
+  .row,
+  [class*="col-"] {
     margin: 0;
     padding: 0;
   }
@@ -88,7 +89,8 @@ body{
 }
 
 .#{$prefixCss}page-nav {
-  .row,[class*="col-"] {
+  .row,
+  [class*="col-"] {
     margin: 0;
     padding: 0;
   }

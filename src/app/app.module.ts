@@ -11,8 +11,8 @@ import { ToastrModule } from 'ngx-toastr';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { IconsProviderModule } from './shared/icon-ant/icons-provider.module';
-import { UserCanActive } from './shared/services/auth.service';
+import { IconsProviderModule } from './lib/icon-ant/icons-provider.module';
+import { UserCanActive } from './lib/services/auth.service';
 
 registerLocaleData(vi);
 

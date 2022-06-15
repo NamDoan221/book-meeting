@@ -7,11 +7,11 @@
     [nzTrigger]="null">
     <div class="sidebar-logo">
       <i nz-icon
-        nzType="wechat"
+        nzType="fire"
         nzTheme="outline"
-        class="hn-font-size-30px hn-color-ffffff"
+        class="bm-font-size-30px bm-color-ffffff"
         style="color: #ffffff;"></i>
-      <h1 class=" hn-mb-12px">Live Chat</h1>
+      <h1 class="bm-mb-12px">BM - Solution</h1>
     </div>
     <ul nz-menu
       nzTheme="dark"
@@ -19,34 +19,44 @@
       [nzInlineCollapsed]="isCollapsed">
       <li nz-submenu
         nzOpen
-        nzTitle="Dashboard"
+        nzTitle="Quản lý"
         nzIcon="user">
         <ul>
           <li nz-menu-item
             nzMatchRouter>
-            <a routerLink="chat"
-              class="hn-text-decorations-none">Chat</a>
+            <a routerLink="personnel"
+              class="bm-text-decorations-none">Nhân sự</a>
           </li>
           <li nz-menu-item
             nzMatchRouter>
-            <a routerLink="social"
-              class="hn-text-decorations-none">Social</a>
+            <a routerLink="department"
+              class="bm-text-decorations-none">Phòng, Ban</a>
+          </li>
+          <li nz-menu-item
+            nzMatchRouter>
+            <a routerLink="meeting"
+              class="bm-text-decorations-none">Phòng họp</a>
+          </li>
+          <li nz-menu-item
+            nzMatchRouter>
+            <a routerLink="meeting-schedule"
+              class="bm-text-decorations-none">Lịch họp</a>
           </li>
         </ul>
       </li>
       <li nz-submenu
         nzOpen
-        nzTitle="Setting"
+        nzTitle="Cài đặt"
         nzIcon="setting">
         <ul>
           <li nz-menu-item
             nzMatchRouter>
             <a routerLink="account"
-              class="hn-text-decorations-none">Account</a>
+              class="bm-text-decorations-none">Tài khoản</a>
           </li>
           <li nz-menu-item
             nzMatchRouter>
-            <a (click)="handlerLogout()">Logout</a>
+            <a (click)="handlerLogout()">Đăng xuất</a>
           </li>
         </ul>
       </li>

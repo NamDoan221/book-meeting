@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { ToastrService } from 'ngx-toastr';
-import { AccountRegister } from '../shared/services/api/account';
-import { AuthService } from '../shared/services/auth.service';
+import { AccountRegister } from '../lib/services/api/account';
+import { AuthService } from '../lib/services/auth.service';
 import { PassWord } from './api/password';
 
 function getBase64(file: File): Promise<string | ArrayBuffer | null> {
@@ -45,7 +45,7 @@ export class HnAccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.account = this.auth.getAccountLocalStorage();
-    this.tempAccount = {...this.account};
+    this.tempAccount = { ...this.account };
   }
 
   changeAvatar(event): void {
@@ -60,9 +60,9 @@ export class HnAccountComponent implements OnInit {
     }
     try {
       await this.auth.changePassword(this.password);
-      this.toast.success('Đổi mật khẩu thành công!');
+      this.toast.success('i18n_notification_manipulation_success');
     } catch (error) {
-      this.toast.error('Đổi mật khẩu thất bại!');
+      this.toast.error('i18n_notification_manipulation_not_success');
       console.log(error);
     }
   }
@@ -70,11 +70,11 @@ export class HnAccountComponent implements OnInit {
   async changeInfo(): Promise<void> {
     try {
       const result = await this.auth.changeInfo(this.account);
-      this.tempAccount = {...result};
+      this.tempAccount = { ...result };
       this.auth.setAccountLocalStorage(result);
-      this.toast.success('Thay đổi thông tin thành công!');
+      this.toast.success('i18n_notification_manipulation_success');
     } catch (error) {
-      this.toast.error('Thay đổi thông tin thất bại!');
+      this.toast.error('i18n_notification_manipulation_not_success');
       console.log(error);
     }
   }

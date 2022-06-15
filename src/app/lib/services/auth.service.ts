@@ -1,9 +1,11 @@
-import { PassWord } from './../../account/api/password';
+import { PassWord } from '../../account/api/password';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DOMAIN_SITE } from './base-url.define';
 import { AccountRegister, AccountUser } from './api/account';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import jwt_decode from "jwt-decode";
+import { ConstantDefines } from '../defines/constant.define';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +15,22 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router
-  ) {}
+  ) { }
+
+  public jwtDecode() {
+    try {
+      const tokenTemp: any = jwt_decode(this.getToken());
+      return tokenTemp;
+    } catch (e) {
+      this.redirectToLogin();
+      return {};
+    }
+  }
+
+  public getToken() {
+    return localStorage.getItem(ConstantDefines.TOKEN_KEY);
+  }
+
 
   public getAccountLocalStorage(): any {
     return JSON.parse(localStorage.getItem('account-info'));
@@ -44,7 +61,8 @@ export class AuthService {
 
   public login(body: AccountUser): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.post(`${DOMAIN_SITE()}api/auth/login`, body).subscribe(result => {
+      this.http.post(`${DOMAIN_SITE()}api/auth/login`, body).subscribe((result: string) => {
+        localStorage.setItem(ConstantDefines.TOKEN_KEY, result);
         return resolve(result);
       }, err => {
         reject(err);
@@ -120,7 +138,7 @@ export class UserCanActive implements CanActivate {
   constructor(
     private auth: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     let path: string = window.location.pathname === DOMAIN_SITE() ? state.url.split('?')[0] : window.location.pathname;

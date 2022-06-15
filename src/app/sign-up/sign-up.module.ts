@@ -1,22 +1,24 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HnSignUpComponent } from './sign-up.component';
-import { HnSignUpRoutingModule } from './sign-up.routing';
-import { IconsProviderModule } from '../shared/icon-ant/icons-provider.module';
+import { BmSignUpComponent } from './sign-up.component';
+import { BmSignUpRoutingModule } from './sign-up.routing';
+import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NzFormModule } from 'ng-zorro-antd/form';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    HnSignUpRoutingModule,
+    BmSignUpRoutingModule,
     IconsProviderModule,
     NzInputModule,
-    NzButtonModule
+    NzButtonModule,
+    NzFormModule
   ],
-  declarations: [HnSignUpComponent]
+  declarations: [BmSignUpComponent]
 })
-export class HnSignUpModule { }
+export class BmSignUpModule { }

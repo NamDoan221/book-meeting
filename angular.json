@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "live-chat": {
+    "book-meeting": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -22,7 +22,7 @@
               "socket.io-client",
               "lodash"
             ],
-            "outputPath": "dist/live-chat",
+            "outputPath": "dist/book-meeting",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -74,18 +74,18 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "live-chat:build"
+            "browserTarget": "book-meeting:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "live-chat:build:production"
+              "browserTarget": "book-meeting:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "live-chat:build"
+            "browserTarget": "book-meeting:build"
           }
         },
         "test": {
@@ -125,16 +125,16 @@
           "builder": "@angular-devkit/build-angular:protractor",
           "options": {
             "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "live-chat:serve"
+            "devServerTarget": "book-meeting:serve"
           },
           "configurations": {
             "production": {
-              "devServerTarget": "live-chat:serve:production"
+              "devServerTarget": "book-meeting:serve:production"
             }
           }
         }
       }
     }
   },
-  "defaultProject": "live-chat"
+  "defaultProject": "book-meeting"
 }

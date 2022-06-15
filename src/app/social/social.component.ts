@@ -1,5 +1,6 @@
 import { HnChatService } from './../chat/services/chat.service';
 import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../lib/services/auth.service';
 
 @Component({
   selector: 'hn-social',
@@ -9,10 +10,13 @@ import { Component, OnInit } from '@angular/core';
 export class HnSocialComponent implements OnInit {
 
   public users: Array<any>;
+  public userLogginName: any;
   constructor(
-    private chatService: HnChatService
+    private chatService: HnChatService,
+    private auth: AuthService
   ) {
     this.users = new Array<any>();
+    this.userLogginName = this.auth.getAccountLocalStorage();
   }
 
   ngOnInit(): void {
@@ -24,8 +28,11 @@ export class HnSocialComponent implements OnInit {
     this.users = await this.chatService.getUser(event.target.value);
   }
 
-  addFriend(event): void {
-    console.log(event);
-
+  async addFriend(event): Promise<void> {
+    const data = {
+      _id: [event._id, this.userLogginName._id],
+      name: `${event.name},${this.userLogginName.name}`
+    };
+    await this.chatService.createGroup(data);
   }
 }

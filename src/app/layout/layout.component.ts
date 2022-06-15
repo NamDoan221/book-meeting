@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '../shared/services/auth.service';
+import { AuthService } from '../lib/services/auth.service';
 
 @Component({
-  selector: 'hn-layout',
+  selector: 'bm-layout',
   templateUrl: './layout.component.html',
   styleUrls: ['./layout.component.scss']
 })
-export class HnLayoutComponent implements OnInit {
+export class BmLayoutComponent implements OnInit {
   public isCollapsed: boolean;
 
   constructor(

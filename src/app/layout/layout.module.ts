@@ -1,19 +1,19 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HnLayoutComponent } from './layout.component';
-import { HnLayoutRoutingModule } from './layout.routing';
-import { IconsProviderModule } from '../shared/icon-ant/icons-provider.module';
+import { BmLayoutComponent } from './layout.component';
+import { BmLayoutRoutingModule } from './layout.routing';
+import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 
 @NgModule({
   imports: [
     CommonModule,
-    HnLayoutRoutingModule,
+    BmLayoutRoutingModule,
     IconsProviderModule,
     NzLayoutModule,
     NzMenuModule,
   ],
-  declarations: [HnLayoutComponent]
+  declarations: [BmLayoutComponent]
 })
-export class HnLayoutModule { }
+export class BmLayoutModule { }

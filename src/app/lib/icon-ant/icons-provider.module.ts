@@ -23,7 +23,12 @@ import {
   PhoneOutline,
   UnlockOutline,
   PoweroffOutline,
-  RetweetOutline
+  RetweetOutline,
+  SlackSquareOutline,
+  GoogleOutline,
+  FireOutline,
+  LockOutline,
+  LoginOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -49,10 +54,15 @@ const icons = [
   FormOutline,
   DashboardOutline,
   MessageOutline,
+  SlackSquareOutline,
+  GoogleOutline,
+  FireOutline,
+  LockOutline,
+  LoginOutline
 ];
 @NgModule({
   imports: [NzIconModule],
   exports: [NzIconModule],
   providers: [{ provide: NZ_ICONS, useValue: icons }],
 })
-export class IconsProviderModule {}
+export class IconsProviderModule { }

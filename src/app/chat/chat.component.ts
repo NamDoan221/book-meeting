@@ -6,7 +6,7 @@ import { Group } from './api/group';
 import { HnChatService } from './services/chat.service';
 import * as moment from 'moment';
 import { Message } from './api/message';
-import { AuthService } from '../shared/services/auth.service';
+import { AuthService } from '../lib/services/auth.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { IFilter } from './api/filter';

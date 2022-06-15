@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Output, EventEmitter, ChangeDetectionStrategy, ViewRef, ChangeDetectorRef } from '@angular/core';
 import { Group } from '../api/group';
-import { AuthService } from 'src/app/shared/services/auth.service';
+import { AuthService } from 'src/app/lib/services/auth.service';
 import { cloneDeep } from 'lodash';
 import { HnChatService } from '../services/chat.service';
 import { User } from '../api/user';

@@ -1,3 +1,4 @@
+import { NzImageModule } from 'ng-zorro-antd/image';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HnAccountComponent } from './account.component';
@@ -6,9 +7,9 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzModalModule } from 'ng-zorro-antd/modal';
-import { IconsProviderModule } from '../shared/icon-ant/icons-provider.module';
+import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CardModule } from '../shared/card/card.module';
+import { CardModule } from '../lib/card/card.module';
 
 @NgModule({
   imports: [
@@ -21,7 +22,8 @@ import { CardModule } from '../shared/card/card.module';
     IconsProviderModule,
     FormsModule,
     ReactiveFormsModule,
-    CardModule
+    CardModule,
+    NzImageModule
   ],
   declarations: [HnAccountComponent]
 })

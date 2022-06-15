@@ -31,32 +31,32 @@
             // background-image: url(#{$path-sources-static}#{'icon-zalo.png'}) !important;
         }
 
-    //   .toast-mobio {
-    //     background-image: url('../assets/images/icon_social/ic_mobio.png') !important;
-    //   }
+        //   .toast-mobio {
+        //     background-image: url('../assets/images/icon_social/ic_mobio.png') !important;
+        //   }
 
-    //   .toast-mobio-message {
-    //     background-image: url('../assets/images/icon_social/ic_message.png') !important;
-    //   }
+        //   .toast-mobio-message {
+        //     background-image: url('../assets/images/icon_social/ic_message.png') !important;
+        //   }
 
         &.toast-line {
-        // background-image: url(#{$path-sources-static}#{'icon-line.png'}) !important;
+            // background-image: url(#{$path-sources-static}#{'icon-line.png'}) !important;
         }
 
-        &.toast-web-live-chat {
-        // background-image: url(#{$path-sources-static}#{'icon-web-live-chat.svg'}) !important;
+        &.toast-web-book-meeting {
+            // background-image: url(#{$path-sources-static}#{'icon-web-book-meeting.svg'}) !important;
         }
     }
 
     .toast-social {
-      background-color: #fff !important;
-      border-left: 8px solid #009cdb;
-      color: #4e4e4e;
-      font-size: 14px;
-      background-repeat: no-repeat;
-      background-size: 24px auto;
-      background-position: 15px center;
-      pointer-events: visible;
+        background-color: #fff !important;
+        border-left: 8px solid #009cdb;
+        color: #4e4e4e;
+        font-size: 14px;
+        background-repeat: no-repeat;
+        background-size: 24px auto;
+        background-position: 15px center;
+        pointer-events: visible;
     }
 
     .toast-success {
@@ -74,4 +74,4 @@
     .toast-warning {
         background-color: #fabb3d;
     }
-  }
+}
