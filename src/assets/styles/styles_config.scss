@@ -85,7 +85,12 @@ $text-transform: uppercase lowercase;
   font-size: 12px !important;
   height: 28px;
 }
-
+label {
+  margin: 0 !important;
+}
+.ant-form-item-explain {
+  min-height: auto;
+}
 .#{$prefixCss}disable {
   pointer-events: none;
   cursor: default;

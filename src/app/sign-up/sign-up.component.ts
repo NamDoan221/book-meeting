@@ -32,14 +32,14 @@ export class BmSignUpComponent implements OnInit {
       avatar: '',
       phone: ''
     };
-  }
-
-  ngOnInit(): void {
     this.signUpForm = this.fb.group({
       userName: [null, [Validators.required]],
       password: [null, [Validators.required]],
       confirm_password: [null, [Validators.required, this.confirmationValidator]]
     });
+  }
+
+  ngOnInit(): void {
   }
 
 

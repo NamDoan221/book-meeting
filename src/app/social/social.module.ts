@@ -6,7 +6,7 @@ import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CardModule } from '../lib/card/card.module';
+import { BmLibCardModule } from '../lib/card/card.module';
 import { HnSocialComponent } from './social.component';
 import { HnSocialRoutingModule } from './social.routing';
 import { HnChatService } from '../chat/services/chat.service';
@@ -21,7 +21,7 @@ import { HnChatService } from '../chat/services/chat.service';
     IconsProviderModule,
     FormsModule,
     ReactiveFormsModule,
-    CardModule,
+    BmLibCardModule,
     HnSocialRoutingModule
   ],
   declarations: [HnSocialComponent],

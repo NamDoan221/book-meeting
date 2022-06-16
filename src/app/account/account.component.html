@@ -1,13 +1,13 @@
-<div class="d-flex h-100 hn-bg-ffffff flex-column hn-p-40px">
+<div class="d-flex h-100 bm-bg-ffffff flex-column bm-p-40px bm-overflow-auto">
   <div class="d-flex">
-    <div class="hn-h-150px hn-w-150px">
+    <div class="bm-h-150px bm-w-150px">
       <img nz-image
         class="h-100 w-100 account-img"
         [nzSrc]="tempAccount.avatar"
         alt="">
     </div>
-    <div class="hn-ml-20px d-flex flex-column justify-content-center">
-      <div class="hn-mb-8px">
+    <div class="bm-ml-20px d-flex flex-column justify-content-center">
+      <div class="bm-mb-8px">
         <span>{{tempAccount.name}}</span>
       </div>
       <div>
@@ -24,99 +24,179 @@
       </div>
     </div>
   </div>
-  <div class="d-flex hn-mt-40px">
-    <div class="w-50 hn-mr-12px">
-      <hn-shared-card [labelTitle]="'Thông tin chung'">
-        <div class="d-flex flex-column">
-          <span class="hn-mb-4px">Tên tài khoản (Email)</span>
-          <nz-input-group class="w-100">
-            <input type="text"
-              class="hn-readonly hn-border-radius-4px"
-              nz-input
-              placeholder="Nhập tên tài khoản"
-              [(ngModel)]="account.email" />
-          </nz-input-group>
-        </div>
-        <div class="d-flex flex-column hn-mt-20px">
-          <span class="hn-mb-4px">Họ và tên</span>
-          <nz-input-group class="w-100">
-            <input type="text"
-              class="hn-border-radius-4px"
-              nz-input
-              placeholder="Nhập họ và tên"
-              [(ngModel)]="account.name" />
-          </nz-input-group>
-        </div>
-        <div class="d-flex flex-column hn-mt-20px">
-          <span class="hn-mb-4px">Số điện thoại</span>
-          <nz-input-group class="w-100">
-            <input type="text"
-              class="hn-border-radius-4px"
-              nz-input
-              placeholder="Nhập số điện thoại"
-              [(ngModel)]="account.phone" />
-          </nz-input-group>
-        </div>
-        <div class="d-flex justify-content-end hn-mt-20px">
-          <button nz-button
-            nzType="primary"
-            (click)="changeInfo()">Cập nhật</button>
-        </div>
-      </hn-shared-card>
+  <div class="d-flex bm-mt-40px">
+    <div class="w-50 bm-mr-12px">
+      <bm-lib-card [labelTitle]="'Thông tin chung'">
+        <form nz-form
+          [formGroup]="accountForm">
+          <nz-form-item class="bm-mb-0">
+            <nz-form-control>
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'accountId'">
+                Mã nhân viên
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="accountId"
+                  placeholder="Nhập mã nhân viên">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control>
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'accountName'">
+                Tên tài khoản
+              </nz-form-label>
+              <nz-input-group>
+                <input [type]="'text'"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="accountName"
+                  placeholder="Nhập tên tài khoản">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control nzErrorTip="Họ và tên không thể để trống!">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'userName'">
+                Họ và tên
+              </nz-form-label>
+              <nz-input-group>
+                <input [type]="'text'"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="userName"
+                  placeholder="Nhập họ và tên">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control [nzErrorTip]="phoneErrorTip">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'phoneNumber'">
+                Số điện thoại
+              </nz-form-label>
+              <nz-input-group>
+                <input [type]="'text'"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="phoneNumber"
+                  placeholder="Nhập số điện thoại">
+              </nz-input-group>
+              <ng-template #phoneErrorTip
+                let-control>
+                <span class="font-size-11"
+                  *ngIf="control.hasError('required')">Số điện thoại không thể để trống!</span>
+                <span class="font-size-11"
+                  *ngIf="control.hasError('pattern') || control.hasError('maxlength') || control.hasError('minlength')">
+                  Số điện thoại không đúng định dạng!
+                </span>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+          <div class="d-flex justify-content-end bm-mt-20px">
+            <button nz-button
+              nzType="primary"
+              [nzLoading]="!!loading"
+              (click)="handlerChangeInfo()">Cập nhật</button>
+          </div>
+        </form>
+      </bm-lib-card>
     </div>
-    <div class="w-50 hn-ml-12px">
-      <hn-shared-card [labelTitle]="'Đổi mật khẩu'">
-        <div class="d-flex flex-column">
-          <span class="hn-mb-4px">Mật khẩu hiện tại</span>
-          <nz-input-group [nzSuffix]="suffixTemplateOldPassword"
-            class="w-100 hn-border-radius-4px">
-            <input [type]="oldPasswordVisible ? 'text' : 'password'"
-              nz-input
-              placeholder="Nhập mật khẩu hiện tại"
-              [(ngModel)]="password.old_password" />
-          </nz-input-group>
-          <ng-template #suffixTemplateOldPassword>
-            <i nz-icon
-              [nzType]="oldPasswordVisible ? 'eye-invisible' : 'eye'"
-              (click)="changeViewPass('oldPassword')"></i>
-          </ng-template>
-        </div>
-        <div class="d-flex flex-column hn-mt-20px">
-          <span class="hn-mb-4px">Mật khẩu</span>
-          <nz-input-group [nzSuffix]="suffixTemplateNewPassword"
-            class="w-100 hn-border-radius-4px">
-            <input [type]="newPasswordVisible ? 'text' : 'password'"
-              nz-input
-              placeholder="Nhập mật khẩu mới"
-              [(ngModel)]="password.new_password" />
-          </nz-input-group>
-          <ng-template #suffixTemplateNewPassword>
-            <i nz-icon
-              [nzType]="newPasswordVisible ? 'eye-invisible' : 'eye'"
-              (click)="changeViewPass('newPassword')"></i>
-          </ng-template>
-        </div>
-        <div class="d-flex flex-column hn-mt-20px">
-          <span class="hn-mb-4px">Xác nhận mật khẩu</span>
-          <nz-input-group [nzSuffix]="suffixTemplateReNewPassword"
-            class="w-100 hn-border-radius-4px">
-            <input [type]="reNewPasswordVisible ? 'text' : 'password'"
-              nz-input
-              placeholder="Nhập lại mật khẩu mới"
-              [(ngModel)]="password.renew_password" />
-          </nz-input-group>
-          <ng-template #suffixTemplateReNewPassword>
-            <i nz-icon
-              [nzType]="reNewPasswordVisible ? 'eye-invisible' : 'eye'"
-              (click)="changeViewPass('reNewPassword')"></i>
-          </ng-template>
-        </div>
-        <div class="d-flex justify-content-end hn-mt-20px">
-          <button nz-button
-            nzType="primary"
-            (click)="changePassword()">Cập nhật</button>
-        </div>
-      </hn-shared-card>
+    <div class="w-50 bm-ml-12px">
+      <bm-lib-card [labelTitle]="'Đổi mật khẩu'">
+        <form class="h-100"
+          nz-form
+          [formGroup]="passwordForm">
+          <div class="h-100 d-flex flex-column justify-content-between">
+            <div>
+              <nz-form-item class="bm-mb-0">
+                <nz-form-control nzErrorTip="Mật khẩu hiện tại không thể để trống!">
+                  <nz-form-label [nzNoColon]="true"
+                    [nzFor]="'current_password'">
+                    Mật khẩu hiện tại
+                  </nz-form-label>
+                  <nz-input-group [nzSuffix]="suffixTemplateCurrentPassword">
+                    <input [type]="currentPasswordVisible ? 'text' : 'password'"
+                      nz-input
+                      class="bm-border-radius-4px"
+                      formControlName="current_password"
+                      placeholder="Nhập mật khẩu hiện tại">
+                  </nz-input-group>
+                  <ng-template #suffixTemplateCurrentPassword>
+                    <i nz-icon
+                      [nzType]=" currentPasswordVisible? 'eye-invisible' : 'eye'"
+                      (click)="changeViewPass('currentPassword')"></i>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item class="bm-mt-16px bm-mb-0">
+                <nz-form-control nzErrorTip="Mật khẩu mới không thể để trống!">
+                  <div class="bm-mb-4px d-flex align-items-center justify-content-between">
+                    <nz-form-label [nzNoColon]="true"
+                      [nzFor]="'new_password'">
+                      Mật khẩu mới
+                    </nz-form-label>
+                    <div class="bm-color-009cdb bm-cursor-pointer"
+                      (click)="handlerRandomPassword($event)">Sinh mật khẩu</div>
+                  </div>
+                  <nz-input-group [nzSuffix]="suffixTemplateNewPassword">
+                    <input [type]="newPasswordVisible ? 'text' : 'password'"
+                      nz-input
+                      class="bm-border-radius-4px"
+                      formControlName="new_password"
+                      placeholder="Nhập mật khẩu mới">
+                  </nz-input-group>
+                  <ng-template #suffixTemplateNewPassword>
+                    <i nz-icon
+                      [nzType]="newPasswordVisible ? 'eye-invisible' : 'eye'"
+                      (click)="changeViewPass('newPassword')"></i>
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+              <nz-form-item class="bm-mt-16px bm-mb-0">
+                <nz-form-control [nzErrorTip]="rePasswordErrorTip">
+                  <nz-form-label [nzNoColon]="true"
+                    [nzFor]="'renew_password'">
+                    Xác nhận mật khẩu
+                  </nz-form-label>
+                  <nz-input-group [nzSuffix]="suffixTemplateReNewPassword">
+                    <input [type]="reNewPasswordVisible ? 'text' : 'password'"
+                      nz-input
+                      class="bm-border-radius-4px"
+                      formControlName="renew_password"
+                      placeholder="Nhập lại mật khẩu mới">
+                  </nz-input-group>
+                  <ng-template #rePasswordErrorTip
+                    let-control>
+                    <span class="font-size-11"
+                      *ngIf="control.hasError('required')">Mật khẩu xác nhận không thể để trống!</span>
+                    <span class="font-size-11"
+                      *ngIf="control.hasError('confirm')">
+                      Mật khẩu xác nhận không trùng khớp!
+                    </span>
+                  </ng-template>
+                </nz-form-control>
+                <ng-template #suffixTemplateReNewPassword>
+                  <i nz-icon
+                    [nzType]="reNewPasswordVisible ? 'eye-invisible' : 'eye'"
+                    (click)="changeViewPass('reNewPassword')"></i>
+                </ng-template>
+              </nz-form-item>
+            </div>
+            <div class="d-flex justify-content-end bm-mt-20px">
+              <button nz-button
+                nzType="primary"
+                [nzLoading]="!!loadingChangePass"
+                (click)="changePassword()">Cập nhật</button>
+            </div>
+          </div>
+        </form>
+      </bm-lib-card>
     </div>
   </div>
 </div>

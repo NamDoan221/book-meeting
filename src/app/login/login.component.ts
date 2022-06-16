@@ -23,13 +23,13 @@ export class BmLoginComponent implements OnInit {
   ) {
     this.loading = false;
     this.passwordVisible = false;
-  }
-
-  ngOnInit(): void {
     this.loginForm = this.fb.group({
       userName: [null, [Validators.required]],
       password: [null, [Validators.required]]
     });
+  }
+
+  ngOnInit(): void {
   }
 
   async handlerLogin() {

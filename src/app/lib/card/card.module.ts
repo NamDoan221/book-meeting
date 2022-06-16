@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CardComponent } from './card.component';
+import { BmLibCardComponent } from './card.component';
 
 @NgModule({
   imports: [
     CommonModule
   ],
-  declarations: [CardComponent],
-  exports: [CardComponent]
+  declarations: [BmLibCardComponent],
+  exports: [BmLibCardComponent]
 })
-export class CardModule { }
+export class BmLibCardModule { }
