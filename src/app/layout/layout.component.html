@@ -11,55 +11,27 @@
         nzTheme="outline"
         class="bm-font-size-30px bm-color-ffffff"
         style="color: #ffffff;"></i>
-      <h1 class="bm-mb-12px">BM - Solution</h1>
+      <h1 class="bm-mb-12px">BMS</h1>
     </div>
     <ul nz-menu
       nzTheme="dark"
       nzMode="inline"
       [nzInlineCollapsed]="isCollapsed">
-      <li nz-submenu
-        nzOpen
-        nzTitle="Quản lý"
-        nzIcon="user">
-        <ul>
-          <li nz-menu-item
-            nzMatchRouter>
-            <a routerLink="personnel"
-              class="bm-text-decorations-none">Nhân sự</a>
-          </li>
-          <li nz-menu-item
-            nzMatchRouter>
-            <a routerLink="department"
-              class="bm-text-decorations-none">Phòng, Ban</a>
-          </li>
-          <li nz-menu-item
-            nzMatchRouter>
-            <a routerLink="meeting"
-              class="bm-text-decorations-none">Phòng họp</a>
-          </li>
-          <li nz-menu-item
-            nzMatchRouter>
-            <a routerLink="meeting-schedule"
-              class="bm-text-decorations-none">Lịch họp</a>
-          </li>
-        </ul>
-      </li>
-      <li nz-submenu
-        nzOpen
-        nzTitle="Cài đặt"
-        nzIcon="setting">
-        <ul>
-          <li nz-menu-item
-            nzMatchRouter>
-            <a routerLink="account"
-              class="bm-text-decorations-none">Tài khoản</a>
-          </li>
-          <li nz-menu-item
-            nzMatchRouter>
-            <a (click)="handlerLogout()">Đăng xuất</a>
-          </li>
-        </ul>
-      </li>
+      <ng-container *ngFor="let menu of menuData">
+        <li nz-submenu
+          nzOpen
+          [nzTitle]="menu.label"
+          [nzIcon]="menu.icon">
+          <ul *ngIf="menu && menu.items && menu.items.length">
+            <ng-container *ngFor="let item of menu.items">
+              <li nz-menu-item
+                (click)="handlerRouting($event, item.url)">
+                {{item.label}}
+              </li>
+            </ng-container>
+          </ul>
+        </li>
+      </ng-container>
     </ul>
   </nz-sider>
   <nz-layout>

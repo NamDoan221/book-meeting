@@ -1,0 +1,56 @@
+<div class="w-100 h-100 d-flex flex-column">
+  <div class="d-flex align-items-center">
+    <div class="bm-font-head-2s bm-mr-40px">Nhân viên</div>
+    <button nz-button
+      nzType="primary"
+      (click)="handlerAddPersonnel($event)">
+      <i nz-icon
+        nzType="plus"
+        nzTheme="outline"></i>Thêm nhân viên</button>
+  </div>
+  <div class="h-100 bm-mt-12px">
+    <nz-table #departmentTable
+      [nzScroll]="{ y: 'calc(100vh - 235px)' }"
+      [nzFrontPagination]="false"
+      [nzData]="listPersonnel"
+      [nzTotal]="total"
+      [nzPageSize]="pageSize"
+      [nzPageIndex]="pageIndexGroup"
+      [nzNoResult]="empty"
+      [nzLoading]="loading"
+      [nzShowTotal]="totalTemplate"
+      [nzSize]="'middle'"
+      [nzBordered]="true"
+      nzPaginationType="small"
+      (nzQueryParams)="handlerQueryParamsChange($event)">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columnConfig"
+            [nzAlign]="'left'"
+            class="bm-font-head-4s">
+            {{ column }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of departmentTable.data;  let i=index">
+          <td class="bm-color-009cdb bm-cursor-pointer"
+            (click)="handlerEditPersonnel($event, item)">{{item.name}}</td>
+          <td>{{item.address}}</td>
+          <td>{{item.gender}}</td>
+          <td>{{item.phone_number}}</td>
+          <td>{{item.department}}</td>
+          <td>{{item.position}}</td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<ng-template #empty>
+  <nz-empty nzNotFoundImage="simple"
+    nzNotFoundContent="Không có dữ liệu"></nz-empty>
+</ng-template>
+
+<ng-template #totalTemplate
+  let-total>Tổng cộng {{ total }} bản ghi</ng-template>

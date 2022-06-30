@@ -1,0 +1,123 @@
+<div class="w-100 h-100 d-flex">
+  <div class="h-100"
+    [ngClass]="{'w-100': !modeEdit, 'w-25': modeEdit, 'bm-pr-24px': modeEdit}">
+    <form nz-form
+      class="w-100 h-100"
+      [formGroup]="personnelForm">
+      <div class="h-100 w-100 d-flex flex-column justify-content-between">
+        <div>
+          <nz-form-item class="bm-mb-0">
+            <nz-form-control nzErrorTip="Tên nhân viên không thể để trống!">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'name'">
+                Tên nhân viên
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="name"
+                  placeholder="Nhập tên nhân viên">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control nzErrorTip="Địa chỉ không thể để trống!">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'address'">
+                Địa chỉ
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="address"
+                  placeholder="Nhập địa chỉ">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control [nzErrorTip]="'Số điện thoại không đúng định dạng!'">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'phone_number'">
+                Số điện thoại
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="phone_number"
+                  placeholder="Nhập số điện thoại">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control [nzErrorTip]="'Giới tính không thể để trống!'">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'gender'">
+                Giới tính
+              </nz-form-label>
+              <div>
+                <nz-radio-group formControlName="gender">
+                  <label nz-radio
+                    nzValue="male">Nam</label>
+                  <label nz-radio
+                    nzValue="female">Nữ</label>
+                  <label nz-radio
+                    nzValue="other">Khác</label>
+                </nz-radio-group>
+              </div>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control>
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'department'">
+                Phòng ban
+              </nz-form-label>
+              <nz-select [nzShowSearch]="true"
+                [formControlName]="'department'"
+                [nzPlaceHolder]="'Chọn phòng ban'"
+                [nzNotFoundContent]="'Không có dữ liệu'"
+                (nzScrollToBottom)="handlerScrollBottom($event)">
+                <nz-option *ngFor="let item of listDepartment"
+                  [nzValue]="item.name"
+                  [nzLabel]="item.name">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control nzErrorTip="Chức vụ không thể để trống!">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'position'">
+                Chức vụ
+              </nz-form-label>
+              <nz-select [nzShowSearch]="true"
+                [formControlName]="'position'"
+                [nzPlaceHolder]="'Chọn chức vụ'"
+                [nzNotFoundContent]="'Không có dữ liệu'"
+                (nzScrollToBottom)="handlerScrollBottom($event)">
+                <nz-option *ngFor="let item of listPosition"
+                  [nzValue]="item.key"
+                  [nzLabel]="item.name">
+                </nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <div class="d-flex justify-content-end bm-mt-20px">
+          <button nz-button
+            nzType="primary"
+            [nzLoading]="!!loading"
+            (click)="handlerUpdate($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="h-100 w-75 bm-border-left-general bm-pl-24px d-flex flex-column"
+    *ngIf="modeEdit">
+    <div class="bm-mb-12px">Danh sách cuộc họp</div>
+    <div class="bm-border-general h-100 w-100">ere</div>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<div class="w-100 h-100 d-flex flex-column">
+  <div class="d-flex align-items-center">
+    <div class="bm-font-head-2s bm-mr-40px">Phòng họp</div>
+    <button nz-button
+      nzType="primary"
+      (click)="handlerAddMeetingRoom($event)">
+      <i nz-icon
+        nzType="plus"
+        nzTheme="outline"></i>Thêm phòng họp</button>
+  </div>
+  <div class="h-100 bm-mt-12px">
+    <nz-table #meetingRoomTable
+      [nzScroll]="{ y: 'calc(100vh - 235px)' }"
+      [nzFrontPagination]="false"
+      [nzData]="listMeetingRoom"
+      [nzTotal]="total"
+      [nzPageSize]="pageSize"
+      [nzPageIndex]="pageIndexGroup"
+      [nzNoResult]="empty"
+      [nzLoading]="loading"
+      [nzShowTotal]="totalTemplate"
+      [nzSize]="'middle'"
+      [nzBordered]="true"
+      nzShowPagination
+      nzPaginationType="small"
+      (nzQueryParams)="handlerQueryParamsChange($event)">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columnConfig"
+            [nzAlign]="'left'"
+            class="bm-font-head-4s">
+            {{ column }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of meetingRoomTable.data;  let i=index">
+          <td class="bm-color-009cdb bm-cursor-pointer"
+            (click)="handlerEditMeetingRoom($event, item)">{{item.name}}</td>
+          <td>{{item.maximum_capacity}}</td>
+          <td>
+            <div class="bm-h-22px bm-overflow-hidden text-truncate">
+              <span nz-tooltip
+                [nzTooltipTitle]="descriptionTemplate"
+                [nzTooltipTitleContext]="{ $implicit: item.description }">
+                {{item.description}}
+              </span>
+            </div>
+            <ng-template #descriptionTemplate
+              let-description>
+              <div class="bm-w-300px bm-max-h-100px bm-overflow-auto">{{ description }}</div>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<ng-template #empty>
+  <nz-empty nzNotFoundImage="simple"
+    nzNotFoundContent="Không có dữ liệu"></nz-empty>
+</ng-template>
+
+<ng-template #totalTemplate
+  let-total>Tổng cộng {{ total }} bản ghi</ng-template>

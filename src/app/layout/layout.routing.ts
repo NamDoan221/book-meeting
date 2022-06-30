@@ -7,17 +7,27 @@ const routes: Routes = [
     path: '',
     component: BmLayoutComponent,
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'chat' },
+      { path: '', pathMatch: 'full', redirectTo: 'account' },
       {
-        path: 'chat',
+        path: 'personnel',
         loadChildren: () =>
-          import('../chat/chat.module').then((m) => m.HnChatModule),
+          import('../personnel/personnel.module').then((m) => m.BmPersonnelModule),
       },
       {
-        path: 'social',
+        path: 'department',
         loadChildren: () =>
-          import('../social/social.module').then((m) => m.HnSocialModule),
+          import('../department/department.module').then((m) => m.BmDepartmentModule),
       },
+      {
+        path: 'meeting-room',
+        loadChildren: () =>
+          import('../meeting-room/meeting-room.module').then((m) => m.BmMeetingRoomModule),
+      },
+      // {
+      //   path: 'meeting-schedule',
+      //   loadChildren: () =>
+      //     import('../department/department.module').then((m) => m.HnSocialModule),
+      // },
       {
         path: 'account',
         loadChildren: () =>

@@ -1,0 +1,68 @@
+<div class="w-100 h-100 d-flex flex-column">
+  <div class="d-flex align-items-center">
+    <div class="bm-font-head-2s bm-mr-40px">Phòng ban</div>
+    <button nz-button
+      nzType="primary"
+      (click)="handlerAddDepartment($event)">
+      <i nz-icon
+        nzType="plus"
+        nzTheme="outline"></i>Thêm phòng ban</button>
+  </div>
+  <div class="h-100 bm-mt-12px">
+    <nz-table #departmentTable
+      [nzScroll]="{ y: 'calc(100vh - 235px)' }"
+      [nzFrontPagination]="false"
+      [nzData]="listDepartment"
+      [nzTotal]="total"
+      [nzPageSize]="pageSize"
+      [nzPageIndex]="pageIndexGroup"
+      [nzNoResult]="empty"
+      [nzLoading]="loading"
+      [nzShowTotal]="totalTemplate"
+      [nzSize]="'middle'"
+      [nzBordered]="true"
+      nzPaginationType="small"
+      (nzQueryParams)="handlerQueryParamsChange($event)">
+      <thead>
+        <tr>
+          <th *ngFor="let column of columnConfig"
+            [nzWidth]="column === 'Thành viên' ? '200px' : 'auto'"
+            [nzAlign]="'left'"
+            class="bm-font-head-4s">
+            {{ column }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of departmentTable.data;  let i=index">
+          <td class="bm-color-009cdb bm-cursor-pointer"
+            (click)="handlerEditDepartment($event, item)">{{item.name}}</td>
+          <td>{{item.manager}}</td>
+          <td class="bm-color-009cdb bm-cursor-pointer"
+            (click)="handlerViewMember($event, item.name)">{{item.member.length}}</td>
+          <td>
+            <div class="bm-h-22px bm-overflow-hidden text-truncate">
+              <span nz-tooltip
+                [nzTooltipTitle]="descriptionTemplate"
+                [nzTooltipTitleContext]="{ $implicit: item.description }">
+                {{item.description}}
+              </span>
+            </div>
+            <ng-template #descriptionTemplate
+              let-description>
+              <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<ng-template #empty>
+  <nz-empty nzNotFoundImage="simple"
+    nzNotFoundContent="Không có dữ liệu"></nz-empty>
+</ng-template>
+
+<ng-template #totalTemplate
+  let-total>Tổng cộng {{ total }} bản ghi</ng-template>

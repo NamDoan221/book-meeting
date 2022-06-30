@@ -4,17 +4,7 @@ import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { ToastrService } from 'ngx-toastr';
 import { AccountRegister } from '../lib/services/api/account';
 import { AuthService } from '../lib/services/auth.service';
-import { PassWord } from './api/password';
-
-function getBase64(file: File): Promise<string | ArrayBuffer | null> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
-
+import { IPassWord } from './interfaces/password.interfaces';
 @Component({
   selector: 'bm-account',
   templateUrl: './account.component.html',

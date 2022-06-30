@@ -1,4 +1,4 @@
-import { PassWord } from '../../account/api/password';
+import { IPassWord } from '../../account/interfaces/password.interfaces';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DOMAIN_SITE } from './base-url.define';
@@ -90,7 +90,7 @@ export class AuthService {
     });
   }
 
-  public changePassword(password: PassWord): Promise<any> {
+  public changePassword(password: IPassWord): Promise<any> {
     const options = this.createHeaderOption();
     return new Promise((resolve, reject) => {
       this.http.put(`${DOMAIN_SITE()}api/auth/change-pass`, password, options).subscribe(result => {
