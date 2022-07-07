@@ -117,7 +117,71 @@
   </div>
   <div class="h-100 w-75 bm-border-left-general bm-pl-24px d-flex flex-column"
     *ngIf="modeEdit">
-    <div class="bm-mb-12px">Danh sách cuộc họp</div>
-    <div class="bm-border-general h-100 w-100">ere</div>
+    <div>Danh sách cuộc họp</div>
+    <div class="h-100 w-100 position-relative">
+      <div class="w-100 h-100 position-absolute">
+        <nz-tabset class="h-100"
+          [(nzSelectedIndex)]="selectedTab"
+          (nzSelectChange)="handlerTabChange($event)">
+          <nz-tab *ngFor="let tab of tabs"
+            [nzTitle]="tab.title">
+            <ng-template nz-tab>
+              <nz-table #meetingTable
+                class="h-100"
+                [nzScroll]="{ y: 'calc(100vh - 285px)' }"
+                [nzFrontPagination]="false"
+                [nzData]="listMeeting"
+                [nzTotal]="total"
+                [nzPageSize]="pageSize"
+                [nzPageIndex]="pageIndexGroup"
+                [nzNoResult]="empty"
+                [nzLoading]="loading"
+                [nzShowTotal]="totalTemplate"
+                [nzSize]="'middle'"
+                [nzBordered]="true"
+                nzPaginationType="small"
+                (nzQueryParams)="handlerQueryParamsChange($event)">
+                <thead>
+                  <tr>
+                    <th *ngFor="let column of columnConfig"
+                      [nzAlign]="'left'"
+                      class="bm-font-head-4s">
+                      {{ column }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of meetingTable.data;  let i=index">
+                    <td>{{item.name}}</td>
+                    <td>{{item.date_time}}</td>
+                    <td>{{item.total_participation}}</td>
+                    <td>
+                      <div class="bm-overflow-hidden text-truncate">
+                        <span nz-tooltip
+                          [nzTooltipTitle]="descriptionTemplate"
+                          [nzTooltipTitleContext]="{ $implicit: item.description }">
+                          {{item.description}}
+                        </span>
+                      </div>
+                      <ng-template #descriptionTemplate
+                        let-description>
+                        <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
+                      </ng-template>
+                    </td>
+                  </tr>
+                </tbody>
+              </nz-table>
+            </ng-template>
+          </nz-tab>
+        </nz-tabset>
+      </div>
+    </div>
   </div>
-</div>
+
+  <ng-template #empty>
+    <nz-empty nzNotFoundImage="simple"
+      nzNotFoundContent="Không có dữ liệu"></nz-empty>
+  </ng-template>
+
+  <ng-template #totalTemplate
+    let-total>Tổng cộng {{ total }} bản ghi</ng-template>

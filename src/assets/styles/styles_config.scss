@@ -18,8 +18,8 @@ $max-min-heights: auto 16px 18px 30px 35px 43px 45px 72px 78px 104px 132px 150px
 $widths: auto 1px 6px 8px 10px 12px 14px 16px 18px 20px 22px 24px 28px 30px 32px 35px 36px 38px 40px 48px 50px 54px 60px
   70px 72px 75px 82px 80vw 90vw 96px 100px 104px 112px 128px 130px 140px 150px 160px 165px 170px 176px 180px 190px 200px
   205px 214px 216px 226px 250px 265px 268px 276px 277px 282px 284px 290px 302px 303px 304px 320px 330px 338px 348px
-  360px 364px 370px 380px 384px 398px 400px 412px 419px 420px 426px 432px 440px 450px 460px 464px 470px 490px 500px
-  510px 520px 549px 604px 643px 657px 681px 704px 732px 756px 762px 795px 800px 838px 890px 1066px;
+  350px 360px 364px 370px 380px 384px 398px 400px 412px 419px 420px 426px 432px 440px 450px 460px 464px 470px 490px
+  500px 503px 510px 520px 549px 604px 643px 657px 681px 704px 732px 756px 762px 795px 800px 838px 890px 1066px;
 $max-min-widths: auto 30px 35px 104px 110px 130px 160px 168px 200px 220px 255px 257px 260px 290px 300px 302px 320px
   348px 395px 400px 577px 600px 670px 704px 708px 800px 894px 981px 1066px 1336px;
 $box-shadow-block: 0 1px 2px 0 rgba(78, 78, 78, 0.3);
@@ -28,7 +28,7 @@ $flex-align-items: baseline center end start left right unset;
 $flex-direction: column row;
 $colors: eee ff5454 4a4a4a 29c7cc 5db200 ffffff 6fd100 4cb7ff 009cdb fbb107 c4c4c4 e6e8ed e6eef5 ebf1fa f7f8fa e5e5e5
   f44336 f57c00 fbc02d 7ed321 5cae22 7b4eff 6de01b 2e92ff 007dff f8fcff 8657ff ebf0f5 ffc500 5ece0d ff5667 8358cb 4a6da7
-  f2f4f8 ff6e6e 4d70a9 f2f5f7 19344a 008547 606060 f1f0f0 f9fbfc f85061 6F44E9 c9c9c9 10a4b3 000;
+  f2f4f8 ff6e6e 4d70a9 f2f5f7 19344a 008547 606060 f1f0f0 f9fbfc f85061 6F44E9 c9c9c9 10a4b3 000 1890ff;
 $colors-start-double-zero: baa4 9cdb b7ff;
 $cursor: pointer default text move copy help none;
 $word-breaks: break-word;
@@ -88,8 +88,11 @@ $text-transform: uppercase lowercase;
 label {
   margin: 0 !important;
 }
+.ant-picker-input > input {
+  font-size: 12px !important;
+}
 .ant-form-item-explain {
-  min-height: auto;
+  min-height: auto !important;
 }
 .ant-drawer-close:focus {
   outline: none !important;

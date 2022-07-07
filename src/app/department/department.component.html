@@ -1,16 +1,28 @@
 <div class="w-100 h-100 d-flex flex-column">
-  <div class="d-flex align-items-center">
-    <div class="bm-font-head-2s bm-mr-40px">Phòng ban</div>
-    <button nz-button
-      nzType="primary"
-      (click)="handlerAddDepartment($event)">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex">
+      <div class="bm-font-head-2s bm-mr-40px">Phòng ban</div>
+      <button nz-button
+        nzType="primary"
+        (click)="handlerAddDepartment($event)">
+        <i nz-icon
+          nzType="plus"
+          nzTheme="outline"></i>Thêm phòng ban</button>
+    </div>
+    <nz-input-group class="bm-max-w-503px"
+      [nzSuffix]="suffixIconSearch">
+      <input type="text"
+        nz-input
+        placeholder="Tìm theo tên phòng ban" />
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
       <i nz-icon
-        nzType="plus"
-        nzTheme="outline"></i>Thêm phòng ban</button>
+        nzType="search"></i>
+    </ng-template>
   </div>
   <div class="h-100 bm-mt-12px">
     <nz-table #departmentTable
-      [nzScroll]="{ y: 'calc(100vh - 235px)' }"
+      [nzScroll]="{ y: 'calc(100vh - 214px)' }"
       [nzFrontPagination]="false"
       [nzData]="listDepartment"
       [nzTotal]="total"
@@ -41,7 +53,7 @@
           <td class="bm-color-009cdb bm-cursor-pointer"
             (click)="handlerViewMember($event, item.name)">{{item.member.length}}</td>
           <td>
-            <div class="bm-h-22px bm-overflow-hidden text-truncate">
+            <div class="bm-overflow-hidden text-truncate">
               <span nz-tooltip
                 [nzTooltipTitle]="descriptionTemplate"
                 [nzTooltipTitleContext]="{ $implicit: item.description }">

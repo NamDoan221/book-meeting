@@ -1,16 +1,28 @@
 <div class="w-100 h-100 d-flex flex-column">
-  <div class="d-flex align-items-center">
-    <div class="bm-font-head-2s bm-mr-40px">Nhân viên</div>
-    <button nz-button
-      nzType="primary"
-      (click)="handlerAddPersonnel($event)">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex">
+      <div class="bm-font-head-2s bm-mr-40px">Nhân viên</div>
+      <button nz-button
+        nzType="primary"
+        (click)="handlerAddPersonnel($event)">
+        <i nz-icon
+          nzType="plus"
+          nzTheme="outline"></i>Thêm nhân viên</button>
+    </div>
+    <nz-input-group class="bm-max-w-503px"
+      [nzSuffix]="suffixIconSearch">
+      <input type="text"
+        nz-input
+        placeholder="Tìm theo tên nhân viên" />
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
       <i nz-icon
-        nzType="plus"
-        nzTheme="outline"></i>Thêm nhân viên</button>
+        nzType="search"></i>
+    </ng-template>
   </div>
   <div class="h-100 bm-mt-12px">
     <nz-table #departmentTable
-      [nzScroll]="{ y: 'calc(100vh - 235px)' }"
+      [nzScroll]="{ y: 'calc(100vh - 214x)' }"
       [nzFrontPagination]="false"
       [nzData]="listPersonnel"
       [nzTotal]="total"

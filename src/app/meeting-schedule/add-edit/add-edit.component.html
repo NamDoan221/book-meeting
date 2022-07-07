@@ -1,0 +1,140 @@
+<form nz-form
+  class="w-100 h-100"
+  [formGroup]="meetingScheduleForm">
+  <div class="h-100 w-100 d-flex flex-column justify-content-between">
+    <div class="bm-overflow-auto">
+      <nz-form-item class="bm-mb-0 w-70">
+        <nz-form-control nzErrorTip="Tên nhân viên không thể để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'name'">
+            Tên nhân viên
+          </nz-form-label>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="name"
+              placeholder="Nhập tên nhân viên">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0 w-70">
+        <nz-form-control nzErrorTip="Thời gian bắt đầu không thể để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'start_time'">
+            Thời gian bắt đầu
+          </nz-form-label>
+          <div>
+            <nz-date-picker class="w-30"
+              [nzShowTime]="{ nzFormat: 'HH:mm' }"
+              nzFormat="yyyy-MM-dd HH:mm"
+              formControlName="start_time"
+              nzPlaceHolder="Chọn thời gian bắt đầu">
+            </nz-date-picker>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0 w-70">
+        <nz-form-control [nzErrorTip]="'Thời lượng dự kiến không thể để trống!'">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'estimated_duration'">
+            Thời lượng dự kiến
+          </nz-form-label>
+          <div class="d-flex">
+            <nz-input-number class="w-85"
+              formControlName="estimated_duration"
+              placeholder="Nhập thời lượng dự kiến"
+              [nzMin]="1"
+              [nzStep]="1">
+            </nz-input-number>
+            <div
+              class="d-flex align-items-center bm-h-32px bm-px-12px bm-border-top-general bm-border-right-general bm-border-bottom-general">
+              Phút
+            </div>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0 w-70">
+        <nz-form-control [nzErrorTip]="'Phòng họp không thể để trống!'">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'meeting_room'">
+            Phòng họp
+          </nz-form-label>
+          <nz-select [nzShowSearch]="true"
+            [formControlName]="'meeting_room'"
+            [nzPlaceHolder]="'Chọn phòng họp'"
+            [nzNotFoundContent]="'Không có dữ liệu'"
+            (nzScrollToBottom)="handlerScrollBottom($event)">
+            <nz-option *ngFor="let item of listMeetingRoom"
+              [nzValue]="item.id"
+              [nzLabel]="item.name">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0 w-70">
+        <nz-form-control nzErrorTip="Người quản lý cuộc họp không thể để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'meeting_manager'">
+            Chức người quản lý cuộc họp
+          </nz-form-label>
+          <nz-select [nzShowSearch]="true"
+            [formControlName]="'meeting_manager'"
+            [nzPlaceHolder]="'Chọn người quản lý cuộc họp'"
+            [nzNotFoundContent]="'Không có dữ liệu'"
+            (nzScrollToBottom)="handlerScrollBottom($event)">
+            <nz-option *ngFor="let item of listPersonnel"
+              [nzValue]="item.id"
+              [nzLabel]="item.name">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px w-70">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'description'">
+            Mô tả cuộc họp
+          </nz-form-label>
+          <nz-input-group>
+            <textarea nz-input
+              formControlName="description"
+              placeholder="Nhập mô tả"
+              [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0 w-70">
+        <nz-form-control nzErrorTip="Cuộc họp phải có ít nhất 1 người tham gia!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'participants'">
+            Người tham gia cuộc họp
+          </nz-form-label>
+          <nz-select [nzShowSearch]="true"
+            [nzMaxTagCount]="3"
+            [nzMaxTagPlaceholder]="tagPlaceHolderTpl"
+            nzMode="multiple"
+            [formControlName]="'participants'"
+            [nzPlaceHolder]="'Chọn nhân viên tham gia'"
+            [nzNotFoundContent]="'Không có dữ liệu'"
+            (nzScrollToBottom)="handlerScrollBottom($event)"
+            (ngModelChange)="handlerChangeMember($event)">
+            <nz-option *ngFor="let item of listPersonnel"
+              [nzValue]="item.name"
+              [nzLabel]="item.name"
+              [nzHide]="listMemberSelected.includes(item.name)">
+            </nz-option>
+          </nz-select>
+          <ng-template #tagPlaceHolderTpl
+            let-selectedList>và {{ selectedList.length }} nhân viên khác</ng-template>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="d-flex justify-content-end bm-mt-20px">
+      <button nz-button
+        nzType="primary"
+        [nzLoading]="!!loading"
+        (click)="handlerUpdate($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
+    </div>
+  </div>
+</form>

@@ -16,6 +16,7 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 
 @NgModule({
   imports: [
@@ -34,7 +35,8 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
     NzFormModule,
     NzSelectModule,
     NzToolTipModule,
-    NzRadioModule
+    NzRadioModule,
+    NzTabsModule
   ],
   declarations: [
     BmPersonnelComponent,

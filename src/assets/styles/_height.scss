@@ -9,7 +9,7 @@
     height: $val !important;
   }
   .#{$prefixCss}max-h-#{$val} {
-    height: $val !important;
+    max-height: $val !important;
   }
 }
 

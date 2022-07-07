@@ -34,6 +34,7 @@ export class BmSignUpComponent implements OnInit {
     };
     this.signUpForm = this.fb.group({
       userName: [null, [Validators.required]],
+      email: [null, [Validators.required, Validators.email]],
       password: [null, [Validators.required]],
       confirm_password: [null, [Validators.required, this.confirmationValidator]]
     });

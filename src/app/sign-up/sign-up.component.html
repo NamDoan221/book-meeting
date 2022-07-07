@@ -17,6 +17,21 @@
           </nz-form-control>
         </nz-form-item>
         <nz-form-item class="bm-mt-16px bm-mb-0">
+          <nz-form-control [nzErrorTip]="emailErrorTpl">
+            <nz-input-group [nzPrefix]="prefixEmail">
+              <input [type]="'text'"
+                nz-input
+                formControlName="email"
+                placeholder="Nhập email">
+            </nz-input-group>
+          </nz-form-control>
+          <ng-template #emailErrorTpl
+            let-control>
+            <ng-container *ngIf="control.hasError('required')">Email không thể để trống!</ng-container>
+            <ng-container *ngIf="control.hasError('email')">Email không đúng định dạng!</ng-container>
+          </ng-template>
+        </nz-form-item>
+        <nz-form-item class="bm-mt-16px bm-mb-0">
           <nz-form-control nzErrorTip="Mật khẩu không thể để trống!">
             <nz-input-group [nzPrefix]="prefixLock"
               [nzSuffix]="suffixTemplatePassword">
@@ -63,6 +78,8 @@
           nzType="user"></i></ng-template>
       <ng-template #prefixLock><i nz-icon
           nzType="lock"></i></ng-template>
+      <ng-template #prefixEmail><i nz-icon
+          nzType="mail"></i></ng-template>
       <ng-template #suffixTemplatePassword>
         <i nz-icon
           [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"

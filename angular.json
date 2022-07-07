@@ -38,7 +38,9 @@
               "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/face-api.js/dist/face-api.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -105,7 +107,9 @@
               "./node_modules/ng-zorro-antd/ng-zorro-antd.min.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/face-api.js/dist/face-api.min.js"
+            ]
           }
         },
         "lint": {

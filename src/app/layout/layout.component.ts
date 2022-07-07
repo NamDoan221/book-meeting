@@ -11,6 +11,7 @@ import { AuthService } from '../lib/services/auth.service';
 export class BmLayoutComponent implements OnInit {
   public isCollapsed: boolean;
   menuData: any[];
+  currentPath: string;
 
   constructor(
     private router: Router,
@@ -24,19 +25,23 @@ export class BmLayoutComponent implements OnInit {
         items: [
           {
             label: 'Nhân sự',
-            url: 'personnel'
+            url: '/personnel'
           },
           {
             label: 'Phòng, Ban',
-            url: 'department'
+            url: '/department'
           },
           {
             label: 'Phòng họp',
-            url: 'meeting-room'
+            url: '/meeting-room'
           },
           {
             label: 'Lịch họp',
-            url: 'meeting-schedule'
+            url: '/meeting-schedule'
+          },
+          {
+            label: 'Điểm danh',
+            url: '/attendance'
           }
         ]
       },
@@ -46,7 +51,7 @@ export class BmLayoutComponent implements OnInit {
         items: [
           {
             label: 'Tài khoản',
-            url: 'account'
+            url: '/account'
           },
           {
             label: 'Đăng xuất',
@@ -58,6 +63,7 @@ export class BmLayoutComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.currentPath = this.router.url;
   }
 
   async handlerRouting(event: Event, url: string) {
@@ -72,6 +78,7 @@ export class BmLayoutComponent implements OnInit {
       }
       return;
     }
+    this.currentPath = url;
     this.router.navigate([url]);
   }
 

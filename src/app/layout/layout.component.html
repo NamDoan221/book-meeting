@@ -25,6 +25,7 @@
           <ul *ngIf="menu && menu.items && menu.items.length">
             <ng-container *ngFor="let item of menu.items">
               <li nz-menu-item
+                [ngClass]="{'bm-bg-1890ff': item.url === currentPath}"
                 (click)="handlerRouting($event, item.url)">
                 {{item.label}}
               </li>
