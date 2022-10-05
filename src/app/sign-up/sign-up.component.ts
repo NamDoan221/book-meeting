@@ -1,50 +1,45 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
-import { AccountRegister } from '../lib/services/api/account';
+import { ConstantDefines } from '../lib/defines/constant.define';
+import { IBodyRegisterAccount } from '../lib/services/api/account';
 import { AuthService } from '../lib/services/auth.service';
 
 @Component({
   selector: 'bm-sign_up',
   templateUrl: './sign-up.component.html'
 })
-export class BmSignUpComponent implements OnInit {
-  signUpForm: FormGroup;
-  passwordVisible: boolean;
-  confirmPasswordVisible: boolean;
-  loading: boolean;
-  public user: AccountRegister;
-  public onRegister: boolean;
+export class BmSignUpComponent {
+  public signUpForm: FormGroup;
+  public passwordVisible: boolean;
+  public passwordRetypeVisible: boolean;
+  public loading: boolean;
+
   constructor(
     private router: Router,
     private auth: AuthService,
     private toast: ToastrService,
     private fb: FormBuilder,
   ) {
-    this.onRegister = false;
+    this.loading = false;
     this.passwordVisible = false;
-    this.user = {
-      email: '',
-      name: '',
-      password: '',
-      rePassword: '',
-      avatar: '',
-      phone: ''
-    };
+    this.passwordRetypeVisible = false;
     this.signUpForm = this.fb.group({
-      userName: [null, [Validators.required]],
-      email: [null, [Validators.required, Validators.email]],
-      password: [null, [Validators.required]],
-      confirm_password: [null, [Validators.required, this.confirmationValidator]]
+      username: ['', [Validators.required]],
+      fullName: ['', [Validators.required]],
+      email: ['', [Validators.email]],
+      address: [''],
+      mobile: ['', [Validators.required, Validators.pattern('^[0-9]*$'), Validators.minLength(10), Validators.maxLength(11)]],
+      avatarUrl: [''],
+      gender: [0, [Validators.required]],
+      dob: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      passwordRetype: ['', [Validators.required, this.confirmationValidator]]
     });
   }
 
-  ngOnInit(): void {
-  }
-
-
-  handlerLogin(): any {
+  handlerLogin() {
     this.router.navigate(['/login']);
   }
 
@@ -60,11 +55,14 @@ export class BmSignUpComponent implements OnInit {
     }
     this.loading = true;
     try {
-      const user = {
-        username: this.signUpForm.get('userName') && this.signUpForm.get('userName').value || '',
-        password: this.signUpForm.get('password') && this.signUpForm.get('password').value || ''
+      const user: IBodyRegisterAccount = this.signUpForm.value;
+      delete user.passwordRetype;
+      user.domain = ConstantDefines.DOMAIN;
+      const result = await this.auth.register(user);
+      if (!result.success) {
+        this.toast.error(result.message ?? 'Tạo tài khoản thất bại! Vui lòng kiểm tra lại thông tin.');
+        return;
       }
-      await this.auth.register(user);
       this.toast.success('Tạo tài khoản thành công!');
       this.router.navigate(['/login']);
     } catch (error) {
@@ -89,7 +87,7 @@ export class BmSignUpComponent implements OnInit {
       this.passwordVisible = !this.passwordVisible;
       return;
     }
-    this.confirmPasswordVisible = !this.confirmPasswordVisible;
+    this.passwordRetypeVisible = !this.passwordRetypeVisible;
   }
 
 }

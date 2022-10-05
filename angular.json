@@ -20,7 +20,8 @@
             "allowedCommonJsDependencies": [
               "ngx-virtual-scroller",
               "socket.io-client",
-              "lodash"
+              "lodash",
+              "crypto-js"
             ],
             "outputPath": "dist/book-meeting",
             "index": "src/index.html",

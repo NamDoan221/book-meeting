@@ -1,32 +1,34 @@
-<div class="d-flex h-100 bm-bg-ffffff flex-column bm-p-40px bm-overflow-auto">
-  <div class="d-flex">
-    <div class="bm-h-150px bm-w-150px">
-      <img nz-image
-        class="h-100 w-100 account-img"
-        [nzSrc]="tempAccount.avatar"
-        alt="">
-    </div>
-    <div class="bm-ml-20px d-flex flex-column justify-content-center">
-      <div class="bm-mb-8px">
-        <span>{{tempAccount.name}}</span>
+<div class="d-flex justify-content-center">
+  <div class="bm-w-656px d-flex flex-column">
+    <div class="bm-bg-ffffff bm-p-20px bm-border-radius-4px">
+      <div class="bm-font-head-3s bm-mb-20px">Thông tin chung</div>
+      <div class="d-flex w-100 bm-mb-20px">
+        <div class="bm-h-100px bm-w-100px">
+          <img nz-image
+            class="h-100 w-100 account-img"
+            [nzSrc]="'https://d1hjkbq40fs2x4.cloudfront.net/2016-01-31/files/1045.jpg'"
+            alt="">
+          <!-- [nzSrc]="tempAccount.avatar" -->
+        </div>
+        <div class="bm-ml-20px d-flex flex-column justify-content-center">
+          <div class="bm-mb-8px">
+            <span>{{tempAccount.name}}</span>
+          </div>
+          <div>
+            <nz-upload nzAction=""
+              [nzFileList]="fileList"
+              [nzAccept]="'image/png,image/jpeg'"
+              [nzFileType]="'image/png,image/jpeg'"
+              (nzChange)="handlerChangeAvatar($event)">
+              <button nz-button
+                nzType="primary"><i nz-icon
+                  nzType="retweet"
+                  nzTheme="outline"></i>Thay đổi ảnh đại diện</button>
+            </nz-upload>
+          </div>
+        </div>
       </div>
-      <div>
-        <nz-upload nzAction=""
-          [nzFileList]="fileList"
-          [nzAccept]="'image/png,image/jpeg'"
-          [nzFileType]="'image/png,image/jpeg'"
-          (nzChange)="changeAvatar($event)">
-          <button nz-button
-            nzType="primary"><i nz-icon
-              nzType="retweet"
-              nzTheme="outline"></i>Thay đổi ảnh đại diện</button>
-        </nz-upload>
-      </div>
-    </div>
-  </div>
-  <div class="d-flex bm-mt-40px">
-    <div class="w-50 bm-mr-12px">
-      <bm-lib-card [labelTitle]="'Thông tin chung'">
+      <div class="w-45">
         <form nz-form
           [formGroup]="accountForm">
           <nz-form-item class="bm-mb-0">
@@ -98,17 +100,26 @@
               </ng-template>
             </nz-form-control>
           </nz-form-item>
-          <div class="d-flex justify-content-end bm-mt-20px">
+          <div class="d-flex bm-mt-20px">
             <button nz-button
               nzType="primary"
               [nzLoading]="!!loading"
               (click)="handlerChangeInfo()">Cập nhật</button>
+            <button nz-button
+              class="bm-ml-12px"
+              nzType="default"
+              (click)="handlerCancel()">Huỷ bỏ</button>
           </div>
         </form>
-      </bm-lib-card>
+      </div>
     </div>
-    <div class="w-50 bm-ml-12px">
-      <bm-lib-card [labelTitle]="'Đổi mật khẩu'">
+    <div class="bm-bg-ffffff bm-p-20px bm-border-radius-4px bm-mt-20px">
+      <div class="bm-font-head-3s bm-mb-12px">Bảo mật</div>
+      <div *ngIf="!modeUpdatePass"
+        class="bm-cursor-pointer bm-color-009cdb"
+        (click)="handlerChangeModeUpdatePass()">Đổi mật khẩu</div>
+      <div *ngIf="modeUpdatePass">
+        <div class="bm-font-head-5s bm-mb-12px">Đổi mật khẩu</div>
         <form class="h-100"
           nz-form
           [formGroup]="passwordForm">
@@ -130,7 +141,7 @@
                   <ng-template #suffixTemplateCurrentPassword>
                     <i nz-icon
                       [nzType]=" currentPasswordVisible? 'eye-invisible' : 'eye'"
-                      (click)="changeViewPass('currentPassword')"></i>
+                      (click)="handlerChangeViewPass('currentPassword')"></i>
                   </ng-template>
                 </nz-form-control>
               </nz-form-item>
@@ -154,7 +165,7 @@
                   <ng-template #suffixTemplateNewPassword>
                     <i nz-icon
                       [nzType]="newPasswordVisible ? 'eye-invisible' : 'eye'"
-                      (click)="changeViewPass('newPassword')"></i>
+                      (click)="handlerChangeViewPass('newPassword')"></i>
                   </ng-template>
                 </nz-form-control>
               </nz-form-item>
@@ -184,19 +195,23 @@
                 <ng-template #suffixTemplateReNewPassword>
                   <i nz-icon
                     [nzType]="reNewPasswordVisible ? 'eye-invisible' : 'eye'"
-                    (click)="changeViewPass('reNewPassword')"></i>
+                    (click)="handlerChangeViewPass('reNewPassword')"></i>
                 </ng-template>
               </nz-form-item>
             </div>
-            <div class="d-flex justify-content-end bm-mt-20px">
+            <div class="d-flex bm-mt-20px">
               <button nz-button
                 nzType="primary"
                 [nzLoading]="!!loadingChangePass"
-                (click)="changePassword()">Cập nhật</button>
+                (click)="handlerChangePassword()">Cập nhật</button>
+              <button nz-button
+                class="bm-ml-12px"
+                nzType="default"
+                (click)="handlerCancelChangePass()">Huỷ bỏ</button>
             </div>
           </div>
         </form>
-      </bm-lib-card>
+      </div>
     </div>
   </div>
 </div>

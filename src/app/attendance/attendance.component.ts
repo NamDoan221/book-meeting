@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, OnDestroy, PLATFORM_ID, ViewChild } from '@angular/core';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -12,16 +12,17 @@ declare var faceapi: any;
   styleUrls: ['./attendance.component.scss']
 })
 
-export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
+export class BmMeetingAttendanceComponent implements OnDestroy {
 
   loading: boolean;
   pageSize: number;
   total: number;
   pageIndexGroup: number;
   listMeetingSchedule: any[];
-  columnConfig: string[];
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
+  canvas: any;
+  interval: any;
 
   @ViewChild('video') video: ElementRef<HTMLVideoElement>;
   @ViewChild('container') container: ElementRef;
@@ -37,28 +38,20 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
     this.pageSize = 20;
     this.pageIndexGroup = 1;
     this.isOpenDraw = false;
-    this.columnConfig = [
-      'Tên cuộc họp',
-      'Thời gian diễn ra',
-      'Thời lượng dự kiến',
-      'Phòng họp',
-      'Người quản lý cuộc họp',
-      'Số người được tham gia',
-      'Mô tả nội dung cuộc họp',
-      'Trạng thái'
-    ];
   }
 
-  ngOnInit(): void {
+  handlerStartAttendance() {
     this.initModelsFaceApi();
+  }
 
-    console.log(faceapi);
-
-    // setTimeout(() => {
-    //   this.video.nativeElement.pause();
-    //   (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop();
-    //   this.video.nativeElement.srcObject = null;
-    // }, 15000)
+  handlerStopAttendance() {
+    (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop();
+    this.video.nativeElement.pause();
+    this.video.nativeElement.srcObject = null;
+    this.container.nativeElement.removeChild(this.canvas);
+    clearInterval(this.interval);
+    this.interval = undefined;
+    this.canvas = undefined;
   }
 
   async initModelsFaceApi() {
@@ -106,42 +99,32 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
   startVideo() {
     if (isPlatformBrowser(this.platform) && 'mediaDevices' in navigator) {
       navigator.mediaDevices.getUserMedia({ video: true }).then(async (ms: MediaStream) => {
-        const _video = this.video.nativeElement;
-        _video.srcObject = ms;
-        await _video.play();
-        let canvas = faceapi.createCanvasFromMedia(_video);
-        canvas.style.position = 'absolute';
-        canvas.style.top = '0';
-        canvas.style.left = `${_video.offsetWidth * 0.2188}px`;
-        this.container.nativeElement.append(canvas);
-        const displaySize = { width: _video.offsetWidth * 0.585, height: _video.clientHeight };
-        faceapi.matchDimensions(canvas, displaySize);
-        let image_number = 0;
-        let interval = setInterval(async () => {
-          if (!canvas) {
+        const video = this.video.nativeElement;
+        video.srcObject = ms;
+        await video.play();
+        this.canvas = faceapi.createCanvasFromMedia(video);
+        this.canvas.style.position = 'absolute';
+        this.container.nativeElement.append(this.canvas);
+        const displaySize = { width: video.videoWidth, height: video.videoHeight };
+        faceapi.matchDimensions(this.canvas, displaySize);
+        this.interval = setInterval(async () => {
+          if (!this.canvas) {
             return;
           }
           const detections = await faceapi
-            .detectAllFaces(_video, new faceapi.TinyFaceDetectorOptions())
+            .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks()
             .withFaceExpressions();
           const resizedDetections = faceapi.resizeResults(detections, displaySize);
-          if (canvas) {
-            canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
-            faceapi.draw.drawDetections(canvas, resizedDetections);
-            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-            faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+          if (this.canvas) {
+            this.canvas.getContext("2d").clearRect(0, 0, video.videoWidth, video.videoHeight);
+            faceapi.draw.drawDetections(this.canvas, resizedDetections);
+            faceapi.draw.drawFaceLandmarks(this.canvas, resizedDetections);
+            faceapi.draw.drawFaceExpressions(this.canvas, resizedDetections);
             const canvas_data = document.createElement("canvas");
             canvas_data
               .getContext("2d")
-              .drawImage(_video, 0, 0, canvas_data.width, canvas_data.height);
-            image_number++;
-            if (image_number > 200) {
-              clearInterval(interval);
-              this.container.nativeElement.removeChild(canvas);
-              interval = undefined;
-              canvas = undefined;
-            }
+              .drawImage(video, 0, 0, canvas_data.width, canvas_data.height);
           }
         }, 100)
       })
@@ -149,7 +132,7 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop();
+    this.handlerStopAttendance();
   }
 
 }

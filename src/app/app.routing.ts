@@ -16,7 +16,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    // canActivate: [UserCanActive],
+    canActivate: [UserCanActive],
     loadChildren: () =>
       import('./layout/layout.module').then((m) => m.BmLayoutModule),
   }

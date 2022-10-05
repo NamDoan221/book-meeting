@@ -1,9 +1,9 @@
 import { AuthService } from '../lib/services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AccountUser } from '../lib/services/api/account';
 import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { IBodyLogin } from '../lib/services/api/account';
 
 @Component({
   selector: 'bm-login',
@@ -14,6 +14,7 @@ export class BmLoginComponent implements OnInit {
   loginForm: FormGroup;
   passwordVisible: boolean;
   loading: boolean;
+  loadingGoogle: boolean;
 
   constructor(
     private fb: FormBuilder,
@@ -22,9 +23,10 @@ export class BmLoginComponent implements OnInit {
     private toast: ToastrService
   ) {
     this.loading = false;
+    this.loadingGoogle = false;
     this.passwordVisible = false;
     this.loginForm = this.fb.group({
-      userName: [null, [Validators.required]],
+      username: [null, [Validators.required]],
       password: [null, [Validators.required]]
     });
   }
@@ -45,23 +47,38 @@ export class BmLoginComponent implements OnInit {
     }
     this.loading = true;
     try {
-      const user = {
-        username: this.loginForm.get('userName') && this.loginForm.get('userName').value || '',
+      const body: IBodyLogin = {
+        username: this.loginForm.get('username') && this.loginForm.get('username').value || '',
         password: this.loginForm.get('password') && this.loginForm.get('password').value || ''
       }
-      // const result = await this.auth.login(user);
+      await this.auth.login(body);
       this.toast.success('Đăng nhập thành công!');
-      this.router.navigate(['/chat']);
+      this.router.navigate(['/meeting-schedule']);
     } catch (error) {
       this.toast.error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin đăng nhập.');
       console.log(error);
     } finally {
-      // this.loading = false;
+      this.loading = false;
     }
   }
 
-  handlerLoginGoogle() {
+  async handlerLoginGoogle() {
+    if (this.loadingGoogle) {
+      return;
+    }
+    this.loadingGoogle = true;
+    try {
+      const result = await this.auth.loginGoogle();
+      console.log(result);
 
+      // this.toast.success('Đăng nhập thành công!');
+      // this.router.navigate(['/chat']);
+    } catch (error) {
+      // this.toast.error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin đăng nhập.');
+      console.log(error);
+    } finally {
+      this.loadingGoogle = false;
+    }
   }
 
   handlerSignUp(): any {

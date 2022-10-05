@@ -16,6 +16,8 @@ import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { BmMeetingAttendanceComponent } from './attendance.component';
+import { BmMeetingAttendanceContentComponent } from './content/content.component';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 export const routes: Routes = [
   {
@@ -42,10 +44,12 @@ export const routes: Routes = [
     NzSelectModule,
     NzInputNumberModule,
     NzToolTipModule,
-    NzDatePickerModule
+    NzDatePickerModule,
+    NzCheckboxModule
   ],
   declarations: [
-    BmMeetingAttendanceComponent
+    BmMeetingAttendanceComponent,
+    BmMeetingAttendanceContentComponent
   ]
 })
 export class BmMeetingAttendanceModule { }

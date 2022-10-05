@@ -1,14 +1,11 @@
 <div class="w-100 h-100 d-flex">
-  <div class="d-flex flex-column bm-border-right-general bm-px-12px w-30">
-    <div>Danh sach lich hop</div>
-    <div class="h-100">Danh sach nguoi tham gia</div>
-    <div>Thao tac</div>
+  <div class="h-100 bm-border-right-general bm-px-12px w-35">
+    <bm-meeting-schedule-content (startAttendance)="handlerStartAttendance()"
+      (stopAttendance)="handlerStopAttendance()"></bm-meeting-schedule-content>
   </div>
-  <div class="bm-px-12px w-70 h-100 position-relative"
+  <div class="bm-mx-12px w-65 h-100 position-relative d-flex justify-content-center align-items-center"
     #container>
     <video #video
-      width="100%"
-      height="100%"
       autoplay
       muted></video>
   </div>

@@ -1,95 +1,185 @@
 <div class="d-flex h-100 w-100 justify-content-center align-items-center">
-  <div
-    class="bm-bg-ffffff bm-w-604px bm-border-radius-4px bm-border-general d-flex align-items-center justify-content-center bm-px-42px bm-py-20px">
-    <div class="w-80">
-      <div class="bm-font-head-2s">ĐĂNG KÝ</div>
-      <div class="bm-mt-8px bm-mb-20px">Bạn hãy điền đầy đủ thông tin để đăng ký tài khoản nhé.</div>
-      <form nz-form
-        [formGroup]="signUpForm">
-        <nz-form-item class="bm-mb-0">
-          <nz-form-control nzErrorTip="Tài khoản không thể để trống!">
-            <nz-input-group [nzPrefix]="prefixUser">
-              <input type="text"
-                nz-input
-                formControlName="userName"
-                placeholder="Tài khoản">
-            </nz-input-group>
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item class="bm-mt-16px bm-mb-0">
-          <nz-form-control [nzErrorTip]="emailErrorTpl">
-            <nz-input-group [nzPrefix]="prefixEmail">
-              <input [type]="'text'"
-                nz-input
-                formControlName="email"
-                placeholder="Nhập email">
-            </nz-input-group>
-          </nz-form-control>
-          <ng-template #emailErrorTpl
-            let-control>
-            <ng-container *ngIf="control.hasError('required')">Email không thể để trống!</ng-container>
-            <ng-container *ngIf="control.hasError('email')">Email không đúng định dạng!</ng-container>
-          </ng-template>
-        </nz-form-item>
-        <nz-form-item class="bm-mt-16px bm-mb-0">
-          <nz-form-control nzErrorTip="Mật khẩu không thể để trống!">
-            <nz-input-group [nzPrefix]="prefixLock"
-              [nzSuffix]="suffixTemplatePassword">
-              <input [type]="passwordVisible ? 'text' : 'password'"
-                nz-input
-                formControlName="password"
-                placeholder="Mật khẩu">
-            </nz-input-group>
-          </nz-form-control>
-        </nz-form-item>
-        <nz-form-item class="bm-mt-16px bm-mb-0">
-          <nz-form-control [nzErrorTip]="passwordConfirmErrorTpl">
-            <nz-input-group [nzPrefix]="prefixLock"
-              [nzSuffix]="suffixTemplateConfirmPassword">
-              <input [type]="confirmPasswordVisible ? 'text' : 'password'"
-                nz-input
-                formControlName="confirm_password"
-                placeholder="Nhập lại mật khẩu">
-            </nz-input-group>
-          </nz-form-control>
-          <ng-template #passwordConfirmErrorTpl
-            let-control>
-            <ng-container *ngIf="control.hasError('required')">Mật khẩu nhập lại không thể để trống!</ng-container>
-            <ng-container *ngIf="control.hasError('confirm')">Mật khẩu nhập lại không trùng khớp!</ng-container>
-          </ng-template>
-        </nz-form-item>
-        <nz-form-item class="bm-mt-16px bm-mb-0">
-          <nz-form-control>
-            <button nz-button
-              [nzType]="'primary'"
-              [nzLoading]="!!loading"
-              (click)="handlerSignUp()">Đăng Ký<i nz-icon
-                nzType="login"></i></button>
-            <div class="bm-font-head-5">
-              Bạn đã có tài khoản? <a (click)="handlerLogin()"
-                nz-button
-                class="bm-p-0 bm-color-009cdb"
-                nzType="link">Đăng nhập</a>
+  <div class="bm-bg-ffffff bm-border-radius-4px bm-border-general bm-py-20px bm-px-32px">
+    <div class="bm-font-head-2s">ĐĂNG KÝ</div>
+    <div class="bm-mt-8px bm-mb-20px">Bạn hãy điền đầy đủ thông tin để đăng ký tài khoản nhé.</div>
+    <form nz-form
+      [formGroup]="signUpForm">
+      <nz-form-item class="bm-mb-0">
+        <nz-form-control nzErrorTip="Tài khoản không thể để trống!">
+          <nz-input-group [nzPrefix]="prefixUser">
+            <input type="text"
+              nz-input
+              formControlName="username"
+              placeholder="Tài khoản">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control nzErrorTip="Họ tên không thể để trống!">
+          <nz-input-group [nzPrefix]="prefixFullName">
+            <input type="text"
+              nz-input
+              formControlName="fullName"
+              placeholder="Họ và tên">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control [nzErrorTip]="'Giới tính không thể để trống!'">
+          <div class="d-flex align-items-center">
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'gender'">
+              Giới tính:
+            </nz-form-label>
+            <div>
+              <nz-radio-group formControlName="gender">
+                <label nz-radio
+                  [nzValue]="0">Nam</label>
+                <label nz-radio
+                  [nzValue]="1">Nữ</label>
+              </nz-radio-group>
             </div>
-          </nz-form-control>
-        </nz-form-item>
-      </form>
-      <ng-template #prefixUser><i nz-icon
-          nzType="user"></i></ng-template>
-      <ng-template #prefixLock><i nz-icon
-          nzType="lock"></i></ng-template>
-      <ng-template #prefixEmail><i nz-icon
-          nzType="mail"></i></ng-template>
-      <ng-template #suffixTemplatePassword>
-        <i nz-icon
-          [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
-          (click)="handlerChangeViewPassword('password')"></i>
-      </ng-template>
-      <ng-template #suffixTemplateConfirmPassword>
-        <i nz-icon
-          [nzType]="confirmPasswordVisible ? 'eye-invisible' : 'eye'"
-          (click)="handlerChangeViewPassword('')"></i>
-      </ng-template>
-    </div>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control nzErrorTip="Ngày sinh không thể để trống!">
+          <nz-date-picker class="w-100"
+            nzFormat="dd/MM/yyyy"
+            formControlName="dob"
+            nzPlaceHolder="Ngày sinh">
+          </nz-date-picker>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control [nzErrorTip]="emailErrorTpl">
+          <nz-input-group [nzPrefix]="prefixEmail">
+            <input [type]="'text'"
+              nz-input
+              formControlName="email"
+              placeholder="Email">
+          </nz-input-group>
+        </nz-form-control>
+        <ng-template #emailErrorTpl
+          let-control>
+          <ng-container *ngIf="control.hasError('required')">Email không thể để trống!</ng-container>
+          <ng-container *ngIf="control.hasError('email')">Email không đúng định dạng!</ng-container>
+        </ng-template>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control nzErrorTip="Địa chỉ không thể để trống!">
+          <nz-input-group [nzPrefix]="prefixAddress">
+            <input type="text"
+              nz-input
+              formControlName="address"
+              placeholder="Địa chỉ">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control [nzErrorTip]="phoneErrorTip">
+          <nz-input-group [nzPrefix]="prefixPhone">
+            <input type="text"
+              nz-input
+              formControlName="mobile"
+              placeholder="Số điện thoại">
+          </nz-input-group>
+          <ng-template #phoneErrorTip
+            let-control>
+            <span class="font-size-11"
+              *ngIf="control.hasError('required')">Số điện thoại không thể để trống!</span>
+            <span class="font-size-11"
+              *ngIf="control.hasError('pattern') || control.hasError('maxlength') || control.hasError('minlength')">
+              Số điện thoại không đúng định dạng!
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control nzErrorTip="Ảnh đại diện không thể để trống!">
+          <nz-input-group [nzPrefix]="prefixAvatar">
+            <input type="text"
+              nz-input
+              formControlName="avatarUrl"
+              placeholder="Ảnh đại diện">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control [nzErrorTip]="passwordErrorTip">
+          <nz-input-group [nzPrefix]="prefixLock"
+            [nzSuffix]="suffixTemplatePassword">
+            <input [type]="passwordVisible ? 'text' : 'password'"
+              nz-input
+              formControlName="password"
+              placeholder="Mật khẩu">
+          </nz-input-group>
+          <ng-template #passwordErrorTip
+            let-control>
+            <span class="font-size-11"
+              *ngIf="control.hasError('required')">Mật khẩu không thể để trống!</span>
+            <span class="font-size-11"
+              *ngIf="control.hasError('minlength')">
+              Mật khẩu phải có độ dài tối thiểu 8 kí tự!
+            </span>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control [nzErrorTip]="passwordRetypeErrorTpl">
+          <nz-input-group [nzPrefix]="prefixLock"
+            [nzSuffix]="suffixTemplatePasswordRetype">
+            <input [type]="passwordRetypeVisible ? 'text' : 'password'"
+              nz-input
+              formControlName="passwordRetype"
+              placeholder="Nhập lại mật khẩu">
+          </nz-input-group>
+        </nz-form-control>
+        <ng-template #passwordRetypeErrorTpl
+          let-control>
+          <ng-container *ngIf="control.hasError('required')">Mật khẩu nhập lại không thể để trống!</ng-container>
+          <ng-container *ngIf="control.hasError('confirm')">Mật khẩu nhập lại không trùng khớp!</ng-container>
+        </ng-template>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0 text-center">
+        <nz-form-control>
+          <button nz-button
+            [nzType]="'primary'"
+            [nzLoading]="!!loading"
+            (click)="handlerSignUp()">Đăng Ký<i nz-icon
+              nzType="login"></i></button>
+          <div class="bm-font-head-5">
+            Bạn đã có tài khoản? <a (click)="handlerLogin()"
+              nz-button
+              class="bm-p-0 bm-color-009cdb"
+              nzType="link">Đăng nhập</a>
+          </div>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+    <ng-template #prefixUser><i nz-icon
+        nzType="user"></i></ng-template>
+    <ng-template #prefixLock><i nz-icon
+        nzType="lock"></i></ng-template>
+    <ng-template #prefixEmail><i nz-icon
+        nzType="mail"></i></ng-template>
+    <ng-template #prefixAvatar><i nz-icon
+        nzType="meh"></i></ng-template>
+    <ng-template #prefixPhone><i nz-icon
+        nzType="phone"></i></ng-template>
+    <ng-template #prefixAddress><i nz-icon
+        nzType="shop"></i></ng-template>
+    <ng-template #prefixFullName><i nz-icon
+        nzType="idcard"></i></ng-template>
+    <ng-template #suffixTemplatePassword>
+      <i nz-icon
+        [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+        (click)="handlerChangeViewPassword('password')"></i>
+    </ng-template>
+    <ng-template #suffixTemplatePasswordRetype>
+      <i nz-icon
+        [nzType]="confirmPasswordVisible ? 'eye-invisible' : 'eye'"
+        (click)="handlerChangeViewPassword('')"></i>
+    </ng-template>
   </div>
 </div>

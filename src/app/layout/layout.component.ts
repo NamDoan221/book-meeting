@@ -25,23 +25,28 @@ export class BmLayoutComponent implements OnInit {
         items: [
           {
             label: 'Nhân sự',
-            url: '/personnel'
+            url: '/personnel',
+            active: false,
           },
           {
             label: 'Phòng, Ban',
-            url: '/department'
+            url: '/department',
+            active: false,
           },
           {
             label: 'Phòng họp',
-            url: '/meeting-room'
+            url: '/meeting-room',
+            active: false,
           },
           {
             label: 'Lịch họp',
-            url: '/meeting-schedule'
+            url: '/meeting-schedule',
+            active: true,
           },
           {
             label: 'Điểm danh',
-            url: '/attendance'
+            url: '/attendance',
+            active: false,
           }
         ]
       },
@@ -51,11 +56,13 @@ export class BmLayoutComponent implements OnInit {
         items: [
           {
             label: 'Tài khoản',
-            url: '/account'
+            url: '/account',
+            active: true,
           },
           {
             label: 'Đăng xuất',
-            url: 'logout'
+            url: 'logout',
+            active: true,
           }
         ]
       }
@@ -64,6 +71,20 @@ export class BmLayoutComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentPath = this.router.url;
+    const role = 'manager';
+    if (role === 'manager' || role === 'admin') {
+      this.menuData = this.menuData.map(element => {
+        return {
+          ...element,
+          items: element.items.map(item => {
+            return {
+              ...item,
+              active: true
+            }
+          })
+        }
+      })
+    }
   }
 
   async handlerRouting(event: Event, url: string) {

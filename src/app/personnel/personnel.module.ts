@@ -8,7 +8,6 @@ import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BmLibCardModule } from '../lib/card/card.module';
 import { BmPersonnelComponent } from './personnel.component';
-import { BmPersonnelRoutingModule } from './personnel.routing';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { BmPersonnelAddEditComponent } from './add-edit/add-edit.component';
@@ -17,10 +16,19 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { RouterModule, Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    component: BmPersonnelComponent
+  }
+];
 
 @NgModule({
   imports: [
     CommonModule,
+    RouterModule.forChild(routes),
     NzInputModule,
     NzButtonModule,
     NzCardModule,
@@ -29,7 +37,6 @@ import { NzTabsModule } from 'ng-zorro-antd/tabs';
     FormsModule,
     ReactiveFormsModule,
     BmLibCardModule,
-    BmPersonnelRoutingModule,
     NzDrawerModule,
     NzNotificationModule,
     NzFormModule,

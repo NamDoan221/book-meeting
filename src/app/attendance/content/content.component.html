@@ -1,0 +1,71 @@
+<form nz-form
+  class="w-100"
+  [formGroup]="meetingScheduleForm">
+  <div class="w-100 d-flex flex-column justify-content-between">
+    <div class="bm-overflow-auto">
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control [nzErrorTip]="'Lịch họp không thể để trống!'">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'meeting_schedule'">
+            Lịch họp
+          </nz-form-label>
+          <nz-select [nzShowSearch]="true"
+            [formControlName]="'meeting_schedule'"
+            [nzPlaceHolder]="'Chọn lịch họp'"
+            [nzNotFoundContent]="'Không có dữ liệu'"
+            (nzScrollToBottom)="handlerScrollBottom($event)">
+            <nz-option *ngFor="let item of listMeetingSchedule"
+              [nzValue]="item.id"
+              [nzLabel]="item.name">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+  </div>
+</form>
+<div class="bm-calc-h-150px bm-mt-12px">
+  <nz-table #departmentTable
+    [nzScroll]="{ y: 'calc(100vh - 270px)' }"
+    [nzFrontPagination]="false"
+    [nzData]="listPersonnel"
+    [nzNoResult]="empty"
+    [nzLoading]="loading"
+    [nzSize]="'middle'"
+    [nzBordered]="true"
+    nzPaginationType="small"
+    (nzQueryParams)="handlerQueryParamsChange($event)">
+    <thead>
+      <tr>
+        <th *ngFor="let column of columnConfig"
+          [nzAlign]="'left'"
+          class="bm-font-head-4s">
+          {{ column }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of departmentTable.data;  let i=index">
+        <td>{{item.name}}</td>
+        <td><label nz-checkbox
+            [(ngModel)]="item.status"></label>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</div>
+<div class="d-flex justify-content-end bm-mt-20px">
+  <button nz-button
+    nzType="primary"
+    class="bm-mr-12px"
+    (click)="handlerStart($event)">{{modeStartCam ? 'Tạm dừng' : 'Bắt đầu'}}</button>
+  <button nz-button
+    nzType="primary"
+    [nzLoading]="!!loading"
+    (click)="handlerUpdate($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
+</div>
+
+<ng-template #empty>
+  <nz-empty nzNotFoundImage="simple"
+    nzNotFoundContent="Không có dữ liệu"></nz-empty>
+</ng-template>

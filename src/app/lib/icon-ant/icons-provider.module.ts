@@ -28,7 +28,11 @@ import {
   GoogleOutline,
   FireOutline,
   LockOutline,
-  LoginOutline
+  LoginOutline,
+  ShopOutline,
+  MehOutline,
+  IdcardOutline,
+  NotificationOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -58,7 +62,11 @@ const icons = [
   GoogleOutline,
   FireOutline,
   LockOutline,
-  LoginOutline
+  LoginOutline,
+  ShopOutline,
+  MehOutline,
+  IdcardOutline,
+  NotificationOutline
 ];
 @NgModule({
   imports: [NzIconModule],

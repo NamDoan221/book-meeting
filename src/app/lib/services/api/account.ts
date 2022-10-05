@@ -1,15 +1,16 @@
-export interface AccountUser {
-  id?: string;
-  email?: string;
+export interface IBodyLogin {
+  username?: string;
   password?: string;
 }
 
-export interface AccountRegister {
-  id?: string;
+export interface IBodyRegisterAccount {
   email?: string;
-  name?: string;
+  username?: string;
+  fullName?: string;
+  mobile?: string;
+  address?: string;
+  avatarUrl?: string;
   password?: string;
-  rePassword?: string;
-  avatar?: string;
-  phone?: string;
+  passwordRetype?: string;
+  domain?: string;
 }

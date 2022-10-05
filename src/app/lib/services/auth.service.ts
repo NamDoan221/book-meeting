@@ -1,99 +1,105 @@
 import { IPassWord } from '../../account/interfaces/password.interfaces';
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { DOMAIN_SITE } from './base-url.define';
-import { AccountRegister, AccountUser } from './api/account';
+import { DOMAIN_SITE } from '../defines/base-url.define';
+import { IBodyRegisterAccount, IBodyLogin } from './api/account';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import jwt_decode from "jwt-decode";
 import { ConstantDefines } from '../defines/constant.define';
+import { BaseService } from './base.service';
+import { CacheService } from './cache.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthService extends BaseService {
 
   constructor(
-    private http: HttpClient,
-    private router: Router
-  ) { }
+    protected http: HttpClient,
+    private router: Router,
+    private cacheService: CacheService
+  ) {
+    super(http);
+  }
 
-  public jwtDecode() {
-    try {
-      const tokenTemp: any = jwt_decode(this.getToken());
-      return tokenTemp;
-    } catch (e) {
+  public getAccountFromCache() {
+    const token = this.cacheService.getKey(ConstantDefines.TOKEN_KEY);
+    if (!token) {
       this.redirectToLogin();
-      return {};
+      return undefined;
     }
+    return JSON.parse(token);
   }
 
-  public getToken() {
-    return localStorage.getItem(ConstantDefines.TOKEN_KEY);
-  }
-
-
-  public getAccountLocalStorage(): any {
-    return JSON.parse(localStorage.getItem('account-info'));
-  }
-
-  public setAccountLocalStorage(account: AccountUser): any {
-    localStorage.setItem('account-info', JSON.stringify(account));
-  }
-
-  public getAccount(): Promise<any> {
-    const options = this.createHeaderOption();
+  public getAccount(domain: string, id: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.get(`${DOMAIN_SITE()}api/auth/me`, options).subscribe(result => {
-        return resolve(result);
-      }, err => {
-        reject(err);
+      this.http.get(`${domain}/Account/${id}`).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
       });
     });
   }
 
-  private createHeaderOption(): any {
-    return {
-      headers: {
-        'x-access-token': JSON.parse(localStorage.getItem('access-token')).token
-      }
-    };
+  public login(body: IBodyLogin): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.post('Auth/login', body).subscribe({
+        next: result => {
+          this.cacheService.setKey(ConstantDefines.TOKEN_KEY, JSON.stringify(result));
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
   }
 
-  public login(body: AccountUser): Promise<any> {
+  public loginGoogle(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.post(`${DOMAIN_SITE()}api/auth/login`, body).subscribe((result: string) => {
-        localStorage.setItem(ConstantDefines.TOKEN_KEY, result);
-        return resolve(result);
-      }, err => {
-        reject(err);
+      this.get(`Auth/google-callback`).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
       });
     });
   }
 
   public logout(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.get(`${DOMAIN_SITE()}api/auth/logout`).subscribe(result => {
-        return resolve(result);
-      }, err => {
-        reject(err);
+      this.http.get(`${DOMAIN_SITE()}api/auth/logout`).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
       });
     });
   }
 
-  public register(body: AccountRegister): Promise<any> {
+  public register(body: IBodyRegisterAccount): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.post(`${DOMAIN_SITE()}api/auth/register`, body).subscribe(result => {
-        return resolve(result);
-      }, err => {
-        reject(err);
+      this.post('Auth/register', body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
       });
     });
   }
 
   public changePassword(password: IPassWord): Promise<any> {
-    const options = this.createHeaderOption();
     return new Promise((resolve, reject) => {
-      this.http.put(`${DOMAIN_SITE()}api/auth/change-pass`, password, options).subscribe(result => {
+      this.http.put(`${DOMAIN_SITE()}api/auth/change-pass`, password).subscribe(result => {
         return resolve(result);
       }, err => {
         reject(err);
@@ -101,10 +107,9 @@ export class AuthService {
     });
   }
 
-  public changeInfo(body: AccountRegister): Promise<any> {
-    const options = this.createHeaderOption();
+  public changeInfo(body: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.put(`${DOMAIN_SITE()}api/auth/change-info`, body, options).subscribe(result => {
+      this.http.put(`${DOMAIN_SITE()}api/auth/change-info`, body).subscribe(result => {
         return resolve(result);
       }, err => {
         reject(err);
@@ -117,19 +122,31 @@ export class AuthService {
   }
 
   public verifyToken(): boolean {
-    const token = this.getAccountLocalStorage();
+    const token = this.cacheService.getKey(ConstantDefines.TOKEN_KEY);
     if (!token) {
       this.redirectToLogin();
       return false;
     }
-    // const tokenTemp = this.jwtHelper.decodeToken(token);
-    if (!token.auth && token.token === null) {
-      // this._cacheService.clearAll();
-      localStorage.clear();
+    const tokenTemp = jwt_decode<{ id?: string }>(JSON.parse(token).JwtToken);
+    if (!tokenTemp || !tokenTemp.id) {
+      this.cacheService.clearAll();
       this.redirectToLogin();
       return false;
     }
     return true;
+  }
+
+  public refreshToken(body: { refreshToken: string }) {
+    return new Promise((resolve, reject) => {
+      this.post('Auth/refresh-tokens', body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
   }
 }
 
@@ -142,11 +159,9 @@ export class UserCanActive implements CanActivate {
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     let path: string = window.location.pathname === DOMAIN_SITE() ? state.url.split('?')[0] : window.location.pathname;
-    const urlParams = new URLSearchParams(window.location.search);
-    const pathValue = urlParams.get('path');
-    if (!this.checkLogin(path)) {
-      // this.redirectToLogin();
-      this.router.navigate(['login']);
+    console.log(route.queryParams, path);
+
+    if (!this.checkLogin()) {
       return false;
     }
 
@@ -156,7 +171,7 @@ export class UserCanActive implements CanActivate {
     return true;
   }
 
-  checkLogin(url: string): boolean {
+  checkLogin(): boolean {
     if (this.auth.verifyToken()) {
       return true;
     }

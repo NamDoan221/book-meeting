@@ -25,6 +25,7 @@
           <ul *ngIf="menu && menu.items && menu.items.length">
             <ng-container *ngFor="let item of menu.items">
               <li nz-menu-item
+                *ngIf="item.active"
                 [ngClass]="{'bm-bg-1890ff': item.url === currentPath}"
                 (click)="handlerRouting($event, item.url)">
                 {{item.label}}
@@ -38,18 +39,25 @@
   <nz-layout>
     <nz-header>
       <div class="app-header">
-        <span class="header-trigger"
+        <div class="header-trigger"
           (click)="isCollapsed = !isCollapsed">
           <i class="trigger"
             nz-icon
             [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></i>
-        </span>
+        </div>
+        <div class="d-flex align-items-center">
+          <i class="notification"
+            nz-icon
+            nzType="notification"
+            nzTheme="outline"></i>
+          <img class="bm-ml-12px bm-h-40px bm-w-40px account-img"
+            src="https://d1hjkbq40fs2x4.cloudfront.net/2016-01-31/files/1045.jpg"
+            alt="">
+        </div>
       </div>
     </nz-header>
     <nz-content>
-      <div class="inner-content">
-        <router-outlet></router-outlet>
-      </div>
+      <router-outlet></router-outlet>
     </nz-content>
   </nz-layout>
 </nz-layout>

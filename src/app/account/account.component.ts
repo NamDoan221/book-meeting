@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { ToastrService } from 'ngx-toastr';
-import { AccountRegister } from '../lib/services/api/account';
+import { ConstantDefines } from '../lib/defines/constant.define';
 import { AuthService } from '../lib/services/auth.service';
 import { IPassWord } from './interfaces/password.interfaces';
 @Component({
@@ -16,19 +16,26 @@ export class BmAccountComponent implements OnInit {
   passwordForm: FormGroup;
   loading: boolean;
   loadingChangePass: boolean;
-  tempAccount: AccountRegister;
+  tempAccount: any;
   currentPasswordVisible: boolean;
   newPasswordVisible: boolean;
   reNewPasswordVisible: boolean;
   fileList: NzUploadFile[] = [];
+  modeUpdatePass: boolean;
+
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
     private toast: ToastrService
   ) {
+    this.modeUpdatePass = false;
     this.currentPasswordVisible = false;
     this.newPasswordVisible = false;
     this.reNewPasswordVisible = false;
+    this.tempAccount = {
+      avatar: '',
+      name: ''
+    }
     this.passwordForm = this.fb.group({
       current_password: ['', [Validators.required]],
       new_password: ['', [Validators.required]],
@@ -42,13 +49,20 @@ export class BmAccountComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.tempAccount = {
-      avatar: '',
-      name: ''
+  async ngOnInit(): Promise<void> {
+    console.log(12);
+
+    const accountFromCache = this.auth.getAccountFromCache();
+    if (!accountFromCache) {
+      return;
     }
-    // this.account = this.auth.getAccountLocalStorage();
-    // this.tempAccount = { ...this.account };
+    try {
+      const result = await this.auth.getAccount(ConstantDefines.DOMAIN, accountFromCache.Id);
+      this.accountForm.setValue(result)
+      this.tempAccount = { ...result };
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   confirmationValidator = (control: FormControl): { [s: string]: boolean } => {
@@ -60,12 +74,12 @@ export class BmAccountComponent implements OnInit {
     }
   }
 
-  changeAvatar(event): void {
+  handlerChangeAvatar(event): void {
     console.log(1, event);
     this.fileList = [];
   }
 
-  async changePassword(): Promise<void> {
+  async handlerChangePassword(): Promise<void> {
     if (this.loadingChangePass) {
       return;
     }
@@ -113,7 +127,11 @@ export class BmAccountComponent implements OnInit {
     }
   }
 
-  changeViewPass(type: string): void {
+  handlerCancel() {
+
+  }
+
+  handlerChangeViewPass(type: string): void {
     switch (type) {
       case 'currentPassword':
         this.currentPasswordVisible = !this.currentPasswordVisible;
@@ -132,6 +150,14 @@ export class BmAccountComponent implements OnInit {
     const passwordRandom = Math.random().toString(36).substring(6);
     this.passwordForm.get('new_password').setValue(passwordRandom);
     this.passwordForm.get('renew_password').setValue(passwordRandom);
+  }
+
+  handlerChangeModeUpdatePass() {
+    this.modeUpdatePass = true;
+  }
+
+  handlerCancelChangePass() {
+    this.modeUpdatePass = false;
   }
 
 }
