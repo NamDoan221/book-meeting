@@ -28,6 +28,9 @@ jobs:
           node-version: '14.x'
       - run: npm install
       - run: npm run build:prod
+      - uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
