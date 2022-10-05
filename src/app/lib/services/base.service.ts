@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { AuthService } from './auth.service';
 import { DOMAIN_SITE } from '../defines/base-url.define';
 import { ConstantDefines } from '../defines/constant.define';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -36,7 +37,7 @@ export class BaseService {
     return this.http.get(url, this.options);
   }
 
-  public post(pathApi: string, body: any, params: HttpParams = new HttpParams()) {
+  public post(pathApi: string, body: any, params: HttpParams = new HttpParams()): Observable<any> {
     this.setRequestOptions(params);
     const url = `${this.apiUrl}${pathApi}`;
     return this.http.post(url, body, this.options);

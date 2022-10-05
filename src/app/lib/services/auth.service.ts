@@ -48,7 +48,10 @@ export class AuthService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post('Auth/login', body).subscribe({
         next: result => {
-          this.cacheService.setKey(ConstantDefines.TOKEN_KEY, JSON.stringify(result));
+          if (!result.success) {
+            return reject();
+          }
+          this.cacheService.setKey(ConstantDefines.TOKEN_KEY, JSON.stringify(result.result));
           return resolve(result);
         },
         error: err => {
