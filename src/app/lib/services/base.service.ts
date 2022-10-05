@@ -1,9 +1,10 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthService } from './auth.service';
 import { DOMAIN_SITE } from '../defines/base-url.define';
 import { ConstantDefines } from '../defines/constant.define';
 import { Observable } from 'rxjs';
+import { CacheService } from './cache.service';
+import jwt_decode from "jwt-decode";
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,8 @@ export class BaseService {
   protected apiUrl: string;
 
   constructor(
-    protected http: HttpClient
+    protected http: HttpClient,
+    protected cacheService: CacheService
   ) {
     this.apiUrl = DOMAIN_SITE();
   }
@@ -24,8 +26,12 @@ export class BaseService {
       'Content-Type': 'application/json',
       'Client-Version': 'v1.0'
     };
-    if (localStorage.getItem(ConstantDefines.TOKEN_KEY)) {
-      header.Authorization = `Bearer ${localStorage.getItem(ConstantDefines.TOKEN_KEY)}`;
+    const token = this.cacheService.getKey(ConstantDefines.TOKEN_KEY);
+    if (token) {
+      const jwtToken = JSON.parse(token).JwtToken;
+      if (jwtToken) {
+        header.Authorization = `Bearer ${jwtToken}`;
+      }
     }
     const headers = new HttpHeaders(header);
     this.options = { headers: headers, params: params };

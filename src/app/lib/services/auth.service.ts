@@ -17,9 +17,9 @@ export class AuthService extends BaseService {
   constructor(
     protected http: HttpClient,
     private router: Router,
-    private cacheService: CacheService
+    protected cacheService: CacheService
   ) {
-    super(http);
+    super(http, cacheService);
   }
 
   public getAccountFromCache() {
