@@ -45,10 +45,14 @@ export class BmMeetingAttendanceComponent implements OnDestroy {
   }
 
   handlerStopAttendance() {
-    (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop();
-    this.video.nativeElement.pause();
-    this.video.nativeElement.srcObject = null;
-    this.container.nativeElement.removeChild(this.canvas);
+    if (this.video) {
+      this.video.nativeElement.srcObject && (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop();
+      this.video.nativeElement.pause();
+      this.video.nativeElement.srcObject = null;
+    }
+    if (this.container && this.canvas) {
+      this.container.nativeElement.removeChild(this.canvas);
+    }
     clearInterval(this.interval);
     this.interval = undefined;
     this.canvas = undefined;
