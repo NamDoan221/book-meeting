@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, Inject, OnDestroy, PLATFORM_ID, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -12,7 +13,7 @@ declare var faceapi: any;
   styleUrls: ['./attendance.component.scss']
 })
 
-export class BmMeetingAttendanceComponent implements OnDestroy {
+export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
 
   loading: boolean;
   pageSize: number;
@@ -23,6 +24,11 @@ export class BmMeetingAttendanceComponent implements OnDestroy {
   drawerRefGlobal: NzDrawerRef;
   canvas: any;
   interval: any;
+  class_sv = {
+    value: 'D13CNPM5'
+  };
+  attendance = [];
+  faceMatcher: any;
 
   @ViewChild('video') video: ElementRef<HTMLVideoElement>;
   @ViewChild('container') container: ElementRef;
@@ -31,6 +37,7 @@ export class BmMeetingAttendanceComponent implements OnDestroy {
     private auth: AuthService,
     private drawerService: NzDrawerService,
     private notification: NzNotificationService,
+    private http: HttpClient,
     @Inject(PLATFORM_ID) private platform: Object
   ) {
     this.loading = false;
@@ -38,6 +45,10 @@ export class BmMeetingAttendanceComponent implements OnDestroy {
     this.pageSize = 20;
     this.pageIndexGroup = 1;
     this.isOpenDraw = false;
+  }
+
+  ngOnInit(): void {
+    this.loadTrainingData();
   }
 
   handlerStartAttendance() {
@@ -68,6 +79,47 @@ export class BmMeetingAttendanceComponent implements OnDestroy {
       faceapi.nets.faceRecognitionNet.loadFromUri('../../../assets/models'),
       faceapi.nets.faceExpressionNet.loadFromUri('../../../assets/models'),
     ]).then(this.startVideo.bind(this));
+  }
+
+  async logFileText(file) {
+    const result = await this.http.get(file).toPromise();
+
+    console.log(result);
+
+    // const response = await fetch(file);
+    // const text = await response.text();
+    return JSON.stringify(result);
+  };
+
+  async loadTrainingData() {
+    const faceDescriptors = [];
+    let getFileDataTrain = await this.logFileText("../../../assets/data/data-train.txt");
+    let dataTrainArr = getFileDataTrain
+      ? JSON.parse(getFileDataTrain).dataTrain
+      : [];
+    dataTrainArr.forEach((i) => {
+      let label = JSON.parse(i._label);
+      if (label.class === this.class_sv.value) {
+        const Arr32 = i._descriptors.map((item) => {
+          return new Float32Array(Object.values(item));
+        });
+        faceDescriptors.push(new faceapi.LabeledFaceDescriptors(i._label, Arr32));
+      }
+    });
+    faceDescriptors.forEach((i, index) => {
+      let label = JSON.parse(i.label);
+      if (label.class === this.class_sv.value) {
+        return this.attendance.push({
+          name: label.name,
+          id: label.id,
+          class: label.class,
+          checked: false,
+        });
+      }
+    });
+
+    this.faceMatcher = new faceapi.FaceMatcher(faceDescriptors, 0.56);
+    // return faceDescriptors;
   }
 
   getListMeetingRoom(params: any) {
@@ -118,17 +170,42 @@ export class BmMeetingAttendanceComponent implements OnDestroy {
           const detections = await faceapi
             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks()
-            .withFaceExpressions();
+            .withFaceExpressions()
+            .withFaceDescriptors();
           const resizedDetections = faceapi.resizeResults(detections, displaySize);
           if (this.canvas) {
             this.canvas.getContext("2d").clearRect(0, 0, video.videoWidth, video.videoHeight);
             faceapi.draw.drawDetections(this.canvas, resizedDetections);
             faceapi.draw.drawFaceLandmarks(this.canvas, resizedDetections);
             faceapi.draw.drawFaceExpressions(this.canvas, resizedDetections);
-            const canvas_data = document.createElement("canvas");
-            canvas_data
-              .getContext("2d")
-              .drawImage(video, 0, 0, canvas_data.width, canvas_data.height);
+            // const canvas_data = document.createElement("canvas");
+            // canvas_data
+            //   .getContext("2d")
+            //   .drawImage(video, 0, 0, canvas_data.width, canvas_data.height);
+            console.log(resizedDetections);
+
+            resizedDetections.forEach((detection) => {
+              let bestMatch: { label?: string } = {};
+              bestMatch = this.faceMatcher.findBestMatch(detection.descriptor);
+              console.log(bestMatch);
+
+              let studentInfo = JSON.parse(
+                bestMatch.label !== "unknown" ? bestMatch.label : "{}"
+              );
+              // if (bestMatch !== "unknown") {
+              //   let findIndex = attendance.findIndex((i) => studentInfo.id === i.id);
+              //   if (findIndex > -1) {
+              //     attendance[findIndex].checked = true;
+              //     renderStudentList();
+              //   }
+              // }
+
+              const box = detection.detection.box;
+              const drawBox = new faceapi.draw.DrawBox(box, {
+                label: studentInfo.name,
+              });
+              drawBox.draw(this.canvas);
+            });
           }
         }, 100)
       })
