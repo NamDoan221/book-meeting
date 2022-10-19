@@ -6,6 +6,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+:host::ng-deep .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+}
+
+:host::ng-deep .ant-menu-submenu-title {
+  padding-left: 12px !important;
+}
+
 .app-layout {
   height: 100vh;
 }
@@ -40,7 +49,7 @@
 .sidebar-logo {
   position: relative;
   height: 64px;
-  padding-left: 24px;
+  padding-left: 12px;
   overflow: hidden;
   line-height: 80px;
   background: #001529;

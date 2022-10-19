@@ -17,6 +17,9 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { RouterModule, Routes } from '@angular/router';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 export const routes: Routes = [
   {
@@ -43,7 +46,10 @@ export const routes: Routes = [
     NzSelectModule,
     NzToolTipModule,
     NzRadioModule,
-    NzTabsModule
+    NzTabsModule,
+    NzSwitchModule,
+    NzSpinModule,
+    NzDatePickerModule
   ],
   declarations: [
     BmPersonnelComponent,

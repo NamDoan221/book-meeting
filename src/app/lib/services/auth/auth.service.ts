@@ -1,28 +1,22 @@
-import { IPassWord } from '../../account/interfaces/password.interfaces';
+import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { DOMAIN_SITE } from '../defines/base-url.define';
-import { IBodyRegisterAccount, IBodyLogin } from './api/account';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import jwt_decode from "jwt-decode";
-import { ConstantDefines } from '../defines/constant.define';
-import { BaseService } from './base.service';
-import { CacheService } from './cache.service';
+import { DOMAIN_SITE } from '../../defines/base-url.define';
+import { ConstantDefines } from '../../defines/constant.define';
+import { BaseService } from '../base.service';
+import { IBodyLogin, IBodyRegisterAccount, IPassWord, IToken } from './interfaces/auth.interfaces';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService extends BaseService {
 
-  constructor(
-    protected http: HttpClient,
-    private router: Router,
-    protected cacheService: CacheService
-  ) {
-    super(http, cacheService);
+  constructor() {
+    super();
   }
 
-  public getAccountFromCache() {
+  public getAccountFromCache(): IToken | undefined {
     const token = this.cacheService.getKey(ConstantDefines.TOKEN_KEY);
     if (!token) {
       this.redirectToLogin();
@@ -31,9 +25,9 @@ export class AuthService extends BaseService {
     return JSON.parse(token);
   }
 
-  public getAccount(domain: string, id: string): Promise<any> {
+  public getAccount(id: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.get(`${domain}/Account/${id}`).subscribe({
+      this.http.get(`${this.domain}/Account/${id}`).subscribe({
         next: result => {
           return resolve(result);
         },
@@ -46,7 +40,7 @@ export class AuthService extends BaseService {
 
   public login(body: IBodyLogin): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.post('Auth/login', body).subscribe({
+      this.post(`${this.domain}/Auth/login`, body).subscribe({
         next: result => {
           if (!result.success) {
             return reject();
@@ -63,7 +57,7 @@ export class AuthService extends BaseService {
 
   public loginGoogle(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.get(`Auth/google-callback`).subscribe({
+      this.get(`${this.domain}/Auth/google-callback`).subscribe({
         next: result => {
           return resolve(result);
         },
@@ -75,8 +69,9 @@ export class AuthService extends BaseService {
   }
 
   public logout(): Promise<any> {
+    const token = this.getAccountFromCache().JwtToken;
     return new Promise((resolve, reject) => {
-      this.http.get(`${DOMAIN_SITE()}api/auth/logout`).subscribe({
+      this.post(`${this.domain}/Account/revoke-token`, { Token: token }).subscribe({
         next: result => {
           return resolve(result);
         },
@@ -89,7 +84,7 @@ export class AuthService extends BaseService {
 
   public register(body: IBodyRegisterAccount): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.post('Auth/register', body).subscribe({
+      this.post(`${this.domain}/Auth/register`, body).subscribe({
         next: result => {
           return resolve(result);
         },
@@ -100,9 +95,19 @@ export class AuthService extends BaseService {
     });
   }
 
-  public changePassword(password: IPassWord): Promise<any> {
+  public changeAvatar(id: string, url: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.put(`${DOMAIN_SITE()}api/auth/change-pass`, password).subscribe(result => {
+      this.put(`${this.domain}/Account/${id}/change-avatar`, undefined, new HttpParams({ fromObject: { url: url } })).subscribe(result => {
+        return resolve(result);
+      }, err => {
+        reject(err);
+      });
+    });
+  }
+
+  public changePassword(id: string, body: IPassWord): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.put(`${this.domain}/Account/${id}/change-password`, body).subscribe(result => {
         return resolve(result);
       }, err => {
         reject(err);
@@ -112,16 +117,12 @@ export class AuthService extends BaseService {
 
   public changeInfo(body: any): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.http.put(`${DOMAIN_SITE()}api/auth/change-info`, body).subscribe(result => {
+      this.put(`${this.domain}/Account`, body).subscribe(result => {
         return resolve(result);
       }, err => {
         reject(err);
       });
     });
-  }
-
-  public redirectToLogin(): void {
-    this.router.navigate(['login']);
   }
 
   public verifyToken(): boolean {

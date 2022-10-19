@@ -1,61 +1,190 @@
 import { Component, OnInit } from '@angular/core';
-import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { AuthService } from '../lib/services/auth.service';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { TabsDefault } from '../lib/defines/tab.define';
+import { ITab } from '../lib/interfaces/tab.interface';
+import { IColumnItem } from '../lib/interfaces/table.interfaces';
+import { DepartmentService } from '../lib/services/department/department.service';
+import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
+import { IParamsGetListPersonnel, IPersonnel } from '../lib/services/personnel/interfaces/personnel.interface';
+import { PersonnelService } from '../lib/services/personnel/personnel.service';
+import { IParamsGetListPosition, IPosition } from '../lib/services/position/interfaces/position.interface';
+import { PositionService } from '../lib/services/position/position.service';
 import { BmPersonnelAddEditComponent } from './add-edit/add-edit.component';
 
 @Component({
   selector: 'bm-personnel',
-  templateUrl: './personnel.component.html',
-  styleUrls: ['./personnel.component.scss']
+  templateUrl: './personnel.component.html'
 })
 export class BmPersonnelComponent implements OnInit {
+  firstCall: boolean;
   loading: boolean;
-  pageSize: number;
-  total: number;
-  pageIndexGroup: number;
-  listPersonnel: any[];
-  columnConfig: string[];
+  columnConfig: IColumnItem[];
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
+  keyToggleLoading: string;
+  searchingWhileEntering: boolean;
+  onSearch: Subject<string> = new Subject();
+  listPersonnel: IPersonnel[];
+  totalPersonnel: number;
+  params: IParamsGetListPersonnel;
+  totalPosition: number;
+  listPosition: IPosition[];
+  onSearchPosition: Subject<string> = new Subject();
+  paramsGetPosition: IParamsGetListPosition;
+  loadingPosition: boolean;
+  firstCallPosition: boolean;
+  tabs: ITab[];
+  selectedTab: number;
+
+  checked: boolean;
+  showDelete: boolean;
+  listOfCurrentPageData: readonly any[] = [];
+  listOfData: readonly any[] = [];
+  setOfCheckedId = new Set<number>();
 
   constructor(
-    private auth: AuthService,
     private drawerService: NzDrawerService,
-    private notification: NzNotificationService
+    private positionService: PositionService,
+    private departmentService: DepartmentService,
+    private toast: ToastrService,
+    private personnelService: PersonnelService
   ) {
+    this.firstCall = true;
     this.loading = false;
-    this.total = 2;
-    this.pageSize = 20;
-    this.pageIndexGroup = 1;
+    this.totalPersonnel = 0;
+    this.totalPosition = 0;
     this.isOpenDraw = false;
-    this.columnConfig = [
-      'Họ và tên',
-      'Địa chỉ',
-      'Giới tính',
-      'Số điện thoại',
-      'Phòng ban',
-      'Chức vụ'
-    ];
-  }
-
-  ngOnInit(): void {
-  }
-
-  getListPersonnel(params: any) {
-    const data = [];
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        name: `Nguyễn Văn A${i}`,
-        address: `Vị trí A${i}`,
-        gender: i / 2 ? 'Nam' : 'Nữ',
-        phone_number: `0984333${i < 10 ? '0' + i : i}`,
-        department: `Phòng ban ${i}`,
-        position: `Chức vụ ${i}`
-      });
+    this.columnConfig = [{
+      name: 'Họ và tên',
+      width: '18%'
+    },
+    {
+      name: 'Giới tính',
+      width: '6%'
+    },
+    {
+      name: 'Ngày sinh',
+      width: '8%'
+    },
+    {
+      name: 'Địa chỉ',
+      width: '18%'
+    },
+    {
+      name: 'Số điện thoại',
+      width: '8%'
+    },
+    {
+      name: 'Chức vụ',
+      width: '18%'
+    },
+    {
+      name: 'Trạng thái',
+      width: '6%'
+    }];
+    this.listPersonnel = [];
+    this.listPosition = [];
+    this.loadingPosition = true;
+    this.firstCallPosition = true;
+    this.paramsGetPosition = {
+      page: 1,
+      pageSize: 20
     }
-    this.listPersonnel = data;
+    this.checked = false;
+    this.showDelete = false;
+    this.params = {
+      page: 1,
+      pageSize: 20,
+      active: true
+    };
+    this.selectedTab = 0;
+    this.tabs = TabsDefault();
+  }
+
+  async ngOnInit(): Promise<void> {
+    this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
+      if (this.searchingWhileEntering) {
+        this.searchingWhileEntering = false;
+
+        return;
+      }
+      this.searchPersonnel(value);
+    });
+    this.onSearchPosition.pipe(debounceTime(500)).subscribe((value) => {
+      this.searchPosition(value);
+    });
+    this.getListPersonnel();
+  }
+
+  async getListPersonnel() {
+    if (this.loading) {
+      return;
+    }
+    try {
+      this.loading = true;
+      const result = await this.personnelService.getListPersonnel(this.params);
+      this.totalPersonnel = result.Total;
+      this.listPersonnel = result.Value;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  searchPersonnel(value: string) {
+    const text = value.trim();
+    !text ? delete this.params.search : (this.params.search = text);
+    this.listPersonnel = [];
+    this.firstCall = true;
+    this.getListPersonnel();
+  }
+
+  searchPosition(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetPosition.search : (this.paramsGetPosition.search = text);
+    this.listPosition = [];
+    this.firstCall = true;
+    this.getListPosition();
+  }
+
+  handlerSearchPosition(event: string) {
+    this.paramsGetPosition.page = 1;
+    this.onSearchPosition.next(event);
+  }
+
+  async getListPosition() {
+    if (this.loadingPosition && !this.firstCallPosition) {
+      return;
+    }
+    this.firstCallPosition = false;
+    try {
+      this.loadingPosition = true;
+      const result = await this.positionService.getListPosition(this.paramsGetPosition);
+      this.totalPosition = result.Total;
+      this.listPosition = result.Value;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingPosition = false;
+    }
+  }
+
+  handlerScrollBottom() {
+    if (this.loadingPosition || !this.totalPosition || this.totalPosition <= this.listPosition.length) {
+      return;
+    }
+    this.paramsGetPosition.page += 1;
+    this.getListPosition();
+  }
+
+  handlerSelectPosition() {
+    this.firstCall = true;
+    this.getListPersonnel();
   }
 
   handlerAddPersonnel(event: Event) {
@@ -63,12 +192,49 @@ export class BmPersonnelComponent implements OnInit {
     this.addOrEdit(undefined);
   }
 
-  handlerEditPersonnel(event: Event, item: any) {
+  handlerEditPersonnel(event: Event, item: IPersonnel) {
     event.stopPropagation();
     this.addOrEdit(item);
   }
 
-  addOrEdit(personnel: any) {
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+    if (this.setOfCheckedId.size > 0) {
+      this.showDelete = true;
+      return;
+    }
+    this.showDelete = false;
+  }
+
+  handlerDeletePosition(event: Event) {
+    event.stopPropagation();
+    console.log(this.setOfCheckedId);
+  }
+
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
+  }
+
+  onAllChecked(value: boolean): void {
+    this.listOfCurrentPageData.forEach(item => this.updateCheckedSet(item.Id, value));
+    this.refreshCheckedStatus();
+  }
+
+  onCurrentPageDataChange(event: readonly any[]): void {
+    this.listOfCurrentPageData = event;
+    this.refreshCheckedStatus();
+  }
+
+  refreshCheckedStatus(): void {
+    this.checked = this.listOfCurrentPageData.every(item => this.setOfCheckedId.has(item.Id));
+  }
+
+  addOrEdit(personnel: IPersonnel) {
     if (this.isOpenDraw) {
       return;
     }
@@ -107,15 +273,47 @@ export class BmPersonnelComponent implements OnInit {
   }
 
   handlerQueryParamsChange(params: NzTableQueryParams): void {
-    if (!params) {
+    if (!params || this.firstCall) {
+      this.firstCall = false;
       return;
     }
-    this.pageIndexGroup = params.pageIndex;
-    this.pageSize = params.pageSize;
-    let param = {
-      page: this.pageIndexGroup,
-      limit: this.pageSize
+    this.params.page = params.pageIndex;
+    this.getListPersonnel();
+  }
+
+  handlerKeyUp(event) {
+    this.params.page = 1;
+    if (event.key === 'Enter') {
+      this.searchingWhileEntering = true;
+      this.searchPersonnel(event.target.value);
+      return;
     }
-    this.getListPersonnel(param)
+    this.onSearch.next(event.target.value);
+  }
+
+  async handlerActiveChange(event: boolean, item: IPersonnel) {
+    this.keyToggleLoading = item.Id;
+    try {
+      const result = await this.personnelService.changeStatusPersonnel(item.Id);
+      if (result.success) {
+        item.Active = event;
+        this.toast.success('i18n_notification_manipulation_success');
+        return;
+      }
+      item.Active = !event;
+      this.toast.error('i18n_notification_manipulation_not_success');
+    } catch (error) {
+      this.toast.error('i18n_notification_manipulation_not_success');
+      item.Active = !event;
+    } finally {
+      this.keyToggleLoading = undefined;
+    }
+  }
+
+  handlerTabChange(event) {
+    this.selectedTab = event.index;
+    this.params.active = event.index === 0;
+    this.firstCall = true;
+    this.getListPersonnel();
   }
 }

@@ -1,9 +1,9 @@
-import { AuthService } from '../lib/services/auth.service';
+import { AuthService } from '../lib/services/auth/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IBodyLogin } from '../lib/services/api/account';
+import { IBodyLogin } from '../lib/services/auth/interfaces/auth.interfaces';
 
 @Component({
   selector: 'bm-login',
@@ -32,6 +32,10 @@ export class BmLoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const url = window.location.href.replace(/(http:|https:)[/]+[^/]+/g, '').replace('/login', '');
+    if (this.auth.verifyToken()) {
+      this.router.navigateByUrl(url);
+    }
   }
 
   async handlerLogin() {

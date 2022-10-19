@@ -3,7 +3,7 @@ import { Component, ElementRef, Inject, OnDestroy, PLATFORM_ID, ViewChild } from
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { AuthService } from '../lib/services/auth.service';
+import { AuthService } from '../lib/services/auth/auth.service';
 declare var faceapi: any;
 
 @Component({

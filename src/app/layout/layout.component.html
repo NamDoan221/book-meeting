@@ -14,6 +14,7 @@
       <h1 class="bm-mb-12px">BMS</h1>
     </div>
     <ul nz-menu
+      class="h-100 bm-overflow-y-auto"
       nzTheme="dark"
       nzMode="inline"
       [nzInlineCollapsed]="isCollapsed">
@@ -26,7 +27,7 @@
             <ng-container *ngFor="let item of menu.items">
               <li nz-menu-item
                 *ngIf="item.active"
-                [ngClass]="{'bm-bg-1890ff': item.url === currentPath}"
+                [ngClass]="{'bm-bg-1890ff': item.url === currentPath, 'bm-pl-24px': true}"
                 (click)="handlerRouting($event, item.url)">
                 {{item.label}}
               </li>
@@ -48,11 +49,8 @@
         <div class="d-flex align-items-center">
           <i class="notification"
             nz-icon
-            nzType="notification"
+            nzType="bell"
             nzTheme="outline"></i>
-          <img class="bm-ml-12px bm-h-40px bm-w-40px account-img"
-            src="https://d1hjkbq40fs2x4.cloudfront.net/2016-01-31/files/1045.jpg"
-            alt="">
         </div>
       </div>
     </nz-header>

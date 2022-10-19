@@ -1,0 +1,122 @@
+<form nz-form
+  class="w-100"
+  [formGroup]="positionForm">
+  <div class="h-100 w-100 d-flex flex-column justify-content-between">
+    <div>
+      <nz-form-item class="bm-mb-0">
+        <nz-form-control nzErrorTip="Tên chức vụ không thể để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Name'">
+            Tên chức vụ
+          </nz-form-label>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="Name"
+              placeholder="Nhập tên chức vụ">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control [nzErrorTip]="codeErrorTip">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Code'">
+            Mã chức vụ
+          </nz-form-label>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="Code"
+              placeholder="Nhập mã chức vụ">
+          </nz-input-group>
+        </nz-form-control>
+        <ng-template #codeErrorTip
+          let-control>
+          <span class="font-size-11"
+            *ngIf="control.hasError('required')">Mã chức vụ không được để trống!</span>
+          <span class="font-size-11"
+            *ngIf="control.hasError('pattern')">
+            Mã chức vụ không đúng định dạng!
+          </span>
+        </ng-template>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control nzErrorTip="Cấp quản lý không thể để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'IdLevel'">
+            Cấp quản lý
+          </nz-form-label>
+          <nz-select [nzShowSearch]="true"
+            [formControlName]="'IdLevel'"
+            [nzPlaceHolder]="'Chọn cấp quản lý'"
+            [nzNotFoundContent]="'Không có dữ liệu'">
+            <nz-option *ngFor="let item of listDepartmentLevel"
+              [nzValue]="item.Id"
+              [nzLabel]="item.Name">
+            </nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control nzErrorTip="Phòng ban không thể để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'IdDepartment'">
+            Phòng ban
+          </nz-form-label>
+          <nz-select [nzShowSearch]="true"
+            [nzServerSearch]="true"
+            [nzPlaceHolder]="'Chọn phòng ban'"
+            [nzNotFoundContent]="notFoundContentTemplate"
+            [formControlName]="'IdDepartment'"
+            (nzOnSearch)="handlerSearchDepartment($event)"
+            (nzScrollToBottom)="handlerScrollBottom()">
+            <nz-option *ngFor="let item of listDepartment"
+              [nzValue]="item.Id"
+              [nzLabel]="item.Name">
+            </nz-option>
+          </nz-select>
+          <ng-template #notFoundContentTemplate>
+            <div class="d-flex align-items-center justify-content-center">
+              <span *ngIf="!loadingDepartment">{{paramsGetDepartment.search ? 'Không có kết quả' : 'Chưa có phòng ban nào trong danh sách'}}</span>
+              <nz-spin *ngIf="loadingDepartment"
+                nzSimple></nz-spin>
+            </div>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Description'">
+            Mô tả
+          </nz-form-label>
+          <nz-input-group>
+            <textarea nz-input
+              formControlName="Description"
+              placeholder="Nhập mô tả"
+              [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Active'">
+            Trạng thái
+          </nz-form-label>
+          <nz-input-group>
+            <nz-switch formControlName="Active"></nz-switch>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="d-flex justify-content-end bm-mt-20px">
+      <button nz-button
+        nzType="primary"
+        [nzLoading]="!!loading"
+        (click)="handlerSave($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
+    </div>
+  </div>
+</form>

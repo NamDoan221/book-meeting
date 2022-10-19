@@ -1,56 +1,102 @@
 import { Component, OnInit } from '@angular/core';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { AuthService } from '../lib/services/auth.service';
+import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { TabsDefault } from '../lib/defines/tab.define';
+import { ITab } from '../lib/interfaces/tab.interface';
+import { IParamsGetListRoom, IRoom } from '../lib/services/room/interfaces/room.interface';
+import { RoomService } from '../lib/services/room/room.service';
 import { BmMeetingRoomAddEditComponent } from './add-edit/add-edit.component';
 
 @Component({
   selector: 'bm-meeting-room',
-  templateUrl: './meeting-room.component.html',
-  styleUrls: ['./meeting-room.component.scss']
+  templateUrl: './meeting-room.component.html'
 })
 export class BmMeetingRoomComponent implements OnInit {
 
+  firstCall: boolean;
   loading: boolean;
-  pageSize: number;
   total: number;
-  pageIndexGroup: number;
-  listMeetingRoom: any[];
+  listMeetingRoom: IRoom[];
   columnConfig: string[];
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
+  onSearch: Subject<string> = new Subject();
+  params: IParamsGetListRoom;
+  keyToggleLoading: string;
+  searchingWhileEntering: boolean;
+  tabs: ITab[];
+  selectedTab: number;
+
+  checked: boolean;
+  showDelete: boolean;
+  listOfCurrentPageData: readonly any[] = [];
+  listOfData: readonly any[] = [];
+  setOfCheckedId = new Set<number>();
 
   constructor(
-    private auth: AuthService,
     private drawerService: NzDrawerService,
-    private notification: NzNotificationService
+    private roomService: RoomService,
+    private toast: ToastrService
   ) {
+    this.firstCall = true;
     this.loading = false;
-    this.total = 2;
-    this.pageSize = 20;
-    this.pageIndexGroup = 1;
+    this.total = 0;
     this.isOpenDraw = false;
     this.columnConfig = [
       'Tên phòng họp',
+      'Mã phòng họp',
       'Sức chứa tối đa',
-      'Mô tả'
+      'Mô tả',
+      'Trạng thái'
     ];
+    this.params = {
+      page: 1,
+      pageSize: 20,
+      active: true
+    };
+    this.selectedTab = 0;
+    this.tabs = TabsDefault();
+    this.showDelete = false;
+    this.checked = false;
   }
 
   ngOnInit(): void {
+    this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
+      if (this.searchingWhileEntering) {
+        this.searchingWhileEntering = false;
+
+        return;
+      }
+      this.searchMeetingRoom(value);
+    });
+    this.getListMeetingRoom();
   }
 
-  getListMeetingRoom(params: any) {
-    const data = [];
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        name: `Meet ${i}`,
-        maximum_capacity: i + 1,
-        description: `Meet mo ta ${i}`
-      });
+  searchMeetingRoom(value: string) {
+    const text = value.trim();
+    !text ? delete this.params.search : (this.params.search = text);
+    this.listMeetingRoom = [];
+    this.firstCall = true;
+    this.getListMeetingRoom();
+  }
+
+  async getListMeetingRoom() {
+    if (this.loading) {
+      return;
     }
-    this.listMeetingRoom = data;
+    this.loading = true;
+    try {
+      const result = await this.roomService.getListRoom(this.params);
+      this.listMeetingRoom = result.Value;
+      this.total = result.Total;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loading = false;
+    }
   }
 
   handlerAddMeetingRoom(event: Event) {
@@ -58,12 +104,12 @@ export class BmMeetingRoomComponent implements OnInit {
     this.addOrEdit(undefined);
   }
 
-  handlerEditMeetingRoom(event: Event, item: any) {
+  handlerEditMeetingRoom(event: Event, item: IRoom) {
     event.stopPropagation();
     this.addOrEdit(item);
   }
 
-  addOrEdit(room: any) {
+  addOrEdit(room: IRoom) {
     if (this.isOpenDraw) {
       return;
     }
@@ -101,17 +147,85 @@ export class BmMeetingRoomComponent implements OnInit {
     });
   }
 
-  handlerQueryParamsChange(params: NzTableQueryParams): void {
-    if (!params) {
+  handlerKeyUp(event) {
+    this.params.page = 1;
+    if (event.key === 'Enter') {
+      this.searchingWhileEntering = true;
+      this.searchMeetingRoom(event.target.value);
       return;
     }
-    this.pageIndexGroup = params.pageIndex;
-    this.pageSize = params.pageSize;
-    let param = {
-      page: this.pageIndexGroup,
-      limit: this.pageSize
-    }
-    this.getListMeetingRoom(param);
+    this.onSearch.next(event.target.value);
   }
 
+  handlerQueryParamsChange(params: NzTableQueryParams): void {
+    if (!params || this.firstCall) {
+      this.firstCall = false;
+      return;
+    }
+    this.params.page = params.pageIndex;
+    this.getListMeetingRoom();
+  }
+
+  async handlerActiveChange(event: boolean, item: IRoom) {
+    this.keyToggleLoading = item.Id;
+    try {
+      const result = await this.roomService.changeStatusRoom(item.Id);
+      if (result.success) {
+        item.Active = event;
+        this.toast.success('i18n_notification_manipulation_success');
+        return;
+      }
+      item.Active = !event;
+      this.toast.error('i18n_notification_manipulation_not_success');
+    } catch (error) {
+      this.toast.error('i18n_notification_manipulation_not_success');
+      item.Active = !event;
+    } finally {
+      this.keyToggleLoading = undefined;
+    }
+  }
+
+  handlerTabChange(event) {
+    this.selectedTab = event.index;
+    this.params.active = event.index === 0;
+    this.firstCall = true;
+    this.getListMeetingRoom();
+  }
+
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+    if (this.setOfCheckedId.size > 0) {
+      this.showDelete = true;
+      return;
+    }
+    this.showDelete = false;
+  }
+
+  handlerDeletePosition(event: Event) {
+    event.stopPropagation();
+    console.log(this.setOfCheckedId);
+  }
+
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
+  }
+
+  onAllChecked(value: boolean): void {
+    this.listOfCurrentPageData.forEach(item => this.updateCheckedSet(item.Id, value));
+    this.refreshCheckedStatus();
+  }
+
+  onCurrentPageDataChange(event: readonly any[]): void {
+    this.listOfCurrentPageData = event;
+    this.refreshCheckedStatus();
+  }
+
+  refreshCheckedStatus(): void {
+    this.checked = this.listOfCurrentPageData.every(item => this.setOfCheckedId.has(item.Id));
+  }
 }

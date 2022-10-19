@@ -1,44 +1,43 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { ConstantDefines } from 'src/app/lib/defines/constant.define';
+import { IRoom } from 'src/app/lib/services/room/interfaces/room.interface';
+import { RoomService } from 'src/app/lib/services/room/room.service';
 
 @Component({
   selector: 'bm-meeting-room-add-edit',
-  templateUrl: './add-edit.component.html',
-  styleUrls: ['./add-edit.component.scss']
+  templateUrl: './add-edit.component.html'
 })
 export class BmMeetingRoomAddEditComponent implements OnInit {
 
   meetingRoomForm: FormGroup;
   loading: boolean;
 
-  @Input() room: any;
+  @Input() room: IRoom;
   @Input() modeEdit: boolean;
 
-  @Output() saveSuccess = new EventEmitter<any>();
+  @Output() saveSuccess = new EventEmitter<IRoom>();
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private roomService: RoomService,
+    private toast: ToastrService
   ) {
     this.loading = false;
   }
 
   ngOnInit(): void {
-    this.initData();
-  }
-
-  initData() {
     this.meetingRoomForm = this.fb.group({
-      name: [this.room?.name || '', [Validators.required]],
-      maximum_capacity: [this.room?.maximum_capacity || null, [Validators.required]],
-      description: [this.room?.description || '']
+      Name: [this.room?.Name || '', [Validators.required]],
+      AmountSlot: [this.room?.AmountSlot || null, [Validators.required]],
+      Description: [this.room?.Description || ''],
+      Code: [this.room?.Code || '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
+      Active: [this.room?.Active || true]
     });
   }
 
-  handlerScrollBottom(event: any) {
-
-  }
-
-  handlerUpdate(event: Event) {
+  async handlerSave(event: Event) {
     event.stopPropagation();
     if (!this.meetingRoomForm.valid) {
       Object.values(this.meetingRoomForm.controls).forEach(control => {
@@ -49,7 +48,27 @@ export class BmMeetingRoomAddEditComponent implements OnInit {
       });
       return;
     }
-    this.saveSuccess.emit(this.meetingRoomForm.value);
+    this.loading = true;
+    const body = {
+      ...this.meetingRoomForm.value,
+      Domain: ConstantDefines.DOMAIN
+    }
+    if (this.modeEdit) {
+      body.Id = this.room.Id;
+    }
+    try {
+      const result = await this.roomService[this.modeEdit ? 'updateRoom' : 'createRoom'](body);
+      if (result.success) {
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.room.Id });
+        this.toast.success('i18n_notification_manipulation_success');
+        return;
+      }
+      this.toast.error(result.message || 'i18n_notification_manipulation_not_success');
+    } catch (error) {
+      this.toast.error('i18n_notification_manipulation_not_success');
+    } finally {
+      this.loading = false;
+    }
   }
 
 }

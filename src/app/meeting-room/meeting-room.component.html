@@ -8,71 +8,102 @@
         <i nz-icon
           nzType="plus"
           nzTheme="outline"></i>Thêm phòng họp</button>
+      <button nz-button
+        *ngIf="showDelete"
+        class="bm-ml-12px"
+        nzType="primary"
+        nzDanger
+        (click)="handlerDeletePosition($event)">Xoá phòng họp</button>
     </div>
     <nz-input-group class="bm-max-w-503px"
       [nzSuffix]="suffixIconSearch">
       <input type="text"
         nz-input
-        placeholder="Tìm theo tên phòng họp" />
+        placeholder="Tìm theo tên phòng họp"
+        (keyup)="handlerKeyUp($event)" />
     </nz-input-group>
     <ng-template #suffixIconSearch>
       <i nz-icon
         nzType="search"></i>
     </ng-template>
   </div>
-  <div class="h-100 bm-mt-12px">
-    <nz-table #meetingRoomTable
-      [nzScroll]="{ y: 'calc(100vh - 220px)' }"
-      [nzFrontPagination]="false"
-      [nzData]="listMeetingRoom"
-      [nzTotal]="total"
-      [nzPageSize]="pageSize"
-      [nzPageIndex]="pageIndexGroup"
-      [nzNoResult]="empty"
-      [nzLoading]="loading"
-      [nzShowTotal]="totalTemplate"
-      [nzSize]="'middle'"
-      [nzBordered]="true"
-      nzShowPagination
-      nzPaginationType="small"
-      (nzQueryParams)="handlerQueryParamsChange($event)">
-      <thead>
-        <tr>
-          <th *ngFor="let column of columnConfig"
-            [nzAlign]="'left'"
-            class="bm-font-head-4s">
-            {{ column }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of meetingRoomTable.data;  let i=index">
-          <td class="bm-color-009cdb bm-cursor-pointer"
-            (click)="handlerEditMeetingRoom($event, item)">{{item.name}}</td>
-          <td>{{item.maximum_capacity}}</td>
-          <td>
-            <div class="bm-overflow-hidden text-truncate">
-              <span nz-tooltip
-                [nzTooltipTitle]="descriptionTemplate"
-                [nzTooltipTitleContext]="{ $implicit: item.description }">
-                {{item.description}}
-              </span>
-            </div>
-            <ng-template #descriptionTemplate
-              let-description>
-              <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
-            </ng-template>
-          </td>
-        </tr>
-      </tbody>
-    </nz-table>
+  <div class="h-100 w-100 bm-mt-12px">
+    <nz-tabset class="h-100"
+      [(nzSelectedIndex)]="selectedTab"
+      (nzSelectChange)="handlerTabChange($event)">
+      <nz-tab *ngFor="let tab of tabs"
+        [nzTitle]="tab.title">
+        <ng-template nz-tab>
+          <div class="h-100"
+            *ngIf="listMeetingRoom && listMeetingRoom.length">
+            <nz-table #meetingRoomTable
+              [nzScroll]="{ y: 'calc(100vh - 270px)' }"
+              [nzFrontPagination]="false"
+              [nzData]="listMeetingRoom"
+              [nzTotal]="total"
+              [nzPageSize]="params.pageSize"
+              [nzPageIndex]="params.page"
+              [nzLoading]="loading"
+              [nzShowTotal]="totalTemplate"
+              [nzSize]="'middle'"
+              [nzBordered]="true"
+              nzShowPagination
+              nzPaginationType="small"
+              (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+              (nzQueryParams)="handlerQueryParamsChange($event)">
+              <thead>
+                <tr>
+                  <th [(nzChecked)]="checked"
+                    [nzWidth]="'2%'"
+                    (nzCheckedChange)="onAllChecked($event)"></th>
+                  <th *ngFor="let column of columnConfig"
+                    [nzAlign]="'left'"
+                    class="bm-font-head-4s">
+                    {{ column }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of meetingRoomTable.data">
+                  <td [nzChecked]="setOfCheckedId.has(item.Id)"
+                    (nzCheckedChange)="onItemChecked(item.Id, $event)"></td>
+                  <td class="bm-color-009cdb bm-cursor-pointer"
+                    (click)="handlerEditMeetingRoom($event, item)">{{item.Name}}</td>
+                  <td>{{item.Code}}</td>
+                  <td>{{item.AmountSlot}}</td>
+                  <td>
+                    <div class="bm-overflow-hidden text-truncate">
+                      <span nz-tooltip
+                        [nzTooltipTitle]="descriptionTemplate"
+                        [nzTooltipTitleContext]="{ $implicit: item.Description }">
+                        {{item.Description || '&mdash;'}}
+                      </span>
+                    </div>
+                    <ng-template #descriptionTemplate
+                      let-description>
+                      <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
+                    </ng-template>
+                  </td>
+                  <td>
+                    <nz-switch [(ngModel)]="item.Active"
+                      [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
+                      (ngModelChange)="handlerActiveChange($event, item)"></nz-switch>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+          <div class="h-100 w-100 d-flex align-items-center justify-content-center"
+            *ngIf="!listMeetingRoom || !listMeetingRoom.length">
+            <span *ngIf="!loading">{{params.search ? 'Không có kết quả' : 'Chưa có phòng họp nào trong danh sách'}}</span>
+            <nz-spin *ngIf="loading"
+              nzSimple></nz-spin>
+          </div>
+        </ng-template>
+      </nz-tab>
+    </nz-tabset>
   </div>
 </div>
-
-<ng-template #empty>
-  <nz-empty nzNotFoundImage="simple"
-    nzNotFoundContent="Không có dữ liệu"></nz-empty>
-</ng-template>
 
 <ng-template #totalTemplate
   let-total>Tổng cộng {{ total }} bản ghi</ng-template>

@@ -34,8 +34,10 @@
             <div>
               <nz-radio-group formControlName="gender">
                 <label nz-radio
+                  class="bm-font-head-5"
                   [nzValue]="0">Nam</label>
                 <label nz-radio
+                  class="bm-font-head-5"
                   [nzValue]="1">Nữ</label>
               </nz-radio-group>
             </div>
@@ -81,7 +83,7 @@
           <nz-input-group [nzPrefix]="prefixPhone">
             <input type="text"
               nz-input
-              formControlName="mobile"
+              formControlName="phone"
               placeholder="Số điện thoại">
           </nz-input-group>
           <ng-template #phoneErrorTip
@@ -89,7 +91,7 @@
             <span class="font-size-11"
               *ngIf="control.hasError('required')">Số điện thoại không thể để trống!</span>
             <span class="font-size-11"
-              *ngIf="control.hasError('pattern') || control.hasError('maxlength') || control.hasError('minlength')">
+              *ngIf="control.hasError('pattern')">
               Số điện thoại không đúng định dạng!
             </span>
           </ng-template>
@@ -111,6 +113,7 @@
             [nzSuffix]="suffixTemplatePassword">
             <input [type]="passwordVisible ? 'text' : 'password'"
               nz-input
+              autocomplete="new-password"
               formControlName="password"
               placeholder="Mật khẩu">
           </nz-input-group>

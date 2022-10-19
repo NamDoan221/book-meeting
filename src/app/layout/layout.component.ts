@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
-import { AuthService } from '../lib/services/auth.service';
+import { AuthService } from '../lib/services/auth/auth.service';
+import { CacheService } from '../lib/services/cache.service';
 
 @Component({
   selector: 'bm-layout',
@@ -16,7 +16,8 @@ export class BmLayoutComponent implements OnInit {
   constructor(
     private router: Router,
     private auth: AuthService,
-    private toast: ToastrService) {
+    private cacheService: CacheService
+  ) {
     this.isCollapsed = false;
     this.menuData = [
       {
@@ -24,13 +25,18 @@ export class BmLayoutComponent implements OnInit {
         icon: 'user',
         items: [
           {
-            label: 'Nhân sự',
+            label: 'Nhân viên',
             url: '/personnel',
             active: false,
           },
           {
             label: 'Phòng, Ban',
             url: '/department',
+            active: false,
+          },
+          {
+            label: 'Chức vụ',
+            url: '/position',
             active: false,
           },
           {
@@ -55,8 +61,18 @@ export class BmLayoutComponent implements OnInit {
         icon: 'setting',
         items: [
           {
-            label: 'Tài khoản',
+            label: 'Thông tin tài khoản',
             url: '/account',
+            active: true,
+          },
+          {
+            label: 'Cấu hình google calendar',
+            url: '/config-google-calendar',
+            active: true,
+          },
+          {
+            label: 'Lịch sử điểm danh',
+            url: '/attendance-history',
             active: true,
           },
           {
@@ -69,7 +85,7 @@ export class BmLayoutComponent implements OnInit {
     ]
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.currentPath = this.router.url;
     const role = 'manager';
     if (role === 'manager' || role === 'admin') {
@@ -92,7 +108,7 @@ export class BmLayoutComponent implements OnInit {
     if (url === 'logout') {
       try {
         const result = await this.auth.logout();
-        localStorage.setItem('access-token', JSON.stringify(result));
+        this.cacheService.clearAll();
         this.router.navigate(['/login']);
       } catch (error) {
         console.log(error);

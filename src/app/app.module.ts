@@ -12,7 +12,7 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { IconsProviderModule } from './lib/icon-ant/icons-provider.module';
-import { UserCanActive } from './lib/services/auth.service';
+import { UserCanActive } from './lib/services/auth/auth.service';
 
 registerLocaleData(vi);
 

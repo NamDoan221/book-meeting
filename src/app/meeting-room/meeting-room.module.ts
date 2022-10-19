@@ -16,6 +16,9 @@ import { BmMeetingRoomComponent } from './meeting-room.component';
 import { BmMeetingRoomAddEditComponent } from './add-edit/add-edit.component';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 
 export const routes: Routes = [
   {
@@ -41,7 +44,10 @@ export const routes: Routes = [
     NzFormModule,
     NzSelectModule,
     NzInputNumberModule,
-    NzToolTipModule
+    NzToolTipModule,
+    NzSwitchModule,
+    NzSpinModule,
+    NzTabsModule
   ],
   declarations: [
     BmMeetingRoomComponent,

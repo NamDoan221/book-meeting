@@ -3,8 +3,8 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ConstantDefines } from '../lib/defines/constant.define';
-import { IBodyRegisterAccount } from '../lib/services/api/account';
-import { AuthService } from '../lib/services/auth.service';
+import { AuthService } from '../lib/services/auth/auth.service';
+import { IBodyRegisterAccount } from '../lib/services/auth/interfaces/auth.interfaces';
 
 @Component({
   selector: 'bm-sign_up',
@@ -30,7 +30,7 @@ export class BmSignUpComponent {
       fullName: ['', [Validators.required]],
       email: ['', [Validators.email]],
       address: [''],
-      mobile: ['', [Validators.required, Validators.pattern('^[0-9]*$'), Validators.minLength(10), Validators.maxLength(11)]],
+      phone: ['', [Validators.required, Validators.pattern('^(0|84)([0-9]{9})$')]],
       avatarUrl: [''],
       gender: [0, [Validators.required]],
       dob: ['', [Validators.required]],

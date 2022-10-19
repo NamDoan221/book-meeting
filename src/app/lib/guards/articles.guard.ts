@@ -10,7 +10,7 @@ import {
   CanDeactivate,
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '../services/auth/auth.service';
 import { map } from 'rxjs/operators';
 import { CheckDeactivate } from '../deactivate/check-deactivate';
 

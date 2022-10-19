@@ -1,108 +1,215 @@
-<div class="w-100 h-100 d-flex">
-  <div class="h-100"
-    [ngClass]="{'w-100': !modeEdit, 'w-25': modeEdit, 'bm-pr-24px': modeEdit}">
+<div class="w-100 d-flex">
+  <div [ngClass]="{'w-100': !modeEdit, 'w-25': modeEdit, 'bm-pr-24px': modeEdit}">
     <form nz-form
-      class="w-100 h-100"
+      class="w-100"
       [formGroup]="personnelForm">
       <div class="h-100 w-100 d-flex flex-column justify-content-between">
         <div>
           <nz-form-item class="bm-mb-0">
+            <nz-form-control nzErrorTip="Tên tài khoản không thể để trống!">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'Username'">
+                Tên tài khoản
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  formControlName="Username"
+                  placeholder="Nhập tên tài khoản">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
             <nz-form-control nzErrorTip="Tên nhân viên không thể để trống!">
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'name'">
+                [nzFor]="'FullName'">
                 Tên nhân viên
               </nz-form-label>
               <nz-input-group>
                 <input type="text"
                   nz-input
                   class="bm-border-radius-4px"
-                  formControlName="name"
+                  formControlName="FullName"
                   placeholder="Nhập tên nhân viên">
               </nz-input-group>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item class="bm-mt-16px bm-mb-0">
-            <nz-form-control nzErrorTip="Địa chỉ không thể để trống!">
+            <nz-form-control>
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'address'">
-                Địa chỉ
+                [nzFor]="'AvatarUrl'">
+                Ảnh đại diện
               </nz-form-label>
               <nz-input-group>
                 <input type="text"
                   nz-input
                   class="bm-border-radius-4px"
-                  formControlName="address"
-                  placeholder="Nhập địa chỉ">
-              </nz-input-group>
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item class="bm-mt-16px bm-mb-0">
-            <nz-form-control [nzErrorTip]="'Số điện thoại không đúng định dạng!'">
-              <nz-form-label [nzNoColon]="true"
-                [nzFor]="'phone_number'">
-                Số điện thoại
-              </nz-form-label>
-              <nz-input-group>
-                <input type="text"
-                  nz-input
-                  class="bm-border-radius-4px"
-                  formControlName="phone_number"
-                  placeholder="Nhập số điện thoại">
+                  formControlName="AvatarUrl"
+                  placeholder="Nhập ảnh đại diện">
               </nz-input-group>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item class="bm-mt-16px bm-mb-0">
             <nz-form-control [nzErrorTip]="'Giới tính không thể để trống!'">
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'gender'">
+                [nzFor]="'Gender'">
                 Giới tính
               </nz-form-label>
               <div>
-                <nz-radio-group formControlName="gender">
+                <nz-radio-group formControlName="Gender">
                   <label nz-radio
-                    nzValue="male">Nam</label>
+                    class="bm-font-head-5"
+                    [nzValue]="0">Nam</label>
                   <label nz-radio
-                    nzValue="female">Nữ</label>
-                  <label nz-radio
-                    nzValue="other">Khác</label>
+                    class="bm-font-head-5"
+                    [nzValue]="1">Nữ</label>
                 </nz-radio-group>
               </div>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item class="bm-mt-16px bm-mb-0">
-            <nz-form-control>
+            <nz-form-control nzErrorTip="Ngày sinh không thể để trống!">
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'department'">
-                Phòng ban
+                [nzFor]="'Dob'">
+                Ngày sinh
               </nz-form-label>
-              <nz-select [nzShowSearch]="true"
-                [formControlName]="'department'"
-                [nzPlaceHolder]="'Chọn phòng ban'"
-                [nzNotFoundContent]="'Không có dữ liệu'"
-                (nzScrollToBottom)="handlerScrollBottom($event)">
-                <nz-option *ngFor="let item of listDepartment"
-                  [nzValue]="item.name"
-                  [nzLabel]="item.name">
-                </nz-option>
-              </nz-select>
+              <div>
+                <nz-date-picker class="w-40"
+                  nzFormat="dd/MM/yyyy"
+                  formControlName="Dob"
+                  nzPlaceHolder="Chọn ngày sinh">
+                </nz-date-picker>
+              </div>
             </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control nzErrorTip="Địa chỉ không thể để trống!">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'Address'">
+                Địa chỉ
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="Address"
+                  placeholder="Nhập địa chỉ">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control [nzErrorTip]="phoneErrorTip">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'Phone'">
+                Số điện thoại
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="Phone"
+                  placeholder="Nhập số điện thoại">
+              </nz-input-group>
+            </nz-form-control>
+            <ng-template #phoneErrorTip
+              let-control>
+              <span class="font-size-11"
+                *ngIf="control.hasError('required')">Số điện thoại không thể để trống!</span>
+              <span class="font-size-11"
+                *ngIf="control.hasError('pattern')">
+                Số điện thoại không đúng định dạng!
+              </span>
+            </ng-template>
           </nz-form-item>
           <nz-form-item class="bm-mt-16px bm-mb-0">
             <nz-form-control nzErrorTip="Chức vụ không thể để trống!">
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'position'">
+                [nzFor]="'IdPosition'">
                 Chức vụ
               </nz-form-label>
               <nz-select [nzShowSearch]="true"
-                [formControlName]="'position'"
+                [nzServerSearch]="true"
+                [formControlName]="'IdPosition'"
                 [nzPlaceHolder]="'Chọn chức vụ'"
-                [nzNotFoundContent]="'Không có dữ liệu'"
-                (nzScrollToBottom)="handlerScrollBottom($event)">
+                [nzNotFoundContent]="notFoundContentTemplate"
+                (nzOnSearch)="handlerSearchPosition($event)"
+                (nzScrollToBottom)="handlerScrollBottom()">
                 <nz-option *ngFor="let item of listPosition"
-                  [nzValue]="item.key"
-                  [nzLabel]="item.name">
+                  [nzValue]="item.Id"
+                  [nzLabel]="item.Name">
                 </nz-option>
               </nz-select>
+              <ng-template #notFoundContentTemplate>
+                <div class="d-flex align-items-center justify-content-center">
+                  <span *ngIf="!loadingPosition">{{paramsGetPosition.search ? 'Không có kết quả' : 'Chưa có chức vụ nào trong danh sách'}}</span>
+                  <nz-spin *ngIf="loadingPosition"
+                    nzSimple></nz-spin>
+                </div>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control [nzErrorTip]="passwordErrorTip">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'Password'">
+                Mật khẩu
+              </nz-form-label>
+              <nz-input-group [nzSuffix]="suffixTemplatePassword">
+                <input [type]="passwordVisible ? 'text' : 'password'"
+                  nz-input
+                  autocomplete="new-password"
+                  formControlName="Password"
+                  placeholder="Mật khẩu">
+              </nz-input-group>
+              <ng-template #passwordErrorTip
+                let-control>
+                <span class="font-size-11"
+                  *ngIf="control.hasError('required')">Mật khẩu không thể để trống!</span>
+                <span class="font-size-11"
+                  *ngIf="control.hasError('minlength')">
+                  Mật khẩu phải có độ dài tối thiểu 8 kí tự!
+                </span>
+              </ng-template>
+            </nz-form-control>
+            <ng-template #suffixTemplatePassword>
+              <i nz-icon
+                [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
+                (click)="handlerChangeViewPassword('password')"></i>
+            </ng-template>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control [nzErrorTip]="passwordRetypeErrorTpl">
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'ConfirmPassword'">
+                Mật khẩu nhập lại
+              </nz-form-label>
+              <nz-input-group [nzSuffix]="suffixTemplatePasswordRetype">
+                <input [type]="passwordRetypeVisible ? 'text' : 'password'"
+                  nz-input
+                  formControlName="ConfirmPassword"
+                  placeholder="Nhập lại mật khẩu">
+              </nz-input-group>
+            </nz-form-control>
+            <ng-template #passwordRetypeErrorTpl
+              let-control>
+              <ng-container *ngIf="control.hasError('required')">Mật khẩu nhập lại không thể để trống!</ng-container>
+              <ng-container *ngIf="control.hasError('confirm')">Mật khẩu nhập lại không trùng khớp!</ng-container>
+            </ng-template>
+            <ng-template #suffixTemplatePasswordRetype>
+              <i nz-icon
+                [nzType]="confirmPasswordVisible ? 'eye-invisible' : 'eye'"
+                (click)="handlerChangeViewPassword('')"></i>
+            </ng-template>
+          </nz-form-item>
+          <nz-form-item class="bm-mb-0 bm-mt-16px">
+            <nz-form-control>
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'Active'">
+                Trạng thái
+              </nz-form-label>
+              <nz-input-group>
+                <nz-switch formControlName="Active"></nz-switch>
+              </nz-input-group>
             </nz-form-control>
           </nz-form-item>
         </div>

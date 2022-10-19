@@ -8,7 +8,6 @@ import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BmLibCardModule } from '../lib/card/card.module';
 import { BmDepartmentComponent } from './department.component';
-import { BmDepartmentMemberComponent } from './member/member.component';
 import { NzDrawerModule } from 'ng-zorro-antd/drawer';
 import { NzNotificationModule } from 'ng-zorro-antd/notification';
 import { BmDepartmentAddEditComponent } from './add-edit/add-edit.component';
@@ -16,6 +15,9 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { RouterModule, Routes } from '@angular/router';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 
 export const routes: Routes = [
   {
@@ -40,11 +42,13 @@ export const routes: Routes = [
     NzNotificationModule,
     NzFormModule,
     NzSelectModule,
-    NzToolTipModule
+    NzToolTipModule,
+    NzSwitchModule,
+    NzSpinModule,
+    NzTabsModule
   ],
   declarations: [
     BmDepartmentComponent,
-    BmDepartmentMemberComponent,
     BmDepartmentAddEditComponent
   ]
 })

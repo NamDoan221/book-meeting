@@ -1,60 +1,60 @@
 <form nz-form
-  class="w-100 h-100"
+  class="w-100"
   [formGroup]="departmentForm">
   <div class="h-100 w-100 d-flex flex-column justify-content-between">
     <div>
       <nz-form-item class="bm-mb-0">
-        <nz-form-control nzErrorTip="Tên nhóm không thể để trống!">
+        <nz-form-control nzErrorTip="Tên phòng ban không thể để trống!">
           <nz-form-label [nzNoColon]="true"
-            [nzFor]="'name'">
-            Tên nhóm
+            [nzFor]="'Name'">
+            Tên phòng ban
           </nz-form-label>
           <nz-input-group>
             <input type="text"
               nz-input
               class="bm-border-radius-4px"
-              formControlName="name"
-              placeholder="Nhập tên nhóm">
+              formControlName="Name"
+              placeholder="Nhập tên phòng ban">
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
-      <nz-form-item class="bm-mt-16px bm-mb-0">
-        <nz-form-control nzErrorTip="Nhóm phải có ít nhất 1 nhân viên!">
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control [nzErrorTip]="codeErrorTip">
           <nz-form-label [nzNoColon]="true"
-            [nzFor]="'member'">
-            Nhân viên thuộc nhóm
+            [nzFor]="'Code'">
+            Mã phòng ban
           </nz-form-label>
-          <nz-select [nzShowSearch]="true"
-            [nzMaxTagCount]="3"
-            [nzMaxTagPlaceholder]="tagPlaceHolderTpl"
-            nzMode="multiple"
-            [formControlName]="'member'"
-            [nzPlaceHolder]="'Chọn nhân viên vào nhóm'"
-            [nzNotFoundContent]="'Không có dữ liệu'"
-            (nzScrollToBottom)="handlerScrollBottom($event)"
-            (ngModelChange)="handlerChangeMember($event)">
-            <nz-option *ngFor="let item of listMember"
-              [nzValue]="item.name"
-              [nzLabel]="item.name"
-              [nzHide]="listMemberSelected.includes(item.name)">
-            </nz-option>
-          </nz-select>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="Code"
+              placeholder="Nhập mã phòng ban">
+          </nz-input-group>
         </nz-form-control>
+        <ng-template #codeErrorTip
+          let-control>
+          <span class="font-size-11"
+            *ngIf="control.hasError('required')">Mã phòng ban không được để trống!</span>
+          <span class="font-size-11"
+            *ngIf="control.hasError('pattern')">
+            Mã phòng ban không đúng định dạng!
+          </span>
+        </ng-template>
       </nz-form-item>
       <nz-form-item class="bm-mt-16px bm-mb-0">
-        <nz-form-control nzErrorTip="Trưởng nhóm không thể để trống!">
+        <nz-form-control nzErrorTip="Cấp quản lý không thể để trống!">
           <nz-form-label [nzNoColon]="true"
-            [nzFor]="'manager'">
-            Trưởng nhóm
+            [nzFor]="'IdLevel'">
+            Cấp quản lý
           </nz-form-label>
           <nz-select [nzShowSearch]="true"
-            [formControlName]="'manager'"
-            [nzPlaceHolder]="'Chọn trưởng nhóm'"
-            [nzNotFoundContent]="'Không có dữ liệu'"
-            (nzScrollToBottom)="handlerScrollBottom($event)">
-            <nz-option *ngFor="let item of listMemberSelected"
-              [nzValue]="item"
-              [nzLabel]="item">
+            [formControlName]="'IdLevel'"
+            [nzPlaceHolder]="'Chọn cấp quản lý'"
+            [nzNotFoundContent]="'Không có dữ liệu'">
+            <nz-option *ngFor="let item of listDepartmentLevel"
+              [nzValue]="item.Id"
+              [nzLabel]="item.Name">
             </nz-option>
           </nz-select>
         </nz-form-control>
@@ -62,14 +62,25 @@
       <nz-form-item class="bm-mb-0 bm-mt-16px">
         <nz-form-control>
           <nz-form-label [nzNoColon]="true"
-            [nzFor]="'description'">
-            Mô tả công việc
+            [nzFor]="'Description'">
+            Mô tả
           </nz-form-label>
           <nz-input-group>
             <textarea nz-input
-              formControlName="description"
-              placeholder="Nhập mô tả công việc của nhóm"
+              formControlName="Description"
+              placeholder="Nhập mô tả"
               [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Active'">
+            Trạng thái
+          </nz-form-label>
+          <nz-input-group>
+            <nz-switch formControlName="Active"></nz-switch>
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
@@ -77,11 +88,8 @@
     <div class="d-flex justify-content-end bm-mt-20px">
       <button nz-button
         nzType="primary"
-        [nzLoading]="!!loading"
-        (click)="handlerUpdate($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
+        [nzLoading]="loading"
+        (click)="handlerSave($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
     </div>
   </div>
 </form>
-
-<ng-template #tagPlaceHolderTpl
-  let-selectedList>và {{ selectedList.length }} nhân viên khác</ng-template>

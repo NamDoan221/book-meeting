@@ -6,72 +6,67 @@
         <div class="bm-h-100px bm-w-100px">
           <img nz-image
             class="h-100 w-100 account-img"
-            [nzSrc]="'https://d1hjkbq40fs2x4.cloudfront.net/2016-01-31/files/1045.jpg'"
+            [nzSrc]="tempAccount.AvatarUrl || 'https://t3.ftcdn.net/jpg/02/09/37/00/360_F_209370065_JLXhrc5inEmGl52SyvSPeVB23hB6IjrR.jpg'"
             alt="">
           <!-- [nzSrc]="tempAccount.avatar" -->
         </div>
         <div class="bm-ml-20px d-flex flex-column justify-content-center">
           <div class="bm-mb-8px">
-            <span>{{tempAccount.name}}</span>
+            <span>{{tempAccount.FullName}}</span>
           </div>
           <div>
-            <nz-upload nzAction=""
-              [nzFileList]="fileList"
-              [nzAccept]="'image/png,image/jpeg'"
-              [nzFileType]="'image/png,image/jpeg'"
-              (nzChange)="handlerChangeAvatar($event)">
-              <button nz-button
-                nzType="primary"><i nz-icon
-                  nzType="retweet"
-                  nzTheme="outline"></i>Thay đổi ảnh đại diện</button>
-            </nz-upload>
+            <button nz-button
+              nzType="primary"
+              (click)="handlerChangeAvatar()"><i nz-icon
+                nzType="retweet"
+                nzTheme="outline"></i>Thay đổi ảnh đại diện</button>
           </div>
         </div>
       </div>
       <div class="w-45">
         <form nz-form
           [formGroup]="accountForm">
-          <nz-form-item class="bm-mb-0">
-            <nz-form-control>
-              <nz-form-label [nzNoColon]="true"
-                [nzFor]="'accountId'">
-                Mã nhân viên
-              </nz-form-label>
-              <nz-input-group>
-                <input type="text"
-                  nz-input
-                  class="bm-border-radius-4px"
-                  formControlName="accountId"
-                  placeholder="Nhập mã nhân viên">
-              </nz-input-group>
-            </nz-form-control>
-          </nz-form-item>
           <nz-form-item class="bm-mt-16px bm-mb-0">
             <nz-form-control>
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'accountName'">
+                [nzFor]="'Username'">
                 Tên tài khoản
               </nz-form-label>
               <nz-input-group>
                 <input [type]="'text'"
                   nz-input
                   class="bm-border-radius-4px"
-                  formControlName="accountName"
+                  formControlName="Username"
                   placeholder="Nhập tên tài khoản">
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item class="bm-mt-16px bm-mb-0">
+            <nz-form-control>
+              <nz-form-label [nzNoColon]="true"
+                [nzFor]="'Email'">
+                Email
+              </nz-form-label>
+              <nz-input-group>
+                <input type="text"
+                  nz-input
+                  class="bm-border-radius-4px"
+                  formControlName="Email"
+                  placeholder="Nhập email">
               </nz-input-group>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item class="bm-mt-16px bm-mb-0">
             <nz-form-control nzErrorTip="Họ và tên không thể để trống!">
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'userName'">
+                [nzFor]="'FullName'">
                 Họ và tên
               </nz-form-label>
               <nz-input-group>
                 <input [type]="'text'"
                   nz-input
                   class="bm-border-radius-4px"
-                  formControlName="userName"
+                  formControlName="FullName"
                   placeholder="Nhập họ và tên">
               </nz-input-group>
             </nz-form-control>
@@ -79,14 +74,14 @@
           <nz-form-item class="bm-mt-16px bm-mb-0">
             <nz-form-control [nzErrorTip]="phoneErrorTip">
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'phoneNumber'">
+                [nzFor]="'Phone'">
                 Số điện thoại
               </nz-form-label>
               <nz-input-group>
                 <input [type]="'text'"
                   nz-input
                   class="bm-border-radius-4px"
-                  formControlName="phoneNumber"
+                  formControlName="Phone"
                   placeholder="Nhập số điện thoại">
               </nz-input-group>
               <ng-template #phoneErrorTip
@@ -94,7 +89,7 @@
                 <span class="font-size-11"
                   *ngIf="control.hasError('required')">Số điện thoại không thể để trống!</span>
                 <span class="font-size-11"
-                  *ngIf="control.hasError('pattern') || control.hasError('maxlength') || control.hasError('minlength')">
+                  *ngIf="control.hasError('pattern')">
                   Số điện thoại không đúng định dạng!
                 </span>
               </ng-template>
@@ -128,14 +123,14 @@
               <nz-form-item class="bm-mb-0">
                 <nz-form-control nzErrorTip="Mật khẩu hiện tại không thể để trống!">
                   <nz-form-label [nzNoColon]="true"
-                    [nzFor]="'current_password'">
+                    [nzFor]="'oldPassword'">
                     Mật khẩu hiện tại
                   </nz-form-label>
                   <nz-input-group [nzSuffix]="suffixTemplateCurrentPassword">
                     <input [type]="currentPasswordVisible ? 'text' : 'password'"
                       nz-input
                       class="bm-border-radius-4px"
-                      formControlName="current_password"
+                      formControlName="oldPassword"
                       placeholder="Nhập mật khẩu hiện tại">
                   </nz-input-group>
                   <ng-template #suffixTemplateCurrentPassword>
@@ -149,7 +144,7 @@
                 <nz-form-control nzErrorTip="Mật khẩu mới không thể để trống!">
                   <div class="bm-mb-4px d-flex align-items-center justify-content-between">
                     <nz-form-label [nzNoColon]="true"
-                      [nzFor]="'new_password'">
+                      [nzFor]="'newPassword'">
                       Mật khẩu mới
                     </nz-form-label>
                     <div class="bm-color-009cdb bm-cursor-pointer"
@@ -159,7 +154,7 @@
                     <input [type]="newPasswordVisible ? 'text' : 'password'"
                       nz-input
                       class="bm-border-radius-4px"
-                      formControlName="new_password"
+                      formControlName="newPassword"
                       placeholder="Nhập mật khẩu mới">
                   </nz-input-group>
                   <ng-template #suffixTemplateNewPassword>
@@ -172,14 +167,14 @@
               <nz-form-item class="bm-mt-16px bm-mb-0">
                 <nz-form-control [nzErrorTip]="rePasswordErrorTip">
                   <nz-form-label [nzNoColon]="true"
-                    [nzFor]="'renew_password'">
+                    [nzFor]="'confirmPassword'">
                     Xác nhận mật khẩu
                   </nz-form-label>
                   <nz-input-group [nzSuffix]="suffixTemplateReNewPassword">
                     <input [type]="reNewPasswordVisible ? 'text' : 'password'"
                       nz-input
                       class="bm-border-radius-4px"
-                      formControlName="renew_password"
+                      formControlName="confirmPassword"
                       placeholder="Nhập lại mật khẩu mới">
                   </nz-input-group>
                   <ng-template #rePasswordErrorTip
@@ -215,3 +210,10 @@
     </div>
   </div>
 </div>
+
+<input #elInputFile
+  type="file"
+  (change)="handlerChangeInputFile($event)"
+  [accept]="'image/png,image/jpeg,image/jpg'"
+  [multiple]="false"
+  style="display:none;" />

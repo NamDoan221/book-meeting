@@ -32,7 +32,8 @@ import {
   ShopOutline,
   MehOutline,
   IdcardOutline,
-  NotificationOutline
+  NotificationOutline,
+  BellOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -66,7 +67,8 @@ const icons = [
   ShopOutline,
   MehOutline,
   IdcardOutline,
-  NotificationOutline
+  NotificationOutline,
+  BellOutline
 ];
 @NgModule({
   imports: [NzIconModule],

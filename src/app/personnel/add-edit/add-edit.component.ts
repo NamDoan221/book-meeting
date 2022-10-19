@@ -1,5 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { Subject } from 'rxjs';
+import { debounceTime, filter } from 'rxjs/operators';
+import { ConstantDefines } from 'src/app/lib/defines/constant.define';
+import { IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
+import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
+import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
+import { PositionService } from 'src/app/lib/services/position/position.service';
 import { Tabs } from '../defines/data.define';
 
 @Component({
@@ -10,46 +18,40 @@ import { Tabs } from '../defines/data.define';
 export class BmPersonnelAddEditComponent implements OnInit {
 
   personnelForm: FormGroup;
-  listDepartment: any[];
-  listPosition: any[];
   loading: boolean;
   listMeeting: any[];
   tabs: Array<any>;
   selectedTab: number;
   columnConfig: string[];
+  totalPosition: number;
+  listPosition: IPosition[];
+  onSearchPosition: Subject<string> = new Subject();
+  paramsGetPosition: IParamsGetListPosition;
+  loadingPosition: boolean;
+  firstCallPosition: boolean;
+  passwordVisible: boolean;
+  passwordRetypeVisible: boolean;
 
   pageSize: number;
   total: number;
   pageIndexGroup: number;
 
-  @Input() personnel: any;
+  @Input() personnel: IPersonnel;
   @Input() modeEdit: boolean;
 
   @Output() saveSuccess = new EventEmitter<any>();
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private personnelService: PersonnelService,
+    private positionService: PositionService,
+    private toast: ToastrService
   ) {
-
     this.total = 2;
     this.pageSize = 20;
     this.pageIndexGroup = 1;
-
     this.loading = false;
-    this.listPosition = [
-      {
-        name: 'Quản lý',
-        key: 'manager'
-      },
-      {
-        name: 'Nhân viên',
-        key: 'member'
-      },
-      {
-        name: 'Giám đốc',
-        key: 'director'
-      }
-    ];
+    this.listPosition = [];
     this.selectedTab = 0;
     this.tabs = Tabs();
     this.columnConfig = [
@@ -58,52 +60,104 @@ export class BmPersonnelAddEditComponent implements OnInit {
       'Số người tham gia',
       'Mô tả cuộc họp'
     ];
+    this.paramsGetPosition = {
+      page: 1,
+      pageSize: 20
+    }
+    this.loadingPosition = true;
+    this.firstCallPosition = true;
   }
 
   ngOnInit(): void {
-    this.getData();
-    this.initData();
+    this.personnelForm = this.fb.group({
+      Username: [{ value: this.personnel?.Username ?? '', disabled: this.modeEdit }, [Validators.required]],
+      FullName: [this.personnel?.FullName ?? '', [Validators.required]],
+      AvatarUrl: [this.personnel?.AvatarUrl ?? ''],
+      Dob: [this.personnel?.Dob ?? '', [Validators.required]],
+      Address: [this.personnel?.Address ?? '', [Validators.required]],
+      Gender: [this.personnel?.Gender ?? 0, [Validators.required]],
+      Phone: [this.personnel?.Phone ?? '', [Validators.required, Validators.pattern('^(0|84)([0-9]{9})$')]],
+      IdPosition: [this.personnel?.IdPosition ?? '', [Validators.required]],
+      Password: ['', this.modeEdit ? [Validators.minLength(8)] : [Validators.required, Validators.minLength(8)]],
+      ConfirmPassword: ['', this.modeEdit ? [this.confirmationValidator] : [Validators.required, this.confirmationValidator]],
+      Active: [this.personnel?.Active ?? true, [Validators.required]]
+    });
+    this.onSearchPosition.pipe(debounceTime(500), filter((value) => value === this.paramsGetPosition.search)).subscribe((value) => {
+      this.searchPosition(value);
+    });
+    this.getListPosition();
   }
 
-  initData() {
-    this.personnelForm = this.fb.group({
-      name: [this.personnel?.name || '', [Validators.required]],
-      address: [this.personnel?.address || '', [Validators.required]],
-      gender: [this.personnel?.gender || '', [Validators.required]],
-      phone_number: [this.personnel?.phone_number || '', [Validators.pattern('^[0-9]*$'), Validators.minLength(10), Validators.maxLength(11)]],
-      department: [this.personnel?.department || ''],
-      position: [this.personnel?.position || '', [Validators.required]]
-    });
+  confirmationValidator = (control: FormControl): { [s: string]: boolean } => {
+    console.log('vao');
+
+    if (!control.value) {
+      console.log(this.personnelForm?.controls?.Password?.value);
+
+      if (this.modeEdit && !this.personnelForm?.controls?.Password?.value) {
+        return undefined;
+      }
+      return { required: true, error: true };
+    }
+    if (control.value !== this.personnelForm.controls.Password.value) {
+      return { confirm: true, error: true };
+    }
+  }
+
+  handlerSearchPosition(event: string) {
+    this.paramsGetPosition.page = 1;
+    this.onSearchPosition.next(event);
+  }
+
+  handlerScrollBottom() {
+    if (this.loadingPosition || !this.totalPosition || this.totalPosition <= this.listPosition.length) {
+      return;
+    }
+    this.paramsGetPosition.page += 1;
+    this.getListPosition();
+  }
+
+  searchPosition(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetPosition.search : (this.paramsGetPosition.search = text);
+    this.listPosition = [];
+    this.getListPosition();
+  }
+
+  async getListPosition() {
+    if (this.loadingPosition && !this.firstCallPosition) {
+      return;
+    }
+    this.firstCallPosition = false;
+    try {
+      this.loadingPosition = true;
+      const result = await this.positionService.getListPosition(this.paramsGetPosition);
+      this.totalPosition = result.Total;
+      this.listPosition.push(...result.Value);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingPosition = false;
+    }
+  }
+
+  handlerChangeViewPassword(type: string): void {
+    if (type === 'password') {
+      this.passwordVisible = !this.passwordVisible;
+      return;
+    }
+    this.passwordRetypeVisible = !this.passwordRetypeVisible;
   }
 
   handlerTabChange(event) {
     this.selectedTab = event.index;
   }
 
-  getData() {
-    const data = [];
-    const data2 = [];
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        name: `Nguyễn Văn A ${i}`,
-        regency: `Nhân viên ${i}`
-      });
-      data2.push({
-        name: `Cuoc hop ${i}`,
-        date_time: `20/7/2022`,
-        total_participation: i + 1,
-        description: `Noi dung cuoc hop ${i}`
-      })
-    }
-    this.listDepartment = data;
-    this.listMeeting = data2;
-  }
-
-  handlerScrollBottom(event: any) {
+  handlerQueryParamsChange(event) {
 
   }
 
-  handlerUpdate(event: Event) {
+  async handlerUpdate(event: Event) {
     event.stopPropagation();
     if (!this.personnelForm.valid) {
       Object.values(this.personnelForm.controls).forEach(control => {
@@ -114,7 +168,30 @@ export class BmPersonnelAddEditComponent implements OnInit {
       });
       return;
     }
-    this.saveSuccess.emit(this.personnelForm.value);
+    this.loading = true;
+    const body = {
+      ...this.personnelForm.value,
+      Domain: ConstantDefines.DOMAIN
+    }
+    !body.AvatarUrl && delete body.AvatarUrl;
+    delete body.ConfirmPassword;
+    if (this.modeEdit) {
+      !body.Password && delete body.Password;
+      body.Id = this.personnel.Id;
+    }
+    try {
+      const result = await this.personnelService[this.modeEdit ? 'updatePersonnel' : 'createPersonnel'](body);
+      if (result.success) {
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.personnel.Id });
+        this.toast.success('i18n_notification_manipulation_success');
+        return;
+      }
+      this.toast.error(result.message || 'i18n_notification_manipulation_not_success');
+    } catch (error) {
+      this.toast.error('i18n_notification_manipulation_not_success');
+    } finally {
+      this.loading = false;
+    }
   }
 
 }

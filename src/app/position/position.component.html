@@ -1,0 +1,140 @@
+<div class="w-100 h-100 d-flex flex-column">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex">
+      <div class="bm-font-head-2s bm-mr-40px">Chức vụ</div>
+      <button nz-button
+        nzType="primary"
+        (click)="handlerAddPosition($event)">
+        <i nz-icon
+          nzType="plus"
+          nzTheme="outline"></i>Thêm chức vụ</button>
+      <button nz-button
+        *ngIf="showDelete"
+        class="bm-ml-12px"
+        nzType="primary"
+        nzDanger
+        (click)="handlerDeletePosition($event)">Xoá chức vụ</button>
+    </div>
+    <div class="d-flex">
+      <div class="d-flex align-items-center bm-mr-12px">
+        <nz-form-label [nzNoColon]="true">
+          Phòng ban
+        </nz-form-label>
+        <nz-select class="bm-w-200px"
+          [nzShowSearch]="true"
+          [nzAllowClear]="true"
+          [nzServerSearch]="true"
+          [(ngModel)]="params.idDepartment"
+          [nzPlaceHolder]="'Chọn phòng ban'"
+          [nzNotFoundContent]="notFoundContentTemplate"
+          (ngModelChange)="handlerSelectDepartment()"
+          (nzOnSearch)="handlerSearchDepartment($event)"
+          (nzScrollToBottom)="handlerScrollBottom()">
+          <nz-option *ngFor="let item of listDepartment"
+            [nzValue]="item.Id"
+            [nzLabel]="item.Name">
+          </nz-option>
+        </nz-select>
+        <ng-template #notFoundContentTemplate>
+          <div class="d-flex align-items-center justify-content-center">
+            <span *ngIf="!loadingDepartment">{{paramsGetDepartment.search ? 'Không có kết quả' : 'Chưa có phòng ban nào trong danh sách'}}</span>
+            <nz-spin *ngIf="loadingDepartment"
+              nzSimple></nz-spin>
+          </div>
+        </ng-template>
+      </div>
+      <nz-input-group class="bm-w-503px"
+        [nzSuffix]="suffixIconSearch">
+        <input type="text"
+          nz-input
+          placeholder="Tìm theo tên chức vụ"
+          (keyup)="handlerKeyUp($event)" />
+      </nz-input-group>
+      <ng-template #suffixIconSearch>
+        <i nz-icon
+          nzType="search"></i>
+      </ng-template>
+    </div>
+  </div>
+  <div class="h-100 w-100 bm-mt-12px">
+    <nz-tabset class="h-100"
+      [(nzSelectedIndex)]="selectedTab"
+      (nzSelectChange)="handlerTabChange($event)">
+      <nz-tab *ngFor="let tab of tabs"
+        [nzTitle]="tab.title">
+        <ng-template nz-tab>
+          <div class="h-100"
+            *ngIf="listPosition && listPosition.length">
+            <nz-table #positionTable
+              [nzScroll]="{ y: 'calc(100vh - 270px)' }"
+              [nzFrontPagination]="false"
+              [nzData]="listPosition"
+              [nzTotal]="totalPosition"
+              [nzPageSize]="params.pageSize"
+              [nzPageIndex]="params.page"
+              [nzLoading]="loading"
+              [nzShowTotal]="totalTemplate"
+              [nzSize]="'middle'"
+              [nzBordered]="true"
+              nzPaginationType="small"
+              #rowSelectionTable
+              (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+              (nzQueryParams)="handlerQueryParamsChange($event)">
+              <thead>
+                <tr>
+                  <th [(nzChecked)]="checked"
+                    [nzWidth]="'2%'"
+                    (nzCheckedChange)="onAllChecked($event)"></th>
+                  <th *ngFor="let column of columnConfig"
+                    [nzWidth]="column.width"
+                    [nzAlign]="'left'"
+                    class="bm-font-head-4s">
+                    {{ column.name }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of positionTable.data">
+                  <td [nzChecked]="setOfCheckedId.has(item.Id)"
+                    (nzCheckedChange)="onItemChecked(item.Id, $event)"></td>
+                  <td class="bm-color-009cdb bm-cursor-pointer"
+                    (click)="handlerEditPosition($event, item)">{{item.Name}}</td>
+                  <td>{{item.Code}}</td>
+                  <td>{{item.IdLevel}}</td>
+                  <td>{{item.IdDepartment}}</td>
+                  <td>
+                    <div class="bm-overflow-hidden text-truncate">
+                      <span nz-tooltip
+                        [nzTooltipTitle]="descriptionTemplate"
+                        [nzTooltipTitleContext]="{ $implicit: item.Description }">
+                        {{item.Description}}
+                      </span>
+                    </div>
+                    <ng-template #descriptionTemplate
+                      let-description>
+                      <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
+                    </ng-template>
+                  </td>
+                  <td>
+                    <nz-switch [(ngModel)]="item.Active"
+                      [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
+                      (ngModelChange)="handlerActiveChange($event, item)"></nz-switch>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
+          </div>
+          <div class="h-100 w-100 d-flex align-items-center justify-content-center"
+            *ngIf="!listPosition || !listPosition.length">
+            <span *ngIf="!loading">{{params.search ? 'Không có kết quả' : 'Chưa có chức vụ nào trong danh sách'}}</span>
+            <nz-spin *ngIf="loading"
+              nzSimple></nz-spin>
+          </div>
+        </ng-template>
+      </nz-tab>
+    </nz-tabset>
+  </div>
+</div>
+
+<ng-template #totalTemplate
+  let-total>Tổng cộng {{ totalPosition }} bản ghi</ng-template>

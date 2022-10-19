@@ -1,65 +1,58 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
+import { DictionaryService } from '../../lib/services/dictionary/dictionary.service';
+import { DepartmentService } from '../../lib/services/department/department.service';
+import { IDepartment } from '../../lib/services/department/interfaces/department.interface';
+import { IDataItemGetByTypeDictionary } from '../../lib/services/dictionary/interfaces/dictionary.interface';
+import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 
 @Component({
   selector: 'bm-department-add_edit',
-  templateUrl: './add-edit.component.html',
-  styleUrls: ['./add-edit.component.scss']
+  templateUrl: './add-edit.component.html'
 })
 export class BmDepartmentAddEditComponent implements OnInit {
 
   departmentForm: FormGroup;
-  listMember: any[];
+  listDepartmentLevel: IDataItemGetByTypeDictionary[];
   loading: boolean;
-  listMemberSelected: any[];
 
-  @Input() department: any;
+  @Input() department: IDepartment;
   @Input() modeEdit: boolean;
 
-  @Output() saveSuccess = new EventEmitter<any>();
+  @Output() saveSuccess = new EventEmitter<IDepartment>();
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private departmentService: DepartmentService,
+    private toast: ToastrService,
+    private dictionaryService: DictionaryService
   ) {
     this.loading = false;
-    this.listMemberSelected = [];
+    this.listDepartmentLevel = [];
   }
 
   ngOnInit(): void {
-    this.getListMemberByDepartmentId();
-    this.initData();
-  }
-
-  initData() {
-    this.listMemberSelected = this.department?.member || [];
     this.departmentForm = this.fb.group({
-      name: [this.department?.name || '', [Validators.required]],
-      manager: [this.department?.manager || '', [Validators.required]],
-      description: [this.department?.description || ''],
-      member: [this.department?.member || [], [Validators.required]]
+      Name: [this.department?.Name || '', [Validators.required]],
+      IdLevel: [this.department?.IdLevel || null, [Validators.required]],
+      Description: [this.department?.Description || ''],
+      Code: [this.department?.Code || '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
+      Active: [this.department?.Active || true]
     });
+    this.getListDepartmentLevel();
   }
 
-  getListMemberByDepartmentId() {
-    const data = [];
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        name: `Nguyễn Văn A ${i}`,
-        regency: `Nhân viên ${i}`
-      });
+  async getListDepartmentLevel() {
+    try {
+      const result = await this.dictionaryService.getListDataByTypeDictionary('DEPARTMENT_LEVEL');
+      this.listDepartmentLevel = result;
+    } catch (error) {
+      console.log(error);
     }
-    this.listMember = data;
   }
 
-  handlerScrollBottom(event: any) {
-
-  }
-
-  handlerChangeMember(event) {
-    this.listMemberSelected = event;
-  }
-
-  handlerUpdate(event: Event) {
+  async handlerSave(event: Event) {
     event.stopPropagation();
     if (!this.departmentForm.valid) {
       Object.values(this.departmentForm.controls).forEach(control => {
@@ -70,7 +63,27 @@ export class BmDepartmentAddEditComponent implements OnInit {
       });
       return;
     }
-    this.saveSuccess.emit(this.departmentForm.value);
+    this.loading = true;
+    const body = {
+      ...this.departmentForm.value,
+      Domain: ConstantDefines.DOMAIN
+    }
+    if (this.modeEdit) {
+      body.Id = this.department.Id;
+    }
+    try {
+      const result = await this.departmentService[this.modeEdit ? 'updateDepartment' : 'createDepartment'](body);
+      if (result.success) {
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.department.Id });
+        this.toast.success('i18n_notification_manipulation_success');
+        return;
+      }
+      this.toast.error(result.message || 'i18n_notification_manipulation_not_success');
+    } catch (error) {
+      this.toast.error('i18n_notification_manipulation_not_success');
+    } finally {
+      this.loading = false;
+    }
   }
 
 }

@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { ToastrService } from 'ngx-toastr';
-import { ConstantDefines } from '../lib/defines/constant.define';
-import { AuthService } from '../lib/services/auth.service';
-import { IPassWord } from './interfaces/password.interfaces';
+import { AuthService } from '../lib/services/auth/auth.service';
+import { PersonnelService } from '../lib/services/personnel/personnel.service';
+
 @Component({
   selector: 'bm-account',
   templateUrl: './account.component.html',
@@ -23,10 +23,13 @@ export class BmAccountComponent implements OnInit {
   fileList: NzUploadFile[] = [];
   modeUpdatePass: boolean;
 
+  @ViewChild('elInputFile') inputFile!: ElementRef;
+
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private toast: ToastrService
+    private toast: ToastrService,
+    private personnelService: PersonnelService
   ) {
     this.modeUpdatePass = false;
     this.currentPasswordVisible = false;
@@ -37,46 +40,54 @@ export class BmAccountComponent implements OnInit {
       name: ''
     }
     this.passwordForm = this.fb.group({
-      current_password: ['', [Validators.required]],
-      new_password: ['', [Validators.required]],
-      renew_password: ['', [Validators.required, this.confirmationValidator]]
-    });
-    this.accountForm = this.fb.group({
-      accountId: [{ value: '', disabled: true }, [Validators.required]],
-      accountName: [{ value: '', disabled: true }, [Validators.required]],
-      userName: ['', [Validators.required]],
-      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$'), Validators.minLength(10), Validators.maxLength(11)]]
+      oldPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required]],
+      confirmPassword: ['', [Validators.required, this.confirmationValidator]]
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    console.log(12);
-
+  async ngOnInit() {
     const accountFromCache = this.auth.getAccountFromCache();
-    if (!accountFromCache) {
-      return;
-    }
-    try {
-      const result = await this.auth.getAccount(ConstantDefines.DOMAIN, accountFromCache.Id);
-      this.accountForm.setValue(result)
-      this.tempAccount = { ...result };
-    } catch (error) {
-      console.log(error);
-    }
+    // try {
+    //   const result = await this.personnelService.getPersonnelById(accountFromCache.Id);
+    //   console.log(result);
+
+    // } catch (error) {
+
+    // }
+    this.accountForm = this.fb.group({
+      Username: [{ value: accountFromCache.Username || '', disabled: true }, [Validators.required]],
+      Email: [accountFromCache.Email || '', [Validators.required, Validators.email]],
+      FullName: [accountFromCache.FullName || '', [Validators.required]],
+      Phone: [accountFromCache.Phone || '', [Validators.required, Validators.pattern('^(0|84)([0-9]{9})$')]] //^(0|(\+?84))([0-9]{9})$
+    });
+    this.tempAccount = { ...accountFromCache };
   }
 
   confirmationValidator = (control: FormControl): { [s: string]: boolean } => {
     if (!control.value) {
       return { required: true };
     }
-    if (control.value !== this.passwordForm.controls.new_password.value) {
+    if (control.value !== this.passwordForm.controls.newPassword.value) {
       return { confirm: true, error: true };
     }
   }
 
-  handlerChangeAvatar(event): void {
-    console.log(1, event);
-    this.fileList = [];
+  handlerChangeAvatar() {
+    console.log('vao');
+
+    this.inputFile.nativeElement.click();
+  }
+
+  async handlerChangeInputFile(event: any) {
+    console.log(event.target.files);
+    try {
+      await this.auth.changeAvatar(this.tempAccount.Id, '');
+      this.toast.success('i18n_notification_manipulation_success');
+    } catch (error) {
+      this.toast.error('i18n_notification_manipulation_not_success');
+      console.log(error);
+    }
   }
 
   async handlerChangePassword(): Promise<void> {
@@ -92,7 +103,9 @@ export class BmAccountComponent implements OnInit {
     }
     this.loadingChangePass = true;
     try {
-      // await this.auth.changePassword(this.password);
+      const body = this.passwordForm.value;
+      delete body.confirmPassword;
+      await this.auth.changePassword(this.tempAccount.Id, body);
       this.toast.success('i18n_notification_manipulation_success');
     } catch (error) {
       this.toast.error('i18n_notification_manipulation_not_success');
@@ -114,9 +127,13 @@ export class BmAccountComponent implements OnInit {
       return;
     }
     this.loading = true;
+    const body = {
+      ...this.accountForm.value,
+      id: this.tempAccount.Id
+    }
     try {
-      // const result = await this.auth.changeInfo(this.account);
-      // this.tempAccount = { ...result };
+      const result = await this.auth.changeInfo(body);
+      this.tempAccount = { ...result };
       // this.auth.setAccountLocalStorage(result);
       this.toast.success('i18n_notification_manipulation_success');
     } catch (error) {
@@ -128,7 +145,15 @@ export class BmAccountComponent implements OnInit {
   }
 
   handlerCancel() {
-
+    this.accountForm.setValue({
+      Username: this.tempAccount.Username ?? '',
+      Email: this.tempAccount.Email ?? '',
+      FullName: this.tempAccount.FullName ?? '',
+      Phone: this.tempAccount.Phone ?? ''
+    });
+    for (const i in this.accountForm.controls) {
+      this.accountForm.controls[i].setErrors(undefined);
+    }
   }
 
   handlerChangeViewPass(type: string): void {
@@ -148,8 +173,8 @@ export class BmAccountComponent implements OnInit {
   handlerRandomPassword(event: Event) {
     event.stopPropagation();
     const passwordRandom = Math.random().toString(36).substring(6);
-    this.passwordForm.get('new_password').setValue(passwordRandom);
-    this.passwordForm.get('renew_password').setValue(passwordRandom);
+    this.passwordForm.get('newPassword').setValue(passwordRandom);
+    this.passwordForm.get('confirmPassword').setValue(passwordRandom);
   }
 
   handlerChangeModeUpdatePass() {
