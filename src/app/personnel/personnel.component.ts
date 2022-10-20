@@ -26,7 +26,6 @@ export class BmPersonnelComponent implements OnInit {
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
   keyToggleLoading: string;
-  searchingWhileEntering: boolean;
   onSearch: Subject<string> = new Subject();
   listPersonnel: IPersonnel[];
   totalPersonnel: number;
@@ -107,11 +106,6 @@ export class BmPersonnelComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
-      if (this.searchingWhileEntering) {
-        this.searchingWhileEntering = false;
-
-        return;
-      }
       this.searchPersonnel(value);
     });
     this.onSearchPosition.pipe(debounceTime(500)).subscribe((value) => {
@@ -210,7 +204,7 @@ export class BmPersonnelComponent implements OnInit {
     this.showDelete = false;
   }
 
-  handlerDeletePosition(event: Event) {
+  handlerDeletePersonnel(event: Event) {
     event.stopPropagation();
     console.log(this.setOfCheckedId);
   }
@@ -282,9 +276,11 @@ export class BmPersonnelComponent implements OnInit {
   }
 
   handlerKeyUp(event) {
+    if (this.params.search === event.target.value) {
+      return;
+    }
     this.params.page = 1;
     if (event.key === 'Enter') {
-      this.searchingWhileEntering = true;
       this.searchPersonnel(event.target.value);
       return;
     }
@@ -297,6 +293,7 @@ export class BmPersonnelComponent implements OnInit {
       const result = await this.personnelService.changeStatusPersonnel(item.Id);
       if (result.success) {
         item.Active = event;
+        this.listPersonnel = this.listPersonnel.filter(element => element.Id !== item.Id)
         this.toast.success('i18n_notification_manipulation_success');
         return;
       }

@@ -1,6 +1,6 @@
-import { BmLayoutComponent } from './layout.component';
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
+import { BmLayoutComponent } from './layout.component';
 
 const routes: Routes = [
   {
@@ -42,6 +42,11 @@ const routes: Routes = [
         path: 'position',
         loadChildren: () =>
           import('../position/position.module').then((m) => m.BmPositionModule)
+      },
+      {
+        path: 'function',
+        loadChildren: () =>
+          import('../function/function.module').then((m) => m.BmFunctionModule)
       }
     ]
   }

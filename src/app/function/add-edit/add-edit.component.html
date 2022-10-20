@@ -1,0 +1,94 @@
+<!-- <form nz-form
+  class="w-100"
+  [formGroup]="meetingRoomForm">
+  <div class="h-100 w-100 d-flex flex-column justify-content-between">
+    <div>
+      <nz-form-item class="bm-mb-0">
+        <nz-form-control nzErrorTip="Tên phòng họp không được để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Name'">
+            Tên phòng họp
+          </nz-form-label>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="Name"
+              placeholder="Nhập tên phòng họp">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control [nzErrorTip]="codeErrorTip">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Code'">
+            Mã phòng
+          </nz-form-label>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="Code"
+              placeholder="Nhập mã phòng">
+          </nz-input-group>
+        </nz-form-control>
+        <ng-template #codeErrorTip
+          let-control>
+          <span class="font-size-11"
+            *ngIf="control.hasError('required')">Mã phòng không được để trống!</span>
+          <span class="font-size-11"
+            *ngIf="control.hasError('pattern')">
+            Mã phòng không đúng định dạng!
+          </span>
+        </ng-template>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control nzErrorTip="Số lượng người tối đa không được để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'AmountSlot'">
+            Số lượng người tối đa
+          </nz-form-label>
+          <nz-input-group>
+            <nz-input-number class="w-100 bm-border-radius-4px"
+              nzPlaceHolder="Nhập số lượng người tối đa"
+              formControlName="AmountSlot"
+              [nzMin]="1"
+              [nzMax]="1000"
+              [nzStep]="1"></nz-input-number>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Description'">
+            Mô tả
+          </nz-form-label>
+          <nz-input-group>
+            <textarea nz-input
+              formControlName="Description"
+              placeholder="Nhập mô tả"
+              [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Active'">
+            Trạng thái
+          </nz-form-label>
+          <nz-input-group>
+            <nz-switch formControlName="Active"></nz-switch>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="d-flex justify-content-end bm-mt-20px">
+      <button nz-button
+        nzType="primary"
+        [nzLoading]="loading"
+        (click)="handlerSave($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
+    </div>
+  </div>
+</form> -->

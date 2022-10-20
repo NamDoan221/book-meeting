@@ -1,17 +1,16 @@
 <nz-layout class="app-layout">
   <nz-sider class="menu-sidebar"
     nzCollapsible
-    nzWidth="256px"
+    [nzWidth]="256"
+    [nzCollapsedWidth]="40"
     nzBreakpoint="md"
     [(nzCollapsed)]="isCollapsed"
     [nzTrigger]="null">
-    <div class="sidebar-logo">
-      <i nz-icon
-        nzType="fire"
-        nzTheme="outline"
-        class="bm-font-size-30px bm-color-ffffff"
-        style="color: #ffffff;"></i>
-      <h1 class="bm-mb-12px">BMS</h1>
+    <div class="sidebar-logo"
+      [ngClass]="{'bm-pl-5px': isCollapsed}">
+      <img src="../../assets/images/logo2.png"
+        alt="">
+      <h1>Book Meeting</h1>
     </div>
     <ul nz-menu
       class="h-100 bm-overflow-y-auto"
@@ -19,7 +18,16 @@
       nzMode="inline"
       [nzInlineCollapsed]="isCollapsed">
       <ng-container *ngFor="let menu of menuData">
+        <li nz-menu-item
+          *ngIf="menu.url"
+          [ngClass]="{'bm-bg-1890ff': menu.url === currentPath, 'bm-pl-12px': true}"
+          (click)="handlerRouting($event, menu.url)">
+          <span nz-icon
+            [nzType]="menu.icon"></span>
+          <span>{{menu.label}}</span>
+        </li>
         <li nz-submenu
+          *ngIf="!menu.url"
           nzOpen
           [nzTitle]="menu.label"
           [nzIcon]="menu.icon">
@@ -47,10 +55,13 @@
             [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></i>
         </div>
         <div class="d-flex align-items-center">
-          <i class="notification"
-            nz-icon
-            nzType="bell"
-            nzTheme="outline"></i>
+          <nz-badge [nzCount]="100"
+            nzSize="small">
+            <i class="notification"
+              nz-icon
+              nzType="bell"
+              nzTheme="outline"></i>
+          </nz-badge>
         </div>
       </div>
     </nz-header>

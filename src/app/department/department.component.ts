@@ -3,7 +3,7 @@ import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { DepartmentService } from '../lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
@@ -24,9 +24,14 @@ export class BmDepartmentComponent implements OnInit {
   params: IParamsGetListDepartment;
   onSearch: Subject<string> = new Subject();
   keyToggleLoading: string;
-  searchingWhileEntering: boolean;
   tabs: Array<any>;
   selectedTab: number;
+
+  checked: boolean;
+  showDelete: boolean;
+  listOfCurrentPageData: readonly any[] = [];
+  listOfData: readonly any[] = [];
+  setOfCheckedId = new Set<number>();
 
   constructor(
     private drawerService: NzDrawerService,
@@ -51,15 +56,12 @@ export class BmDepartmentComponent implements OnInit {
     }
     this.selectedTab = 0;
     this.tabs = TabsDefault();
+    this.showDelete = false;
+    this.checked = false;
   }
 
   ngOnInit(): void {
     this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
-      if (this.searchingWhileEntering) {
-        this.searchingWhileEntering = false;
-
-        return;
-      }
       this.searchDepartment(value);
     });
     this.getListDepartment();
@@ -147,9 +149,11 @@ export class BmDepartmentComponent implements OnInit {
   }
 
   handlerKeyUp(event) {
+    if (this.params.search === event.target.value) {
+      return;
+    }
     this.params.page = 1;
     if (event.key === 'Enter') {
-      this.searchingWhileEntering = true;
       this.searchDepartment(event.target.value);
       return;
     }
@@ -162,6 +166,7 @@ export class BmDepartmentComponent implements OnInit {
       const result = await this.departmentService.changeStatusDepartment(item.Id);
       if (result.success) {
         item.Active = event;
+        this.listDepartment = this.listDepartment.filter(element => element.Id !== item.Id)
         this.toast.success('i18n_notification_manipulation_success');
         return;
       }
@@ -180,5 +185,42 @@ export class BmDepartmentComponent implements OnInit {
     this.params.active = event.index === 0;
     this.firstCall = true;
     this.getListDepartment();
+  }
+
+  updateCheckedSet(id: number, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+    if (this.setOfCheckedId.size > 0) {
+      this.showDelete = true;
+      return;
+    }
+    this.showDelete = false;
+  }
+
+  handlerDeleteDepartment(event: Event) {
+    event.stopPropagation();
+    console.log(this.setOfCheckedId);
+  }
+
+  onItemChecked(id: number, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshCheckedStatus();
+  }
+
+  onAllChecked(value: boolean): void {
+    this.listOfCurrentPageData.forEach(item => this.updateCheckedSet(item.Id, value));
+    this.refreshCheckedStatus();
+  }
+
+  onCurrentPageDataChange(event: readonly any[]): void {
+    this.listOfCurrentPageData = event;
+    this.refreshCheckedStatus();
+  }
+
+  refreshCheckedStatus(): void {
+    this.checked = this.listOfCurrentPageData.every(item => this.setOfCheckedId.has(item.Id));
   }
 }

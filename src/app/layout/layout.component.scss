@@ -13,6 +13,7 @@
 
 :host::ng-deep .ant-menu-submenu-title {
   padding-left: 12px !important;
+  padding-right: 12px !important;
 }
 
 .app-layout {
@@ -51,21 +52,21 @@
   height: 64px;
   padding-left: 12px;
   overflow: hidden;
-  line-height: 80px;
+  line-height: 60px;
   background: #001529;
   transition: all 0.3s;
 }
 
 .sidebar-logo img {
   display: inline-block;
-  height: 32px;
-  width: 32px;
+  height: 30px;
+  width: 30px;
   vertical-align: middle;
 }
 
 .sidebar-logo h1 {
   display: inline-block;
-  margin: 0 0 0 20px;
+  margin: 0 0 0 12px;
   color: #fff;
   font-weight: 600;
   font-size: 14px;

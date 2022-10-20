@@ -8,11 +8,14 @@ import { vi_VN } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
 import { ToastrModule } from 'ngx-toastr';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { IconsProviderModule } from './lib/icon-ant/icons-provider.module';
 import { UserCanActive } from './lib/services/auth/auth.service';
+import { NzResultModule } from 'ng-zorro-antd/result';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { BmNotFoundComponent } from './not-found/not-found.component';
 
 registerLocaleData(vi);
 
@@ -22,7 +25,8 @@ export function HttpLoaderFactory(http: HttpClient): any {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    BmNotFoundComponent
   ],
   imports: [
     BrowserModule,
@@ -45,9 +49,15 @@ export function HttpLoaderFactory(http: HttpClient): any {
         deps: [HttpClient],
       },
       isolate: false,
-    })
+    }),
+    NzResultModule,
+    NzButtonModule
   ],
   providers: [{ provide: NZ_I18N, useValue: vi_VN }, UserCanActive],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private translate: TranslateService) {
+    this.translate.setDefaultLang('vi');
+  }
+}

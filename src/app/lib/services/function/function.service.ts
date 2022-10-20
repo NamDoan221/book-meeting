@@ -38,7 +38,7 @@ export class FunctionService extends BaseService {
     });
   }
 
-  public updateRoom(body: IFunction): Promise<any> {
+  public updateFunction(body: IFunction): Promise<any> {
     const id = body.Id;
     delete body.Id;
     return new Promise((resolve, reject) => {
@@ -53,7 +53,7 @@ export class FunctionService extends BaseService {
     });
   }
 
-  public changeStatusRoom(id: string): Promise<any> {
+  public changeStatusFunction(id: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`Function/${id}/toggle`, undefined).subscribe({
         next: result => {

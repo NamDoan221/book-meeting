@@ -6,25 +6,25 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
-import { IParamsGetListRoom, IRoom } from '../lib/services/room/interfaces/room.interface';
-import { RoomService } from '../lib/services/room/room.service';
-import { BmMeetingRoomAddEditComponent } from './add-edit/add-edit.component';
+import { FunctionService } from '../lib/services/function/function.service';
+import { IFunction, IParamsGetListFunction } from '../lib/services/function/interfaces/function.interface';
+import { BmFunctionAddEditComponent } from './add-edit/add-edit.component';
 
 @Component({
-  selector: 'bm-meeting-room',
-  templateUrl: './meeting-room.component.html'
+  selector: 'bm-function',
+  templateUrl: './function.component.html'
 })
-export class BmMeetingRoomComponent implements OnInit {
+export class BmFunctionComponent implements OnInit {
 
   firstCall: boolean;
   loading: boolean;
   total: number;
-  listMeetingRoom: IRoom[];
+  listFunction: IFunction[];
   columnConfig: string[];
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
   onSearch: Subject<string> = new Subject();
-  params: IParamsGetListRoom;
+  params: IParamsGetListFunction;
   keyToggleLoading: string;
   tabs: ITab[];
   selectedTab: number;
@@ -37,7 +37,7 @@ export class BmMeetingRoomComponent implements OnInit {
 
   constructor(
     private drawerService: NzDrawerService,
-    private roomService: RoomService,
+    private functionService: FunctionService,
     private toast: ToastrService
   ) {
     this.firstCall = true;
@@ -45,9 +45,10 @@ export class BmMeetingRoomComponent implements OnInit {
     this.total = 0;
     this.isOpenDraw = false;
     this.columnConfig = [
-      'Tên phòng họp',
-      'Mã phòng họp',
-      'Sức chứa tối đa',
+      'Tên chức năng',
+      'Mã chức năng',
+      'Đường dẫn',
+      'Hiển thị trên menu',
       'Mô tả',
       'Trạng thái'
     ];
@@ -64,27 +65,27 @@ export class BmMeetingRoomComponent implements OnInit {
 
   ngOnInit(): void {
     this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
-      this.searchMeetingRoom(value);
+      this.searchFunction(value);
     });
-    this.getListMeetingRoom();
+    this.getListFunction();
   }
 
-  searchMeetingRoom(value: string) {
+  searchFunction(value: string) {
     const text = value.trim();
     !text ? delete this.params.search : (this.params.search = text);
-    this.listMeetingRoom = [];
+    this.listFunction = [];
     this.firstCall = true;
-    this.getListMeetingRoom();
+    this.getListFunction();
   }
 
-  async getListMeetingRoom() {
+  async getListFunction() {
     if (this.loading) {
       return;
     }
     this.loading = true;
     try {
-      const result = await this.roomService.getListRoom(this.params);
-      this.listMeetingRoom = result.Value;
+      const result = await this.functionService.getListFunction(this.params);
+      this.listFunction = result.Value;
       this.total = result.Total;
     } catch (error) {
       console.log(error);
@@ -93,32 +94,32 @@ export class BmMeetingRoomComponent implements OnInit {
     }
   }
 
-  handlerAddMeetingRoom(event: Event) {
+  handlerAddFunction(event: Event) {
     event.stopPropagation();
     this.addOrEdit(undefined);
   }
 
-  handlerEditMeetingRoom(event: Event, item: IRoom) {
+  handlerEditFunction(event: Event, item: IFunction) {
     event.stopPropagation();
     this.addOrEdit(item);
   }
 
-  addOrEdit(room: IRoom) {
+  addOrEdit(functionData: IFunction) {
     if (this.isOpenDraw) {
       return;
     }
     this.isOpenDraw = true;
-    this.drawerRefGlobal = this.drawerService.create<BmMeetingRoomAddEditComponent>({
+    this.drawerRefGlobal = this.drawerService.create<BmFunctionAddEditComponent>({
       nzBodyStyle: { overflow: 'auto' },
       nzMaskClosable: false,
       nzWidth: '30vw',
       nzClosable: true,
       nzKeyboard: true,
-      nzTitle: room ? `Sửa phòng họp` : 'Thêm phòng họp',
-      nzContent: BmMeetingRoomAddEditComponent,
+      nzTitle: functionData ? `Sửa chức năng` : 'Thêm chức năng',
+      nzContent: BmFunctionAddEditComponent,
       nzContentParams: {
-        room: room,
-        modeEdit: room ? true : false
+        function: functionData,
+        modeEdit: functionData ? true : false
       }
     });
 
@@ -127,11 +128,11 @@ export class BmMeetingRoomComponent implements OnInit {
       this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
         this.isOpenDraw = false;
         this.drawerRefGlobal.close();
-        if (room) {
-          Object.assign(room, data);
+        if (functionData) {
+          Object.assign(functionData, data);
           return;
         }
-        this.listMeetingRoom = [data, ...this.listMeetingRoom];
+        this.listFunction = [data, ...this.listFunction];
       });
     });
 
@@ -147,7 +148,7 @@ export class BmMeetingRoomComponent implements OnInit {
     }
     this.params.page = 1;
     if (event.key === 'Enter') {
-      this.searchMeetingRoom(event.target.value);
+      this.searchFunction(event.target.value);
       return;
     }
     this.onSearch.next(event.target.value);
@@ -159,16 +160,16 @@ export class BmMeetingRoomComponent implements OnInit {
       return;
     }
     this.params.page = params.pageIndex;
-    this.getListMeetingRoom();
+    this.getListFunction();
   }
 
-  async handlerActiveChange(event: boolean, item: IRoom) {
+  async handlerActiveChange(event: boolean, item: IFunction) {
     this.keyToggleLoading = item.Id;
     try {
-      const result = await this.roomService.changeStatusRoom(item.Id);
+      const result = await this.functionService.changeStatusFunction(item.Id);
       if (result.success) {
         item.Active = event;
-        this.listMeetingRoom = this.listMeetingRoom.filter(element => element.Id !== item.Id)
+        this.listFunction = this.listFunction.filter(element => element.Id !== item.Id)
         this.toast.success('i18n_notification_manipulation_success');
         return;
       }
@@ -186,7 +187,7 @@ export class BmMeetingRoomComponent implements OnInit {
     this.selectedTab = event.index;
     this.params.active = event.index === 0;
     this.firstCall = true;
-    this.getListMeetingRoom();
+    this.getListFunction();
   }
 
   updateCheckedSet(id: number, checked: boolean): void {
@@ -202,7 +203,7 @@ export class BmMeetingRoomComponent implements OnInit {
     this.showDelete = false;
   }
 
-  handlerDeleteMeetingRoom(event: Event) {
+  handlerDeleteFunction(event: Event) {
     event.stopPropagation();
     console.log(this.setOfCheckedId);
   }

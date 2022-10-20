@@ -33,7 +33,6 @@ export class BmPositionComponent implements OnInit {
   onSearch: Subject<string> = new Subject();
   onSearchDepartment: Subject<string> = new Subject();
   keyToggleLoading: string;
-  searchingWhileEntering: boolean;
   paramsGetDepartment: IParamsGetListDepartment;
   tabs: ITab[];
   selectedTab: number;
@@ -100,11 +99,6 @@ export class BmPositionComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
-      if (this.searchingWhileEntering) {
-        this.searchingWhileEntering = false;
-
-        return;
-      }
       this.searchPosition(value);
     });
     this.onSearchDepartment.pipe(debounceTime(500)).subscribe((value) => {
@@ -275,9 +269,11 @@ export class BmPositionComponent implements OnInit {
   }
 
   handlerKeyUp(event) {
+    if (this.params.search === event.target.value) {
+      return;
+    }
     this.params.page = 1;
     if (event.key === 'Enter') {
-      this.searchingWhileEntering = true;
       this.searchPosition(event.target.value);
       return;
     }
@@ -290,6 +286,7 @@ export class BmPositionComponent implements OnInit {
       const result = await this.positionService.changeStatusPosition(item.Id);
       if (result.success) {
         item.Active = event;
+        this.listPosition = this.listPosition.filter(element => element.Id !== item.Id)
         this.toast.success('i18n_notification_manipulation_success');
         return;
       }

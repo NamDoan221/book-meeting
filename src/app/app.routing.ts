@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { UserCanActive } from './lib/services/auth/auth.service';
+import { BmNotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: '' },
@@ -19,6 +20,10 @@ const routes: Routes = [
     canActivate: [UserCanActive],
     loadChildren: () =>
       import('./layout/layout.module').then((m) => m.BmLayoutModule),
+  },
+  {
+    path: '**',
+    component: BmNotFoundComponent
   }
 ];
 

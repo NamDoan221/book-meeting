@@ -21,6 +21,12 @@ export class BmLayoutComponent implements OnInit {
     this.isCollapsed = false;
     this.menuData = [
       {
+        label: 'Trang chủ',
+        icon: 'home',
+        url: '/dashboard',
+        active: false
+      },
+      {
         label: 'Quản lý',
         icon: 'user',
         items: [
@@ -53,6 +59,11 @@ export class BmLayoutComponent implements OnInit {
             label: 'Điểm danh',
             url: '/attendance',
             active: false,
+          },
+          {
+            label: 'Dữ liệu khuôn mặt',
+            url: '/face-data',
+            active: false,
           }
         ]
       },
@@ -63,22 +74,37 @@ export class BmLayoutComponent implements OnInit {
           {
             label: 'Thông tin tài khoản',
             url: '/account',
-            active: true,
+            active: false,
+          },
+          {
+            label: 'Cấu hình dữ liệu khuôn mặt',
+            url: '/config-face',
+            active: false,
           },
           {
             label: 'Cấu hình google calendar',
             url: '/config-google-calendar',
-            active: true,
+            active: false,
           },
           {
             label: 'Lịch sử điểm danh',
             url: '/attendance-history',
-            active: true,
+            active: false,
+          },
+          {
+            label: 'Phân quyền',
+            url: '/role',
+            active: false,
+          },
+          {
+            label: 'Chức năng',
+            url: '/function',
+            active: false,
           },
           {
             label: 'Đăng xuất',
             url: 'logout',
-            active: true,
+            active: false,
           }
         ]
       }
@@ -92,7 +118,7 @@ export class BmLayoutComponent implements OnInit {
       this.menuData = this.menuData.map(element => {
         return {
           ...element,
-          items: element.items.map(item => {
+          items: element.items?.map(item => {
             return {
               ...item,
               active: true
@@ -105,6 +131,9 @@ export class BmLayoutComponent implements OnInit {
 
   async handlerRouting(event: Event, url: string) {
     event.stopPropagation();
+    if (!url) {
+      return;
+    }
     if (url === 'logout') {
       try {
         const result = await this.auth.logout();

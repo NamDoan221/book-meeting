@@ -1,25 +1,25 @@
 <div class="w-100 h-100 d-flex flex-column">
   <div class="d-flex align-items-center justify-content-between">
     <div class="d-flex">
-      <div class="bm-font-head-2s bm-mr-40px">Phòng họp</div>
+      <div class="bm-font-head-2s bm-mr-40px">Chức năng</div>
       <button nz-button
         nzType="primary"
-        (click)="handlerAddMeetingRoom($event)">
+        (click)="handlerAddFunction($event)">
         <i nz-icon
           nzType="plus"
-          nzTheme="outline"></i>Thêm phòng họp</button>
+          nzTheme="outline"></i>Thêm chức năng</button>
       <button nz-button
         *ngIf="showDelete"
         class="bm-ml-12px"
         nzType="primary"
         nzDanger
-        (click)="handlerDeleteMeetingRoom($event)">Xoá phòng họp</button>
+        (click)="handlerDeleteFunction($event)">Xoá chức năng</button>
     </div>
     <nz-input-group class="bm-max-w-503px"
       [nzSuffix]="suffixIconSearch">
       <input type="text"
         nz-input
-        placeholder="Tìm theo tên phòng họp"
+        placeholder="Tìm theo tên chức năng"
         (keyup)="handlerKeyUp($event)" />
     </nz-input-group>
     <ng-template #suffixIconSearch>
@@ -35,11 +35,11 @@
         [nzTitle]="tab.title">
         <ng-template nz-tab>
           <div class="h-100"
-            *ngIf="listMeetingRoom && listMeetingRoom.length">
+            *ngIf="listFunction && listFunction.length">
             <nz-table #meetingRoomTable
               [nzScroll]="{ y: 'calc(100vh - 270px)' }"
               [nzFrontPagination]="false"
-              [nzData]="listMeetingRoom"
+              [nzData]="listFunction"
               [nzTotal]="total"
               [nzPageSize]="params.pageSize"
               [nzPageIndex]="params.page"
@@ -68,9 +68,10 @@
                   <td [nzChecked]="setOfCheckedId.has(item.Id)"
                     (nzCheckedChange)="onItemChecked(item.Id, $event)"></td>
                   <td class="bm-color-009cdb bm-cursor-pointer"
-                    (click)="handlerEditMeetingRoom($event, item)">{{item.Name}}</td>
+                    (click)="handlerEditFunction($event, item)">{{item.Name}}</td>
                   <td>{{item.Code}}</td>
-                  <td>{{item.AmountSlot}}</td>
+                  <td>{{item.Url}}</td>
+                  <td>{{item.IsMenu ? 'Hiển thị' : 'Ẩn'}}</td>
                   <td>
                     <div class="bm-overflow-hidden text-truncate">
                       <span nz-tooltip
@@ -94,7 +95,7 @@
             </nz-table>
           </div>
           <div class="h-100 w-100 d-flex align-items-center justify-content-center"
-            *ngIf="!listMeetingRoom || !listMeetingRoom.length">
+            *ngIf="!listFunction || !listFunction.length">
             <span *ngIf="!loading">{{params.search ? 'Không có kết quả' : 'Chưa có phòng họp nào trong danh sách'}}</span>
             <nz-spin *ngIf="loading"
               nzSimple></nz-spin>
