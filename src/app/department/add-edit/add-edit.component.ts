@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
-import { DictionaryService } from '../../lib/services/dictionary/dictionary.service';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 import { DepartmentService } from '../../lib/services/department/department.service';
 import { IDepartment } from '../../lib/services/department/interfaces/department.interface';
+import { DictionaryService } from '../../lib/services/dictionary/dictionary.service';
 import { IDataItemGetByTypeDictionary } from '../../lib/services/dictionary/interfaces/dictionary.interface';
-import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 
 @Component({
   selector: 'bm-department-add_edit',
@@ -25,7 +25,7 @@ export class BmDepartmentAddEditComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private departmentService: DepartmentService,
-    private toast: ToastrService,
+    private nzMessageService: NzMessageService,
     private dictionaryService: DictionaryService
   ) {
     this.loading = false;
@@ -75,12 +75,12 @@ export class BmDepartmentAddEditComponent implements OnInit {
       const result = await this.departmentService[this.modeEdit ? 'updateDepartment' : 'createDepartment'](body);
       if (result.success) {
         this.saveSuccess.emit({ ...body, Id: result.result ?? this.department.Id });
-        this.toast.success('i18n_notification_manipulation_success');
+        this.nzMessageService.success('Thao tác thành công.');
         return;
       }
-      this.toast.error(result.message || 'i18n_notification_manipulation_not_success');
+      this.nzMessageService.error(result.message || 'Thao tác không thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
     } finally {
       this.loading = false;
     }

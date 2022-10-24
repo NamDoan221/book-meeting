@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { ConstantDefines } from '../lib/defines/constant.define';
 import { AuthService } from '../lib/services/auth/auth.service';
 import { IBodyRegisterAccount } from '../lib/services/auth/interfaces/auth.interfaces';
@@ -19,7 +19,7 @@ export class BmSignUpComponent {
   constructor(
     private router: Router,
     private auth: AuthService,
-    private toast: ToastrService,
+    private nzMessageService: NzMessageService,
     private fb: FormBuilder,
   ) {
     this.loading = false;
@@ -60,13 +60,13 @@ export class BmSignUpComponent {
       user.domain = ConstantDefines.DOMAIN;
       const result = await this.auth.register(user);
       if (!result.success) {
-        this.toast.error(result.message ?? 'Tạo tài khoản thất bại! Vui lòng kiểm tra lại thông tin.');
+        this.nzMessageService.error(result.message ?? 'Tạo tài khoản thất bại! Vui lòng kiểm tra lại thông tin.');
         return;
       }
-      this.toast.success('Tạo tài khoản thành công!');
+      this.nzMessageService.success('Tạo tài khoản thành công!');
       this.router.navigate(['/login']);
     } catch (error) {
-      this.toast.error('Tạo tài khoản thất bại! Vui lòng kiểm tra lại thông tin.');
+      this.nzMessageService.error('Tạo tài khoản thất bại! Vui lòng kiểm tra lại thông tin.');
       console.log(error);
     } finally {
       this.loading = false;

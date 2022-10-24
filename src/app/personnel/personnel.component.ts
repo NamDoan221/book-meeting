@@ -1,14 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
 import { IColumnItem } from '../lib/interfaces/table.interfaces';
-import { DepartmentService } from '../lib/services/department/department.service';
-import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
 import { IParamsGetListPersonnel, IPersonnel } from '../lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from '../lib/services/personnel/personnel.service';
 import { IParamsGetListPosition, IPosition } from '../lib/services/position/interfaces/position.interface';
@@ -48,8 +46,7 @@ export class BmPersonnelComponent implements OnInit {
   constructor(
     private drawerService: NzDrawerService,
     private positionService: PositionService,
-    private departmentService: DepartmentService,
-    private toast: ToastrService,
+    private nzMessageService: NzMessageService,
     private personnelService: PersonnelService
   ) {
     this.firstCall = true;
@@ -105,10 +102,10 @@ export class BmPersonnelComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
+    this.onSearch.pipe(debounceTime(1500), filter(value => value !== this.params.search)).subscribe((value) => {
       this.searchPersonnel(value);
     });
-    this.onSearchPosition.pipe(debounceTime(500)).subscribe((value) => {
+    this.onSearchPosition.pipe(debounceTime(500), filter(value => value !== this.paramsGetPosition.search)).subscribe((value) => {
       this.searchPosition(value);
     });
     this.getListPersonnel();
@@ -294,13 +291,13 @@ export class BmPersonnelComponent implements OnInit {
       if (result.success) {
         item.Active = event;
         this.listPersonnel = this.listPersonnel.filter(element => element.Id !== item.Id)
-        this.toast.success('i18n_notification_manipulation_success');
+        this.nzMessageService.success('Thao tác thành công.');
         return;
       }
       item.Active = !event;
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
       item.Active = !event;
     } finally {
       this.keyToggleLoading = undefined;

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { ConstantDefines } from 'src/app/lib/defines/constant.define';
@@ -45,7 +45,7 @@ export class BmPersonnelAddEditComponent implements OnInit {
     private fb: FormBuilder,
     private personnelService: PersonnelService,
     private positionService: PositionService,
-    private toast: ToastrService
+    private nzMessageService: NzMessageService
   ) {
     this.total = 2;
     this.pageSize = 20;
@@ -82,7 +82,7 @@ export class BmPersonnelAddEditComponent implements OnInit {
       ConfirmPassword: ['', this.modeEdit ? [this.confirmationValidator] : [Validators.required, this.confirmationValidator]],
       Active: [this.personnel?.Active ?? true, [Validators.required]]
     });
-    this.onSearchPosition.pipe(debounceTime(500), filter((value) => value === this.paramsGetPosition.search)).subscribe((value) => {
+    this.onSearchPosition.pipe(debounceTime(500), filter(value => value === this.paramsGetPosition.search)).subscribe((value) => {
       this.searchPosition(value);
     });
     this.getListPosition();
@@ -183,12 +183,12 @@ export class BmPersonnelAddEditComponent implements OnInit {
       const result = await this.personnelService[this.modeEdit ? 'updatePersonnel' : 'createPersonnel'](body);
       if (result.success) {
         this.saveSuccess.emit({ ...body, Id: result.result ?? this.personnel.Id });
-        this.toast.success('i18n_notification_manipulation_success');
+        this.nzMessageService.success('Thao tác thành công.');
         return;
       }
-      this.toast.error(result.message || 'i18n_notification_manipulation_not_success');
+      this.nzMessageService.error(result.message || 'Thao tác không thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
     } finally {
       this.loading = false;
     }

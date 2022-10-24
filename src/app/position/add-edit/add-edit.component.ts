@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { ConstantDefines } from 'src/app/lib/defines/constant.define';
@@ -34,7 +34,7 @@ export class BmPositionAddEditComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private toast: ToastrService,
+    private nzMessageService: NzMessageService,
     private dictionaryService: DictionaryService,
     private positionService: PositionService,
     private departmentService: DepartmentService
@@ -61,7 +61,7 @@ export class BmPositionAddEditComponent implements OnInit {
       Active: [this.position?.Active || true]
     });
     this.getListDepartmentLevel();
-    this.onSearchDepartment.pipe(debounceTime(500), filter((value) => value === this.paramsGetDepartment.search)).subscribe((value) => {
+    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value === this.paramsGetDepartment.search)).subscribe((value) => {
       this.searchDepartment(value);
     });
     this.getListDepartment();
@@ -136,12 +136,12 @@ export class BmPositionAddEditComponent implements OnInit {
       const result = await this.positionService[this.modeEdit ? 'updatePosition' : 'createPosition'](body);
       if (result.success) {
         this.saveSuccess.emit({ ...body, Id: result.result ?? this.position.Id });
-        this.toast.success('i18n_notification_manipulation_success');
+        this.nzMessageService.success('Thao tác thành công.');
         return;
       }
-      this.toast.error(result.message || 'i18n_notification_manipulation_not_success');
+      this.nzMessageService.error(result.message || 'Thao tác không thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
     } finally {
       this.loading = false;
     }

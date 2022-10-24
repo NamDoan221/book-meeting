@@ -1,7 +1,7 @@
 <div class="w-100 h-100 d-flex flex-column">
   <div class="d-flex align-items-center justify-content-between">
-    <div class="d-flex">
-      <div class="bm-font-head-2s bm-mr-40px">Chức năng</div>
+    <div class="d-flex align-items-center">
+      <div class="bm-font-head-3s bm-mr-24px">Chức năng</div>
       <button nz-button
         nzType="primary"
         (click)="handlerAddFunction($event)">
@@ -32,6 +32,7 @@
       [(nzSelectedIndex)]="selectedTab"
       (nzSelectChange)="handlerTabChange($event)">
       <nz-tab *ngFor="let tab of tabs"
+        [nzDisabled]="loading"
         [nzTitle]="tab.title">
         <ng-template nz-tab>
           <div class="h-100"
@@ -39,7 +40,6 @@
             <nz-table #meetingRoomTable
               [nzScroll]="{ y: 'calc(100vh - 270px)' }"
               [nzFrontPagination]="false"
-              [nzData]="listFunction"
               [nzTotal]="total"
               [nzPageSize]="params.pageSize"
               [nzPageIndex]="params.page"
@@ -49,8 +49,8 @@
               [nzBordered]="true"
               nzShowPagination
               nzPaginationType="small"
-              (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
-              (nzQueryParams)="handlerQueryParamsChange($event)">
+              [nzData]="listFunction"
+              nzTableLayout="fixed">
               <thead>
                 <tr>
                   <th [(nzChecked)]="checked"
@@ -61,36 +61,50 @@
                     class="bm-font-head-4s">
                     {{ column }}
                   </th>
+                  <th>#</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of meetingRoomTable.data">
-                  <td [nzChecked]="setOfCheckedId.has(item.Id)"
-                    (nzCheckedChange)="onItemChecked(item.Id, $event)"></td>
-                  <td class="bm-color-009cdb bm-cursor-pointer"
-                    (click)="handlerEditFunction($event, item)">{{item.Name}}</td>
-                  <td>{{item.Code}}</td>
-                  <td>{{item.Url}}</td>
-                  <td>{{item.IsMenu ? 'Hiển thị' : 'Ẩn'}}</td>
-                  <td>
-                    <div class="bm-overflow-hidden text-truncate">
-                      <span nz-tooltip
-                        [nzTooltipTitle]="descriptionTemplate"
-                        [nzTooltipTitleContext]="{ $implicit: item.Description }">
-                        {{item.Description || '&mdash;'}}
-                      </span>
-                    </div>
-                    <ng-template #descriptionTemplate
-                      let-description>
-                      <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
-                    </ng-template>
-                  </td>
-                  <td>
-                    <nz-switch [(ngModel)]="item.Active"
-                      [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
-                      (ngModelChange)="handlerActiveChange($event, item)"></nz-switch>
-                  </td>
-                </tr>
+                <ng-container *ngFor="let data of meetingRoomTable.data">
+                  <ng-container *ngFor="let item of mapOfExpandedData[data.Id]">
+                    <tr *ngIf="(item.Parent && item.Parent.Expand) || !item.Parent">
+                      <td [nzChecked]="setOfCheckedId.has(item.Id)"
+                        (nzCheckedChange)="onItemChecked(item.Id, $event)"></td>
+                      <td [nzIndentSize]="item.Level * 20"
+                        [nzShowExpand]="item.FunctionChilds && item.FunctionChilds.length > 0"
+                        [(nzExpand)]="item.Expand"
+                        (nzExpandChange)="collapse(mapOfExpandedData[data.Id], item, $event)">
+                        <span class="bm-color-009cdb bm-cursor-pointer"
+                          (click)="handlerEditFunction($event, item)">{{ item.Name }}</span>
+                      </td>
+                      <td>{{item.Code}}</td>
+                      <td>{{item.Url}}</td>
+                      <td>{{item.IsMenu ? 'Hiển thị' : 'Ẩn'}}</td>
+                      <td>
+                        <div class="bm-overflow-hidden text-truncate">
+                          <span nz-tooltip
+                            [nzTooltipTitle]="descriptionTemplate"
+                            [nzTooltipTitleContext]="{ $implicit: item.Description }">
+                            {{item.Description || '&mdash;'}}
+                          </span>
+                        </div>
+                        <ng-template #descriptionTemplate
+                          let-description>
+                          <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
+                        </ng-template>
+                      </td>
+                      <td>
+                        <nz-switch [(ngModel)]="item.Active"
+                          [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
+                          (ngModelChange)="handlerActiveChange($event, item)">
+                        </nz-switch>
+                      </td>
+                      <td><span *ngIf="item.Level === 0"
+                          (click)="handlerAddSubFunction($event, item.Id)"
+                          class="bm-color-009cdb bm-cursor-pointer">Thêm chức năng con</span></td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
               </tbody>
             </nz-table>
           </div>

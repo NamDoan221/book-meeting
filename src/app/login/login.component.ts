@@ -1,9 +1,9 @@
 import { AuthService } from '../lib/services/auth/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IBodyLogin } from '../lib/services/auth/interfaces/auth.interfaces';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'bm-login',
@@ -20,7 +20,7 @@ export class BmLoginComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private auth: AuthService,
-    private toast: ToastrService
+    private nzMessageService: NzMessageService
   ) {
     this.loading = false;
     this.loadingGoogle = false;
@@ -56,10 +56,10 @@ export class BmLoginComponent implements OnInit {
         password: this.loginForm.get('password') && this.loginForm.get('password').value || ''
       }
       await this.auth.login(body);
-      this.toast.success('Đăng nhập thành công!');
+      this.nzMessageService.success('Đăng nhập thành công!');
       this.router.navigate(['/meeting-schedule']);
     } catch (error) {
-      this.toast.error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin đăng nhập.');
+      this.nzMessageService.error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin đăng nhập.');
       console.log(error);
     } finally {
       this.loading = false;
@@ -75,10 +75,10 @@ export class BmLoginComponent implements OnInit {
       const result = await this.auth.loginGoogle();
       console.log(result);
 
-      // this.toast.success('Đăng nhập thành công!');
+      // this.nzMessageService.success('Đăng nhập thành công!');
       // this.router.navigate(['/chat']);
     } catch (error) {
-      // this.toast.error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin đăng nhập.');
+      // this.nzMessageService.error('Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin đăng nhập.');
       console.log(error);
     } finally {
       this.loadingGoogle = false;

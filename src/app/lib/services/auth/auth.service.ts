@@ -2,6 +2,7 @@ import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import jwt_decode from "jwt-decode";
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { DOMAIN_SITE } from '../../defines/base-url.define';
 import { ConstantDefines } from '../../defines/constant.define';
 import { BaseService } from '../base.service';
@@ -16,7 +17,7 @@ export class AuthService extends BaseService {
     super();
   }
 
-  public getAccountFromCache(): IToken | undefined {
+  public decodeToken(): IToken | undefined {
     const token = this.cacheService.getKey(ConstantDefines.TOKEN_KEY);
     if (!token) {
       this.redirectToLogin();
@@ -69,7 +70,7 @@ export class AuthService extends BaseService {
   }
 
   public logout(): Promise<any> {
-    const token = this.getAccountFromCache().JwtToken;
+    const token = this.decodeToken().JwtToken;
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Account/revoke-token`, { Token: token }).subscribe({
         next: result => {
@@ -158,12 +159,13 @@ export class AuthService extends BaseService {
 export class UserCanActive implements CanActivate {
   constructor(
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private nzMessageService: NzMessageService
   ) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
     let path: string = window.location.pathname === DOMAIN_SITE() ? state.url.split('?')[0] : window.location.pathname;
-    console.log(route.queryParams, path);
+    console.log(route, state);
 
     if (!this.checkLogin()) {
       return false;
@@ -172,6 +174,11 @@ export class UserCanActive implements CanActivate {
     // if (!this.auth.checkPermission(path, undefined, false, false)) {
     //   return false;
     // }
+    if (path === '/personnel') {
+      this.nzMessageService.error('Bạn không có quyền truy cập chức năng này.');
+      // this.router.navigate(['/account']);
+      return false;
+    }
     return true;
   }
 

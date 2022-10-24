@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../lib/services/auth/auth.service';
 import { CacheService } from '../lib/services/cache.service';
 
@@ -16,7 +17,8 @@ export class BmLayoutComponent implements OnInit {
   constructor(
     private router: Router,
     private auth: AuthService,
-    private cacheService: CacheService
+    private cacheService: CacheService,
+    private nzMessageService: NzMessageService
   ) {
     this.isCollapsed = false;
     this.menuData = [
@@ -36,7 +38,7 @@ export class BmLayoutComponent implements OnInit {
             active: false,
           },
           {
-            label: 'Phòng, Ban',
+            label: 'Phòng ban',
             url: '/department',
             active: false,
           },
@@ -112,6 +114,8 @@ export class BmLayoutComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    console.log(this.auth.decodeToken());
+
     this.currentPath = this.router.url;
     const role = 'manager';
     if (role === 'manager' || role === 'admin') {
@@ -144,6 +148,10 @@ export class BmLayoutComponent implements OnInit {
       }
       return;
     }
+    // if (url === '/personnel') {
+    //   this.nzMessageService.error('Bạn không có quyền truy cập chức năng này.');
+    //   return false;
+    // }
     this.currentPath = url;
     this.router.navigate([url]);
   }

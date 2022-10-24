@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
-import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../lib/services/auth/auth.service';
 import { PersonnelService } from '../lib/services/personnel/personnel.service';
 
@@ -28,7 +28,7 @@ export class BmAccountComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private toast: ToastrService,
+    private nzMessageService: NzMessageService,
     private personnelService: PersonnelService
   ) {
     this.modeUpdatePass = false;
@@ -47,7 +47,7 @@ export class BmAccountComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const accountFromCache = this.auth.getAccountFromCache();
+    const accountFromCache = this.auth.decodeToken();
     // try {
     //   const result = await this.personnelService.getPersonnelById(accountFromCache.Id);
     //   console.log(result);
@@ -83,9 +83,9 @@ export class BmAccountComponent implements OnInit {
     console.log(event.target.files);
     try {
       await this.auth.changeAvatar(this.tempAccount.Id, '');
-      this.toast.success('i18n_notification_manipulation_success');
+      this.nzMessageService.success('Thao tác thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
       console.log(error);
     }
   }
@@ -106,9 +106,9 @@ export class BmAccountComponent implements OnInit {
       const body = this.passwordForm.value;
       delete body.confirmPassword;
       await this.auth.changePassword(this.tempAccount.Id, body);
-      this.toast.success('i18n_notification_manipulation_success');
+      this.nzMessageService.success('Thao tác thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
       console.log(error);
     } finally {
       this.loadingChangePass = false;
@@ -135,9 +135,9 @@ export class BmAccountComponent implements OnInit {
       const result = await this.auth.changeInfo(body);
       this.tempAccount = { ...result };
       // this.auth.setAccountLocalStorage(result);
-      this.toast.success('i18n_notification_manipulation_success');
+      this.nzMessageService.success('Thao tác thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
       console.log(error);
     } finally {
       this.loading = false;

@@ -55,7 +55,6 @@ $rotates: 45deg 90deg 180deg 270deg;
 $text-transform: uppercase lowercase;
 
 @import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
-@import "../node_modules/ngx-toastr/toastr.css";
 @import "./scroll";
 @import "./font";
 @import "./margin-or-padding";
@@ -70,12 +69,10 @@ $text-transform: uppercase lowercase;
 @import "./max-min-height";
 @import "./max-min-width";
 @import "./overflow";
-@import "./daterangepicker";
 @import "./placeholder";
 @import "./body";
 @import "./opacity";
 @import "./shadow";
-@import "./toast-custom";
 @import "./rotate";
 @import "./text-decorations";
 @import "./variables";
@@ -102,7 +99,15 @@ label {
 .ant-select-selection-placeholder,
 .ant-form-item-label label,
 .ant-select-item-empty,
-.ant-input-number-input {
+.ant-input-number-input,
+.ant-tabs-tab-btn,
+.ant-table-cell,
+.ant-menu-item,
+.ant-menu-submenu-title,
+span,
+label,
+a,
+p {
   font-size: 12px !important;
 }
 .#{$prefixCss}disable {

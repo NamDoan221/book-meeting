@@ -8,18 +8,18 @@
   }
 }
 
-.mo-width-max-content {
+.#{$prefixCss}width-max-content {
   width: intrinsic !important;
   width: -moz-max-content !important;
   width: -webkit-max-content !important;
 }
 
 @each $val in $percent {
-  .mo-percent-min-width-#{$val} {
-    min-width: $val#{'%'} !important;
+  .#{$prefixCss}percent-min-width-#{$val} {
+    min-width: $val +#{"%"} !important;
   }
 
-  .mo-percent-max-width-#{$val} {
-    max-width: $val#{'%'} !important;
+  .#{$prefixCss}percent-max-width-#{$val} {
+    max-width: $val +#{"%"} !important;
   }
 }

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ToastrService } from 'ngx-toastr';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 import { IRoom } from 'src/app/lib/services/room/interfaces/room.interface';
 import { RoomService } from 'src/app/lib/services/room/room.service';
@@ -22,7 +22,7 @@ export class BmMeetingRoomAddEditComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private roomService: RoomService,
-    private toast: ToastrService
+    private nzMessageService: NzMessageService
   ) {
     this.loading = false;
   }
@@ -60,12 +60,12 @@ export class BmMeetingRoomAddEditComponent implements OnInit {
       const result = await this.roomService[this.modeEdit ? 'updateRoom' : 'createRoom'](body);
       if (result.success) {
         this.saveSuccess.emit({ ...body, Id: result.result ?? this.room.Id });
-        this.toast.success('i18n_notification_manipulation_success');
+        this.nzMessageService.success('Thao tác thành công.');
         return;
       }
-      this.toast.error(result.message || 'i18n_notification_manipulation_not_success');
+      this.nzMessageService.error(result.message || 'Thao tác không thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
     } finally {
       this.loading = false;
     }

@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
 import { IColumnItem } from '../lib/interfaces/table.interfaces';
@@ -47,7 +47,7 @@ export class BmPositionComponent implements OnInit {
     private drawerService: NzDrawerService,
     private positionService: PositionService,
     private departmentService: DepartmentService,
-    private toast: ToastrService
+    private nzMessageService: NzMessageService
   ) {
     this.firstCall = true;
     this.loading = false;
@@ -98,10 +98,10 @@ export class BmPositionComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
+    this.onSearch.pipe(debounceTime(1500), filter(value => value !== this.params.search)).subscribe((value) => {
       this.searchPosition(value);
     });
-    this.onSearchDepartment.pipe(debounceTime(500)).subscribe((value) => {
+    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
       this.searchDepartment(value);
     });
     this.getListPosition();
@@ -287,13 +287,13 @@ export class BmPositionComponent implements OnInit {
       if (result.success) {
         item.Active = event;
         this.listPosition = this.listPosition.filter(element => element.Id !== item.Id)
-        this.toast.success('i18n_notification_manipulation_success');
+        this.nzMessageService.success('Thao tác thành công.');
         return;
       }
       item.Active = !event;
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
       item.Active = !event;
     } finally {
       this.keyToggleLoading = undefined;

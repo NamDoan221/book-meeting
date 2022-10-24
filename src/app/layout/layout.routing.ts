@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { UserCanActive } from '../lib/services/auth/auth.service';
 import { BmLayoutComponent } from './layout.component';
 
 const routes: Routes = [
   {
     path: '',
+    canActivate: [UserCanActive],
     component: BmLayoutComponent,
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'account' },
@@ -47,6 +49,11 @@ const routes: Routes = [
         path: 'function',
         loadChildren: () =>
           import('../function/function.module').then((m) => m.BmFunctionModule)
+      },
+      {
+        path: 'role',
+        loadChildren: () =>
+          import('../role/role.module').then((m) => m.BmRoleModule)
       }
     ]
   }

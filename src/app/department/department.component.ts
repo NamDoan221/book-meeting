@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { ToastrService } from 'ngx-toastr';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
@@ -36,7 +36,7 @@ export class BmDepartmentComponent implements OnInit {
   constructor(
     private drawerService: NzDrawerService,
     private departmentService: DepartmentService,
-    private toast: ToastrService
+    private nzMessageService: NzMessageService
   ) {
     this.firstCall = true;
     this.loading = false;
@@ -61,7 +61,7 @@ export class BmDepartmentComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.onSearch.pipe(debounceTime(1500)).subscribe((value) => {
+    this.onSearch.pipe(debounceTime(1500), filter(value => value !== this.params.search)).subscribe((value) => {
       this.searchDepartment(value);
     });
     this.getListDepartment();
@@ -167,13 +167,13 @@ export class BmDepartmentComponent implements OnInit {
       if (result.success) {
         item.Active = event;
         this.listDepartment = this.listDepartment.filter(element => element.Id !== item.Id)
-        this.toast.success('i18n_notification_manipulation_success');
+        this.nzMessageService.success('Thao tác thành công.');
         return;
       }
       item.Active = !event;
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
     } catch (error) {
-      this.toast.error('i18n_notification_manipulation_not_success');
+      this.nzMessageService.error('Thao tác không thành công.');
       item.Active = !event;
     } finally {
       this.keyToggleLoading = undefined;

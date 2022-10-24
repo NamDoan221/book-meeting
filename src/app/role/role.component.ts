@@ -8,44 +8,46 @@ import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
 import { FunctionService } from '../lib/services/function/function.service';
 import { IFunction, IParamsGetListFunction } from '../lib/services/function/interfaces/function.interface';
+import { IParamsGetListPosition, IPosition } from '../lib/services/position/interfaces/position.interface';
+import { PositionService } from '../lib/services/position/position.service';
+import { IParamsGetListRole, IRole } from '../lib/services/role/interfaces/role.interface';
+import { RoleService } from '../lib/services/role/role.service';
 import { BmFunctionAddEditComponent } from './add-edit/add-edit.component';
-import { IFunctionTreeNode } from './interfaces/function.interface';
+import { IFunctionView } from './interfaces/function.interface';
 
 @Component({
-  selector: 'bm-function',
-  templateUrl: './function.component.html'
+  selector: 'bm-role',
+  templateUrl: './role.component.html'
 })
-export class BmFunctionComponent implements OnInit {
+export class BmRoleComponent implements OnInit {
 
   firstCall: boolean;
   loading: boolean;
   total: number;
-  listFunction: IFunctionTreeNode[] = [];
+  listFunction: IFunctionView[] = [];
   columnConfig: string[];
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
   onSearch: Subject<string> = new Subject();
   params: IParamsGetListFunction;
   keyToggleLoading: string;
-  tabs: ITab[];
-  selectedTab: number;
-
-  checked: boolean;
-  showDelete: boolean;
-  listOfCurrentPageData: readonly any[] = [];
-  listOfData: readonly any[] = [];
-  setOfCheckedId = new Set<number>();
-
-  listOfMapData: IFunctionTreeNode[] = [];
-  mapOfExpandedData: { [key: string]: IFunctionTreeNode[] } = {};
+  listRole: IRole[];
+  paramsGetListRole: IParamsGetListRole;
+  totalPosition: number;
+  listPosition: IPosition[];
+  onSearchPosition: Subject<string> = new Subject();
+  paramsGetPosition: IParamsGetListPosition;
+  loadingPosition: boolean;
 
   constructor(
     private drawerService: NzDrawerService,
     private functionService: FunctionService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private roleService: RoleService,
+    private positionService: PositionService
   ) {
     this.firstCall = true;
-    this.loading = false;
+    this.loading = true;
     this.total = 0;
     this.isOpenDraw = false;
     this.columnConfig = [
@@ -58,59 +60,69 @@ export class BmFunctionComponent implements OnInit {
     ];
     this.params = {
       page: 1,
-      pageSize: 20,
+      pageSize: 100,
       active: true
     };
-    this.selectedTab = 0;
-    this.tabs = TabsDefault();
-    this.showDelete = false;
-    this.checked = false;
+    this.paramsGetListRole = {
+      active: true
+    };
+
+    this.loadingPosition = false;
+    this.paramsGetPosition = {
+      page: 1,
+      pageSize: 20,
+      search: ''
+    }
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.onSearch.pipe(debounceTime(1500), filter(value => value !== this.params.search)).subscribe((value) => {
       this.searchFunction(value);
     });
+    this.onSearchPosition.pipe(debounceTime(500), filter(value => value !== this.paramsGetPosition.search)).subscribe((value) => {
+      this.searchPosition(value);
+    });
     this.getListFunction();
+    this.getListPosition();
+    // this.getListRole();
   }
 
-  collapse(array: IFunctionTreeNode[], data: IFunctionTreeNode, $event: boolean): void {
-    if (!$event) {
-      if (data.FunctionChilds) {
-        data.FunctionChilds.forEach(d => {
-          const target = array.find(a => a.Id === d.Id)!;
-          target.Expand = false;
-          this.collapse(array, target, false);
-        });
-      } else {
-        return;
-      }
-    }
-  }
+  async getListRole() {
+    // if (this.loading) {
+    //   return;
+    // }
+    this.loading = true;
+    try {
+      const result = await this.roleService.getListRole(this.paramsGetListRole);
+      this.listRole = result;
+      console.log(result);
+      this.listFunction = this.listFunction.map(functionItem => {
+        console.log('functionItem.FunctionChilds', functionItem.FunctionChilds);
 
-  convertTreeToList(root: IFunctionTreeNode): IFunctionTreeNode[] {
-    const stack: IFunctionTreeNode[] = [];
-    const array: IFunctionTreeNode[] = [];
-    const hashMap = {};
-    stack.push({ ...root, Level: 0, Expand: false });
+        return {
+          ...functionItem,
+          FunctionChilds: functionItem.FunctionChilds?.map(functionChild => {
+            let check = false;
+            console.log('this.listRole', this.listRole);
 
-    while (stack.length !== 0) {
-      const node = stack.pop()!;
-      this.visitNode(node, hashMap, array);
-      if (node.FunctionChilds) {
-        for (let i = node.FunctionChilds.length - 1; i >= 0; i--) {
-          stack.push({ ...node.FunctionChilds[i], Level: node.Level! + 1, Expand: false, Parent: node });
-        }
-      }
-    }
-
-    return array;
-  }
-
-  visitNode(node: IFunctionTreeNode, hashMap: { [key: string]: boolean }, array: IFunctionTreeNode[]): void {
-    if (!hashMap[node.Id]) {
-      hashMap[node.Id] = true;
-      array.push(node);
+            const functionItemInRole = this.listRole?.find(role => role.IdFunction === functionItem.Id);
+            if (functionItemInRole) {
+              const functionItemInRoleChild = functionItemInRole.RoleChilds?.find(role => role.IdFunction === functionChild.Id);
+              if (functionItemInRoleChild) {
+                check = true
+              }
+            }
+            return {
+              ...functionChild,
+              checked: check
+            };
+          })
+        };
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // this.loading = false;
     }
   }
 
@@ -123,21 +135,18 @@ export class BmFunctionComponent implements OnInit {
   }
 
   async getListFunction() {
-    if (this.loading) {
-      return;
-    }
-    this.loading = true;
+    // if (this.loading) {
+    //   return;
+    // }
+    // this.loading = true;
     try {
       const result = await this.functionService.getListFunction(this.params);
       this.listFunction = result.Value;
       this.total = result.Total;
-      this.listFunction.forEach(item => {
-        this.mapOfExpandedData[item.Id] = this.convertTreeToList(item);
-      });
     } catch (error) {
       console.log(error);
     } finally {
-      this.loading = false;
+      // this.loading = false;
     }
   }
 
@@ -192,9 +201,6 @@ export class BmFunctionComponent implements OnInit {
         const functionUpdate = this.listFunction.find(item => item.Id === data.IdParent);
         if (functionUpdate) {
           functionUpdate.FunctionChilds = [data, ...functionUpdate.FunctionChilds];
-          this.listFunction.forEach(item => {
-            this.mapOfExpandedData[item.Id] = this.convertTreeToList(item);
-          });
         }
       });
     });
@@ -223,7 +229,7 @@ export class BmFunctionComponent implements OnInit {
       return;
     }
     this.params.page = params.pageIndex;
-    this.getListFunction();
+    this.getListRole();
   }
 
   async handlerActiveChange(event: boolean, item: IFunction) {
@@ -246,47 +252,53 @@ export class BmFunctionComponent implements OnInit {
     }
   }
 
-  handlerTabChange(event) {
-    this.selectedTab = event.index;
-    this.params.active = event.index === 0;
-    this.firstCall = true;
-    this.getListFunction();
+  handlerUpdateRole(event: boolean, item: IFunction) {
+
   }
 
-  updateCheckedSet(id: number, checked: boolean): void {
-    if (checked) {
-      this.setOfCheckedId.add(id);
-    } else {
-      this.setOfCheckedId.delete(id);
-    }
-    if (this.setOfCheckedId.size > 0) {
-      this.showDelete = true;
+  handlerSelectPosition() {
+    this.firstCall = true;
+    this.getListRole();
+  }
+
+  searchPosition(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetPosition.search : (this.paramsGetPosition.search = text);
+    this.listPosition = [];
+    this.firstCall = true;
+    this.getListPosition();
+  }
+
+  handlerSearchPosition(event: string) {
+    console.log('vao');
+
+    this.paramsGetPosition.page = 1;
+    this.onSearchPosition.next(event);
+  }
+
+  handlerScrollBottom() {
+    if (this.loadingPosition || !this.totalPosition || this.totalPosition <= this.listPosition.length) {
       return;
     }
-    this.showDelete = false;
+    this.paramsGetPosition.page += 1;
+    this.getListPosition();
   }
 
-  handlerDeleteFunction(event: Event) {
-    event.stopPropagation();
-    console.log(this.setOfCheckedId);
-  }
-
-  onItemChecked(id: number, checked: boolean): void {
-    this.updateCheckedSet(id, checked);
-    this.refreshCheckedStatus();
-  }
-
-  onAllChecked(value: boolean): void {
-    this.listOfCurrentPageData.forEach(item => this.updateCheckedSet(item.Id, value));
-    this.refreshCheckedStatus();
-  }
-
-  onCurrentPageDataChange(event: readonly any[]): void {
-    this.listOfCurrentPageData = event;
-    this.refreshCheckedStatus();
-  }
-
-  refreshCheckedStatus(): void {
-    this.checked = this.listOfCurrentPageData.every(item => this.setOfCheckedId.has(item.Id));
+  async getListPosition() {
+    if (this.loadingPosition) {
+      return;
+    }
+    try {
+      this.loadingPosition = true;
+      const result = await this.positionService.getListPosition(this.paramsGetPosition);
+      this.totalPosition = result.Total;
+      this.listPosition = result.Value;
+      this.paramsGetListRole.idPosition = this.listPosition.length ? this.listPosition[0].Id : '';
+      this.getListRole();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingPosition = false;
+    }
   }
 }

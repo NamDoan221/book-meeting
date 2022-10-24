@@ -7,7 +7,6 @@ import { NZ_I18N } from 'ng-zorro-antd/i18n';
 import { vi_VN } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
-import { ToastrModule } from 'ngx-toastr';
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
@@ -16,6 +15,7 @@ import { UserCanActive } from './lib/services/auth/auth.service';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { BmNotFoundComponent } from './not-found/not-found.component';
+import { NzMessageModule } from 'ng-zorro-antd/message';
 
 registerLocaleData(vi);
 
@@ -34,14 +34,6 @@ export function HttpLoaderFactory(http: HttpClient): any {
     IconsProviderModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    ToastrModule.forRoot({
-      timeOut: 3000,
-      positionClass: 'toast-top-right',
-      maxOpened: 8,
-      newestOnTop: true,
-      enableHtml: true,
-      autoDismiss: true
-    }),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
@@ -51,9 +43,13 @@ export function HttpLoaderFactory(http: HttpClient): any {
       isolate: false,
     }),
     NzResultModule,
-    NzButtonModule
+    NzButtonModule,
+    NzMessageModule
   ],
-  providers: [{ provide: NZ_I18N, useValue: vi_VN }, UserCanActive],
+  providers: [
+    { provide: NZ_I18N, useValue: vi_VN },
+    UserCanActive
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

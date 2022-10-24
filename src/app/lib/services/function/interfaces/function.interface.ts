@@ -8,7 +8,6 @@ export interface IParamsGetListFunction {
 export interface IFunction {
   Id?: string;
   Active?: boolean;
-  Domain?: string;
   Code?: string;
   Name: string;
   Url?: string;
@@ -17,4 +16,5 @@ export interface IFunction {
   Description?: string;
   IsMenu?: boolean;
   Icon?: string;
+  FunctionChilds?: IFunction[];
 }
