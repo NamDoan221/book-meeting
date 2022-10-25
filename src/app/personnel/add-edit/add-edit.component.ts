@@ -70,7 +70,7 @@ export class BmPersonnelAddEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.personnelForm = this.fb.group({
-      Username: [{ value: this.personnel?.Username ?? '', disabled: this.modeEdit }, [Validators.required]],
+      Username: [this.personnel?.Username ?? '', [Validators.required]],
       FullName: [this.personnel?.FullName ?? '', [Validators.required]],
       AvatarUrl: [this.personnel?.AvatarUrl ?? ''],
       Dob: [this.personnel?.Dob ?? '', [Validators.required]],
@@ -78,30 +78,12 @@ export class BmPersonnelAddEditComponent implements OnInit {
       Gender: [this.personnel?.Gender ?? 0, [Validators.required]],
       Phone: [this.personnel?.Phone ?? '', [Validators.required, Validators.pattern('^(0|84)([0-9]{9})$')]],
       IdPosition: [this.personnel?.IdPosition ?? '', [Validators.required]],
-      Password: ['', this.modeEdit ? [Validators.minLength(8)] : [Validators.required, Validators.minLength(8)]],
-      ConfirmPassword: ['', this.modeEdit ? [this.confirmationValidator] : [Validators.required, this.confirmationValidator]],
       Active: [this.personnel?.Active ?? true, [Validators.required]]
     });
     this.onSearchPosition.pipe(debounceTime(500), filter(value => value === this.paramsGetPosition.search)).subscribe((value) => {
       this.searchPosition(value);
     });
     this.getListPosition();
-  }
-
-  confirmationValidator = (control: FormControl): { [s: string]: boolean } => {
-    console.log('vao');
-
-    if (!control.value) {
-      console.log(this.personnelForm?.controls?.Password?.value);
-
-      if (this.modeEdit && !this.personnelForm?.controls?.Password?.value) {
-        return undefined;
-      }
-      return { required: true, error: true };
-    }
-    if (control.value !== this.personnelForm.controls.Password.value) {
-      return { confirm: true, error: true };
-    }
   }
 
   handlerSearchPosition(event: string) {

@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
+import { convertFileToBase64 } from '../lib/defines/function.define';
 import { AuthService } from '../lib/services/auth/auth.service';
 import { PersonnelService } from '../lib/services/personnel/personnel.service';
 
@@ -48,13 +49,6 @@ export class BmAccountComponent implements OnInit {
 
   async ngOnInit() {
     const accountFromCache = this.auth.decodeToken();
-    // try {
-    //   const result = await this.personnelService.getPersonnelById(accountFromCache.Id);
-    //   console.log(result);
-
-    // } catch (error) {
-
-    // }
     this.accountForm = this.fb.group({
       Username: [{ value: accountFromCache.Username || '', disabled: true }, [Validators.required]],
       Email: [accountFromCache.Email || '', [Validators.required, Validators.email]],
@@ -74,15 +68,15 @@ export class BmAccountComponent implements OnInit {
   }
 
   handlerChangeAvatar() {
-    console.log('vao');
-
     this.inputFile.nativeElement.click();
   }
 
   async handlerChangeInputFile(event: any) {
-    console.log(event.target.files);
+    // console.log(event.target.files);
+    // const url = await convertFileToBase64(event.target.files[0]);
+    // console.log(url);
     try {
-      await this.auth.changeAvatar(this.tempAccount.Id, '');
+      await this.auth.changeAvatar(this.tempAccount.Id, 'http://genk.mediacdn.vn/2016/best-photos-2016-natgeo-national-geographic-7-5846f70467192-880-1481173142742.jpg');
       this.nzMessageService.success('Thao tác thành công.');
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');
@@ -107,6 +101,8 @@ export class BmAccountComponent implements OnInit {
       delete body.confirmPassword;
       await this.auth.changePassword(this.tempAccount.Id, body);
       this.nzMessageService.success('Thao tác thành công.');
+      this.modeUpdatePass = false;
+      this.passwordForm.reset();
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');
       console.log(error);
@@ -128,13 +124,13 @@ export class BmAccountComponent implements OnInit {
     }
     this.loading = true;
     const body = {
-      ...this.accountForm.value,
-      id: this.tempAccount.Id
+      ...this.tempAccount,
+      ...this.accountForm.value
     }
     try {
-      const result = await this.auth.changeInfo(body);
-      this.tempAccount = { ...result };
-      // this.auth.setAccountLocalStorage(result);
+      const result = await this.auth.changeInfo(body, this.tempAccount.Id);
+      this.tempAccount = { ...body };
+      this.auth.setToken(JSON.stringify(this.tempAccount));
       this.nzMessageService.success('Thao tác thành công.');
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');

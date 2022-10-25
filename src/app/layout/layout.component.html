@@ -19,25 +19,24 @@
       [nzInlineCollapsed]="isCollapsed">
       <ng-container *ngFor="let menu of menuData">
         <li nz-menu-item
-          *ngIf="menu.url"
-          [ngClass]="{'bm-bg-1890ff': menu.url === currentPath, 'bm-pl-12px': true}"
-          (click)="handlerRouting($event, menu.url)">
+          *ngIf="menu.Url"
+          [ngClass]="{'bm-bg-1890ff': menu.Url === currentPath, 'bm-pl-12px': true}"
+          (click)="handlerRouting($event, menu.Url)">
           <span nz-icon
-            [nzType]="menu.icon"></span>
-          <span>{{menu.label}}</span>
+            [nzType]="menu.Icon"></span>
+          <span>{{menu.Name}}</span>
         </li>
         <li nz-submenu
-          *ngIf="!menu.url"
+          *ngIf="!menu.Url"
           nzOpen
-          [nzTitle]="menu.label"
-          [nzIcon]="menu.icon">
-          <ul *ngIf="menu && menu.items && menu.items.length">
-            <ng-container *ngFor="let item of menu.items">
+          [nzTitle]="menu.Name"
+          [nzIcon]="menu.Icon">
+          <ul *ngIf="menu?.FunctionChilds?.length">
+            <ng-container *ngFor="let item of menu.FunctionChilds">
               <li nz-menu-item
-                *ngIf="item.active"
-                [ngClass]="{'bm-bg-1890ff': item.url === currentPath, 'bm-pl-24px': true}"
-                (click)="handlerRouting($event, item.url)">
-                {{item.label}}
+                [ngClass]="{'bm-bg-1890ff': item.Url === currentPath, 'bm-pl-24px': true}"
+                (click)="handlerRouting($event, item.Url)">
+                {{item.Name}}
               </li>
             </ng-container>
           </ul>

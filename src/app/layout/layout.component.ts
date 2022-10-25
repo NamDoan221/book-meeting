@@ -3,6 +3,10 @@ import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../lib/services/auth/auth.service';
 import { CacheService } from '../lib/services/cache.service';
+import { FunctionService } from '../lib/services/function/function.service';
+import { IFunction } from '../lib/services/function/interfaces/function.interface';
+import { IRole } from '../lib/services/role/interfaces/role.interface';
+import { menuDefault } from './defines/layout.define';
 
 @Component({
   selector: 'bm-layout',
@@ -11,125 +15,50 @@ import { CacheService } from '../lib/services/cache.service';
 })
 export class BmLayoutComponent implements OnInit {
   public isCollapsed: boolean;
-  menuData: any[];
+  menuData: IFunction[];
   currentPath: string;
 
   constructor(
     private router: Router,
     private auth: AuthService,
     private cacheService: CacheService,
+    private functionService: FunctionService,
     private nzMessageService: NzMessageService
   ) {
     this.isCollapsed = false;
-    this.menuData = [
-      {
-        label: 'Trang chủ',
-        icon: 'home',
-        url: '/dashboard',
-        active: false
-      },
-      {
-        label: 'Quản lý',
-        icon: 'user',
-        items: [
-          {
-            label: 'Nhân viên',
-            url: '/personnel',
-            active: false,
-          },
-          {
-            label: 'Phòng ban',
-            url: '/department',
-            active: false,
-          },
-          {
-            label: 'Chức vụ',
-            url: '/position',
-            active: false,
-          },
-          {
-            label: 'Phòng họp',
-            url: '/meeting-room',
-            active: false,
-          },
-          {
-            label: 'Lịch họp',
-            url: '/meeting-schedule',
-            active: true,
-          },
-          {
-            label: 'Điểm danh',
-            url: '/attendance',
-            active: false,
-          },
-          {
-            label: 'Dữ liệu khuôn mặt',
-            url: '/face-data',
-            active: false,
-          }
-        ]
-      },
-      {
-        label: 'Cài đặt',
-        icon: 'setting',
-        items: [
-          {
-            label: 'Thông tin tài khoản',
-            url: '/account',
-            active: false,
-          },
-          {
-            label: 'Cấu hình dữ liệu khuôn mặt',
-            url: '/config-face',
-            active: false,
-          },
-          {
-            label: 'Cấu hình google calendar',
-            url: '/config-google-calendar',
-            active: false,
-          },
-          {
-            label: 'Lịch sử điểm danh',
-            url: '/attendance-history',
-            active: false,
-          },
-          {
-            label: 'Phân quyền',
-            url: '/role',
-            active: false,
-          },
-          {
-            label: 'Chức năng',
-            url: '/function',
-            active: false,
-          },
-          {
-            label: 'Đăng xuất',
-            url: 'logout',
-            active: false,
-          }
-        ]
-      }
-    ]
+    this.menuData = []
   }
 
   async ngOnInit(): Promise<void> {
-    console.log(this.auth.decodeToken());
-
+    this.buildMenu();
     this.currentPath = this.router.url;
-    const role = 'manager';
-    if (role === 'manager' || role === 'admin') {
-      this.menuData = this.menuData.map(element => {
-        return {
-          ...element,
-          items: element.items?.map(item => {
-            return {
-              ...item,
-              active: true
-            }
+  }
+
+  async buildMenu() {
+    const roles = this.auth.decodeToken().Roles;
+    try {
+      const result = await this.functionService.getListFunction({ page: 1, pageSize: 100, active: true });
+      const functionByRole = result.Value.filter(item => roles.find(role => role.IdFunction === item.Id));
+      menuDefault().forEach(item => {
+        const functionChilds = [];
+        item.FunctionChilds?.forEach(child => {
+          if (!!functionByRole.find(element => element.IsMenu && element.Url === child.Url)) {
+            functionChilds.push({
+              ...child,
+              IsMenu: true
+            })
+          }
+        });
+        if (!!functionChilds?.length) {
+          this.menuData.push({
+            ...item,
+            IsMenu: true,
+            FunctionChilds: functionChilds
           })
         }
-      })
+      });
+    } catch (error) {
+      console.log(error);
     }
   }
 

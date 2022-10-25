@@ -100,6 +100,7 @@
             *ngIf="!listDepartment || !listDepartment.length">
             <span *ngIf="!loading">{{params.search ? 'Không có kết quả' : 'Chưa có phòng ban nào trong danh sách'}}</span>
             <nz-spin *ngIf="loading"
+              nzTip="Đang tải..."
               nzSimple></nz-spin>
           </div>
         </ng-template>

@@ -1,8 +1,10 @@
-export const getBase64 = (file: File): Promise<string | ArrayBuffer | null> => {
-  return new Promise((resolve, reject) => {
+export const convertFileToBase64 = (file: File): Promise<string | ArrayBuffer> => {
+  return new Promise((resolve) => {
     const reader = new FileReader();
+
     reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
+    reader.onload = (event) => {
+      resolve(event.target?.result ?? '');
+    };
   });
-}
+};

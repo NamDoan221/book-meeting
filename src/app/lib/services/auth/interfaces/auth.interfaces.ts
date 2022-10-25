@@ -1,3 +1,5 @@
+import { IRole } from "../../role/interfaces/role.interface";
+
 export interface IPassWord {
   oldPassword: string;
   newPassword: string;
@@ -19,6 +21,7 @@ export interface IToken {
   Active: boolean;
   Phone: string;
   Id: string;
+  Roles: IRole[];
 }
 
 export interface IBodyLogin {
@@ -36,4 +39,10 @@ export interface IBodyRegisterAccount {
   password?: string;
   passwordRetype?: string;
   domain?: string;
+}
+
+export interface IBodyChangeInfo {
+  Email: string;
+  FullName: string;
+  Phone: string;
 }

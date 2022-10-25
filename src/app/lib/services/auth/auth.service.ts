@@ -6,7 +6,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { DOMAIN_SITE } from '../../defines/base-url.define';
 import { ConstantDefines } from '../../defines/constant.define';
 import { BaseService } from '../base.service';
-import { IBodyLogin, IBodyRegisterAccount, IPassWord, IToken } from './interfaces/auth.interfaces';
+import { IBodyChangeInfo, IBodyLogin, IBodyRegisterAccount, IPassWord, IToken } from './interfaces/auth.interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +24,10 @@ export class AuthService extends BaseService {
       return undefined;
     }
     return JSON.parse(token);
+  }
+
+  public setToken(token: string) {
+    this.cacheService.setKey(ConstantDefines.TOKEN_KEY, token);
   }
 
   public getAccount(id: string): Promise<any> {
@@ -46,7 +50,7 @@ export class AuthService extends BaseService {
           if (!result.success) {
             return reject();
           }
-          this.cacheService.setKey(ConstantDefines.TOKEN_KEY, JSON.stringify(result.result));
+          this.setToken(JSON.stringify(result.result));
           return resolve(result);
         },
         error: err => {
@@ -108,7 +112,7 @@ export class AuthService extends BaseService {
 
   public changePassword(id: string, body: IPassWord): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.put(`${this.domain}/Account/${id}/change-password`, body).subscribe(result => {
+      this.put(`${this.domain}/Account/${id}/change-password`, undefined, new HttpParams({ fromObject: { ...body } })).subscribe(result => {
         return resolve(result);
       }, err => {
         reject(err);
@@ -116,9 +120,19 @@ export class AuthService extends BaseService {
     });
   }
 
-  public changeInfo(body: any): Promise<any> {
+  public changeInfo(body: IBodyChangeInfo, idAccount: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.put(`${this.domain}/Account`, body).subscribe(result => {
+      this.put(`${this.domain}/Account/${idAccount}`, body).subscribe(result => {
+        return resolve(result);
+      }, err => {
+        reject(err);
+      });
+    });
+  }
+
+  public disconnectGoogle(idAccount: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.put(`${this.domain}/Account/${idAccount}/disconnect-google`, undefined).subscribe(result => {
         return resolve(result);
       }, err => {
         reject(err);
@@ -153,6 +167,12 @@ export class AuthService extends BaseService {
       });
     });
   }
+
+  public checkPermission(path: string) {
+    const roles = this.decodeToken().Roles;
+    console.log(roles);
+    return true;
+  }
 }
 
 @Injectable()
@@ -171,12 +191,7 @@ export class UserCanActive implements CanActivate {
       return false;
     }
 
-    // if (!this.auth.checkPermission(path, undefined, false, false)) {
-    //   return false;
-    // }
-    if (path === '/personnel') {
-      this.nzMessageService.error('Bạn không có quyền truy cập chức năng này.');
-      // this.router.navigate(['/account']);
+    if (!this.auth.checkPermission(path)) {
       return false;
     }
     return true;

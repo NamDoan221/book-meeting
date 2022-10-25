@@ -31,12 +31,12 @@ export class BmFunctionAddEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.functionForm = this.fb.group({
-      Name: [this.function?.Name || '', [Validators.required]],
-      Url: [this.function?.Url || ''], // Validators.pattern('^\/+([a-zA-Z])+$')
-      Description: [this.function?.Description || ''],
-      IsMenu: [this.function?.IsMenu || true],
-      Code: [this.function?.Code || '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
-      Active: [this.function?.Active || true]
+      Name: [this.function?.Name ?? '', [Validators.required]],
+      Url: [this.function?.Url ?? ''], // Validators.pattern('^\/+([a-zA-Z])+$')
+      Description: [this.function?.Description ?? ''],
+      IsMenu: [{ value: this.function?.IsMenu ?? (this.parentId ? false : true), disabled: !!this.parentId || this.function.IdParent }],
+      Code: [this.function?.Code ?? '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
+      Active: [this.function?.Active ?? true]
     });
   }
 
@@ -61,9 +61,11 @@ export class BmFunctionAddEditComponent implements OnInit {
     }
     if (this.parentId) {
       body.IdParent = this.parentId;
+      body.IsMenu = false;
     }
     if (this.function?.IdParent) {
       body.IdParent = this.function.IdParent;
+      body.IsMenu = false;
     }
     try {
       const result = await this.functionService[this.modeEdit ? 'updateFunction' : 'createFunction'](body);

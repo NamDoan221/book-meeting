@@ -10,9 +10,8 @@ import { FunctionService } from '../lib/services/function/function.service';
 import { IFunction, IParamsGetListFunction } from '../lib/services/function/interfaces/function.interface';
 import { IParamsGetListPosition, IPosition } from '../lib/services/position/interfaces/position.interface';
 import { PositionService } from '../lib/services/position/position.service';
-import { IParamsGetListRole, IRole } from '../lib/services/role/interfaces/role.interface';
+import { IBodyUpdateRole, IParamsGetListRole, IRole } from '../lib/services/role/interfaces/role.interface';
 import { RoleService } from '../lib/services/role/role.service';
-import { BmFunctionAddEditComponent } from './add-edit/add-edit.component';
 import { IFunctionView } from './interfaces/function.interface';
 
 @Component({
@@ -21,16 +20,10 @@ import { IFunctionView } from './interfaces/function.interface';
 })
 export class BmRoleComponent implements OnInit {
 
-  firstCall: boolean;
   loading: boolean;
-  total: number;
   listFunction: IFunctionView[] = [];
-  columnConfig: string[];
-  isOpenDraw: boolean;
-  drawerRefGlobal: NzDrawerRef;
   onSearch: Subject<string> = new Subject();
   params: IParamsGetListFunction;
-  keyToggleLoading: string;
   listRole: IRole[];
   paramsGetListRole: IParamsGetListRole;
   totalPosition: number;
@@ -40,24 +33,12 @@ export class BmRoleComponent implements OnInit {
   loadingPosition: boolean;
 
   constructor(
-    private drawerService: NzDrawerService,
     private functionService: FunctionService,
     private nzMessageService: NzMessageService,
     private roleService: RoleService,
     private positionService: PositionService
   ) {
-    this.firstCall = true;
     this.loading = true;
-    this.total = 0;
-    this.isOpenDraw = false;
-    this.columnConfig = [
-      'Tên chức năng',
-      'Mã chức năng',
-      'Đường dẫn tới trang',
-      'Hiển thị trên menu',
-      'Mô tả',
-      'Trạng thái'
-    ];
     this.params = {
       page: 1,
       pageSize: 100,
@@ -84,131 +65,61 @@ export class BmRoleComponent implements OnInit {
     });
     this.getListFunction();
     this.getListPosition();
-    // this.getListRole();
   }
 
   async getListRole() {
-    // if (this.loading) {
-    //   return;
-    // }
     this.loading = true;
     try {
       const result = await this.roleService.getListRole(this.paramsGetListRole);
       this.listRole = result;
-      console.log(result);
-      this.listFunction = this.listFunction.map(functionItem => {
-        console.log('functionItem.FunctionChilds', functionItem.FunctionChilds);
-
-        return {
-          ...functionItem,
-          FunctionChilds: functionItem.FunctionChilds?.map(functionChild => {
-            let check = false;
-            console.log('this.listRole', this.listRole);
-
-            const functionItemInRole = this.listRole?.find(role => role.IdFunction === functionItem.Id);
-            if (functionItemInRole) {
-              const functionItemInRoleChild = functionItemInRole.RoleChilds?.find(role => role.IdFunction === functionChild.Id);
-              if (functionItemInRoleChild) {
-                check = true
-              }
-            }
-            return {
-              ...functionChild,
-              checked: check
-            };
-          })
-        };
-      });
+      this.mergeFunctionAndRole();
     } catch (error) {
       console.log(error);
     } finally {
-      // this.loading = false;
+      this.loading = false;
     }
+  }
+
+  mergeFunctionAndRole() {
+    this.listFunction = this.listFunction.map(functionItem => {
+      return {
+        ...functionItem,
+        FunctionChilds: functionItem.FunctionChilds?.map(functionChild => {
+          let check = false;
+          const functionItemInRole = this.listRole?.find(role => role.IdFunction === functionItem.Id);
+          if (functionItemInRole) {
+            const functionItemInRoleChild = functionItemInRole.RoleChilds?.find(role => role.IdFunction === functionChild.Id);
+            if (functionItemInRoleChild) {
+              check = true
+            }
+          }
+          return {
+            ...functionChild,
+            checked: check
+          };
+        })
+      };
+    });
   }
 
   searchFunction(value: string) {
     const text = value.trim();
     !text ? delete this.params.search : (this.params.search = text);
     this.listFunction = [];
-    this.firstCall = true;
     this.getListFunction();
   }
 
   async getListFunction() {
-    // if (this.loading) {
-    //   return;
-    // }
-    // this.loading = true;
+    this.loading = true;
     try {
       const result = await this.functionService.getListFunction(this.params);
       this.listFunction = result.Value;
-      this.total = result.Total;
+      this.mergeFunctionAndRole();
     } catch (error) {
       console.log(error);
     } finally {
-      // this.loading = false;
+      this.loading = false;
     }
-  }
-
-  handlerAddSubFunction(event: Event, parentId: string) {
-    event.stopPropagation();
-    this.addOrEdit(undefined, parentId);
-  }
-
-  handlerAddFunction(event: Event) {
-    event.stopPropagation();
-    this.addOrEdit(undefined);
-  }
-
-  handlerEditFunction(event: Event, item: IFunction) {
-    event.stopPropagation();
-    this.addOrEdit(item);
-  }
-
-  addOrEdit(functionData: IFunction, parentId?: string) {
-    if (this.isOpenDraw) {
-      return;
-    }
-    this.isOpenDraw = true;
-    this.drawerRefGlobal = this.drawerService.create<BmFunctionAddEditComponent>({
-      nzBodyStyle: { overflow: 'auto' },
-      nzMaskClosable: false,
-      nzWidth: '30vw',
-      nzClosable: true,
-      nzKeyboard: true,
-      nzTitle: functionData ? `Sửa chức năng` : 'Thêm chức năng',
-      nzContent: BmFunctionAddEditComponent,
-      nzContentParams: {
-        parentId: parentId,
-        function: functionData,
-        modeEdit: functionData ? true : false
-      }
-    });
-
-    this.drawerRefGlobal.afterOpen.subscribe(() => {
-      this.isOpenDraw = true;
-      this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
-        this.isOpenDraw = false;
-        this.drawerRefGlobal.close();
-        if (functionData) {
-          Object.assign(functionData, data);
-          return;
-        }
-        if (!data.IdParent) {
-          this.listFunction = [data, ...this.listFunction];
-          return;
-        }
-        const functionUpdate = this.listFunction.find(item => item.Id === data.IdParent);
-        if (functionUpdate) {
-          functionUpdate.FunctionChilds = [data, ...functionUpdate.FunctionChilds];
-        }
-      });
-    });
-
-    this.drawerRefGlobal.afterClose.subscribe(data => {
-      this.isOpenDraw = false;
-      this.drawerRefGlobal.close();
-    });
   }
 
   handlerKeyUp(event) {
@@ -223,41 +134,25 @@ export class BmRoleComponent implements OnInit {
     this.onSearch.next(event.target.value);
   }
 
-  handlerQueryParamsChange(params: NzTableQueryParams): void {
-    if (!params || this.firstCall) {
-      this.firstCall = false;
-      return;
-    }
-    this.params.page = params.pageIndex;
-    this.getListRole();
-  }
-
-  async handlerActiveChange(event: boolean, item: IFunction) {
-    this.keyToggleLoading = item.Id;
+  async handlerUpdateRole(event: boolean, item: IFunction) {
     try {
-      const result = await this.functionService.changeStatusFunction(item.Id);
+      const body: IBodyUpdateRole = {
+        IdPosition: this.paramsGetListRole.idPosition,
+        IdFunction: item.Id,
+        Active: event
+      }
+      const result = await this.roleService.updateRole(body);
       if (result.success) {
-        item.Active = event;
-        this.listFunction = this.listFunction.filter(element => element.Id !== item.Id)
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
-      item.Active = !event;
       this.nzMessageService.error('Thao tác không thành công.');
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');
-      item.Active = !event;
-    } finally {
-      this.keyToggleLoading = undefined;
     }
   }
 
-  handlerUpdateRole(event: boolean, item: IFunction) {
-
-  }
-
   handlerSelectPosition() {
-    this.firstCall = true;
     this.getListRole();
   }
 
@@ -265,13 +160,10 @@ export class BmRoleComponent implements OnInit {
     const text = value.trim();
     !text ? delete this.paramsGetPosition.search : (this.paramsGetPosition.search = text);
     this.listPosition = [];
-    this.firstCall = true;
     this.getListPosition();
   }
 
   handlerSearchPosition(event: string) {
-    console.log('vao');
-
     this.paramsGetPosition.page = 1;
     this.onSearchPosition.next(event);
   }

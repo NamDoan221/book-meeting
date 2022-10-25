@@ -1,25 +1,24 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzInputModule } from 'ng-zorro-antd/input';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule, Routes } from '@angular/router';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTableModule } from 'ng-zorro-antd/table';
-import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BmLibCardModule } from '../lib/card/card.module';
-import { BmPersonnelComponent } from './personnel.component';
-import { NzDrawerModule } from 'ng-zorro-antd/drawer';
-import { NzNotificationModule } from 'ng-zorro-antd/notification';
-import { BmPersonnelAddEditComponent } from './add-edit/add-edit.component';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { NzRadioModule } from 'ng-zorro-antd/radio';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { RouterModule, Routes } from '@angular/router';
-import { NzSwitchModule } from 'ng-zorro-antd/switch';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzNotificationModule } from 'ng-zorro-antd/notification';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { NzTableModule } from 'ng-zorro-antd/table';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
+import { BmPersonnelAddEditComponent } from './add-edit/add-edit.component';
+import { BmPersonnelComponent } from './personnel.component';
 
 export const routes: Routes = [
   {
@@ -39,7 +38,6 @@ export const routes: Routes = [
     IconsProviderModule,
     FormsModule,
     ReactiveFormsModule,
-    BmLibCardModule,
     NzDrawerModule,
     NzNotificationModule,
     NzFormModule,

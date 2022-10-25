@@ -148,59 +148,6 @@
               </ng-template>
             </nz-form-control>
           </nz-form-item>
-          <nz-form-item class="bm-mt-16px bm-mb-0">
-            <nz-form-control [nzErrorTip]="passwordErrorTip">
-              <nz-form-label [nzNoColon]="true"
-                [nzFor]="'Password'">
-                Mật khẩu
-              </nz-form-label>
-              <nz-input-group [nzSuffix]="suffixTemplatePassword">
-                <input [type]="passwordVisible ? 'text' : 'password'"
-                  nz-input
-                  autocomplete="new-password"
-                  formControlName="Password"
-                  placeholder="Mật khẩu">
-              </nz-input-group>
-              <ng-template #passwordErrorTip
-                let-control>
-                <span class="font-size-11"
-                  *ngIf="control.hasError('required')">Mật khẩu không thể để trống!</span>
-                <span class="font-size-11"
-                  *ngIf="control.hasError('minlength')">
-                  Mật khẩu phải có độ dài tối thiểu 8 kí tự!
-                </span>
-              </ng-template>
-            </nz-form-control>
-            <ng-template #suffixTemplatePassword>
-              <i nz-icon
-                [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
-                (click)="handlerChangeViewPassword('password')"></i>
-            </ng-template>
-          </nz-form-item>
-          <nz-form-item class="bm-mt-16px bm-mb-0">
-            <nz-form-control [nzErrorTip]="passwordRetypeErrorTpl">
-              <nz-form-label [nzNoColon]="true"
-                [nzFor]="'ConfirmPassword'">
-                Mật khẩu nhập lại
-              </nz-form-label>
-              <nz-input-group [nzSuffix]="suffixTemplatePasswordRetype">
-                <input [type]="passwordRetypeVisible ? 'text' : 'password'"
-                  nz-input
-                  formControlName="ConfirmPassword"
-                  placeholder="Nhập lại mật khẩu">
-              </nz-input-group>
-            </nz-form-control>
-            <ng-template #passwordRetypeErrorTpl
-              let-control>
-              <ng-container *ngIf="control.hasError('required')">Mật khẩu nhập lại không thể để trống!</ng-container>
-              <ng-container *ngIf="control.hasError('confirm')">Mật khẩu nhập lại không trùng khớp!</ng-container>
-            </ng-template>
-            <ng-template #suffixTemplatePasswordRetype>
-              <i nz-icon
-                [nzType]="confirmPasswordVisible ? 'eye-invisible' : 'eye'"
-                (click)="handlerChangeViewPassword('')"></i>
-            </ng-template>
-          </nz-form-item>
           <nz-form-item class="bm-mb-0 bm-mt-16px">
             <nz-form-control>
               <nz-form-label [nzNoColon]="true"

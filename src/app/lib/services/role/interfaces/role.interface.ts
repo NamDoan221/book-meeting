@@ -24,3 +24,9 @@ export interface IRoleChild extends IRole {
   ParentCode?: string;
   ParentName?: string;
 }
+
+export interface IBodyUpdateRole {
+  IdPosition: string;
+  IdFunction: string;
+  Active: boolean;
+}

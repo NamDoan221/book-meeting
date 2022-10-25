@@ -128,6 +128,7 @@
             *ngIf="!listPosition || !listPosition.length">
             <span *ngIf="!loading">{{params.search ? 'Không có kết quả' : 'Chưa có chức vụ nào trong danh sách'}}</span>
             <nz-spin *ngIf="loading"
+              nzTip="Đang tải..."
               nzSimple></nz-spin>
           </div>
         </ng-template>
