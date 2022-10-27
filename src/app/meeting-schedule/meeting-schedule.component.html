@@ -9,11 +9,19 @@
           nzType="plus"
           nzTheme="outline"></i>Thêm lịch họp</button>
     </div>
+    <nz-range-picker class="bm-w-503px"
+      [nzShowTime]="{ nzFormat: 'HH:mm' }"
+      nzFormat="yyyy-MM-dd HH:mm"
+      ngModel
+      (ngModelChange)="onChange($event)"
+      (nzOnCalendarChange)="onCalendarChange($event)"
+      (nzOnOk)="onOk($event)"></nz-range-picker>
     <nz-input-group class="bm-max-w-503px"
       [nzSuffix]="suffixIconSearch">
       <input type="text"
         nz-input
-        placeholder="Tìm theo tên cuộc họp" />
+        placeholder="Tìm theo tên lịch họp"
+        (keyup)="handlerKeyUp($event)" />
     </nz-input-group>
     <ng-template #suffixIconSearch>
       <i nz-icon
@@ -21,63 +29,67 @@
     </ng-template>
   </div>
   <div class="h-100 bm-mt-12px">
-    <nz-table #meetingRoomTable
-      [nzScroll]="{ y: 'calc(100vh - 220px)' }"
-      [nzFrontPagination]="false"
-      [nzData]="listMeetingSchedule"
-      [nzTotal]="total"
-      [nzPageSize]="pageSize"
-      [nzPageIndex]="pageIndexGroup"
-      [nzNoResult]="empty"
-      [nzLoading]="loading"
-      [nzShowTotal]="totalTemplate"
-      [nzSize]="'middle'"
-      [nzBordered]="true"
-      nzShowPagination
-      nzPaginationType="small"
-      (nzQueryParams)="handlerQueryParamsChange($event)">
-      <thead>
-        <tr>
-          <th *ngFor="let column of columnConfig"
-            [nzAlign]="'left'"
-            class="bm-font-head-4s">
-            {{ column }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let item of meetingRoomTable.data;  let i=index">
-          <td class="bm-color-009cdb bm-cursor-pointer"
-            (click)="handlerEditMeetingSchedule($event, item)">{{item.name}}</td>
-          <td>{{item.start_time | date: 'yyyy-MM-dd HH:mm'}}</td>
-          <td>{{item.estimated_duration}} Phút</td>
-          <td>{{item.meeting_room}}</td>
-          <td>{{item.meeting_manager}}</td>
-          <td>{{item.participants.length || 0}}</td>
-          <td>
-            <div class="bm-overflow-hidden text-truncate">
-              <span nz-tooltip
-                [nzTooltipTitle]="descriptionTemplate"
-                [nzTooltipTitleContext]="{ $implicit: item.description }">
-                {{item.description}}
-              </span>
-            </div>
-            <ng-template #descriptionTemplate
-              let-description>
-              <div class="bm-max-h-100px bm-overflow-auto">{{ description }}</div>
-            </ng-template>
-          </td>
-          <td>{{item.status}}</td>
-        </tr>
-      </tbody>
-    </nz-table>
+    <div class="h-100"
+      *ngIf="listMeetingSchedule && listMeetingSchedule.length">
+      <nz-table #meetingScheduleTable
+        [nzScroll]="{ y: 'calc(100vh - 220px)' }"
+        [nzFrontPagination]="false"
+        [nzData]="listMeetingSchedule"
+        [nzTotal]="total"
+        [nzPageSize]="params.pageSize"
+        [nzPageIndex]="params.page"
+        [nzLoading]="loading"
+        [nzShowTotal]="totalTemplate"
+        [nzSize]="'middle'"
+        [nzBordered]="true"
+        nzShowPagination
+        nzPaginationType="small"
+        (nzQueryParams)="handlerQueryParamsChange($event)">
+        <thead>
+          <tr>
+            <th *ngFor="let column of columnConfig"
+              [nzAlign]="'left'"
+              class="bm-font-head-4s">
+              {{ column }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of meetingScheduleTable.data;  let i=index">
+            <td class="bm-color-009cdb bm-cursor-pointer"
+              (click)="handlerEditMeetingSchedule($event, item)">{{item.Title}}</td>
+            <td>{{item.EstStartTime | date: 'yyyy-MM-dd HH:mm'}}</td>
+            <td>{{item.EstDuration}} Phút</td>
+            <td>{{item.IdRoom}}</td>
+            <td>{{item.IdCreator}}</td>
+            <td>{{10}}</td>
+            <td>
+              <div class="bm-overflow-hidden text-truncate">
+                <span nz-tooltip
+                  [nzTooltipTitle]="contentTemplate"
+                  [nzTooltipTitleContext]="{ $implicit: item.Content }">
+                  {{item.Content}}
+                </span>
+              </div>
+              <ng-template #contentTemplate
+                let-content>
+                <div class="bm-max-h-100px bm-overflow-auto">{{ content }}</div>
+              </ng-template>
+            </td>
+            <td>{{item.Status}}</td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+    <div class="h-100 w-100 d-flex align-items-center justify-content-center"
+      *ngIf="!listMeetingSchedule || !listMeetingSchedule.length">
+      <span *ngIf="!loading">{{params.search ? 'Không có kết quả' : 'Chưa có lịch họp nào trong danh sách'}}</span>
+      <nz-spin *ngIf="loading"
+        nzTip="Đang tải..."
+        nzSimple></nz-spin>
+    </div>
   </div>
 </div>
-
-<ng-template #empty>
-  <nz-empty nzNotFoundImage="simple"
-    nzNotFoundContent="Không có dữ liệu"></nz-empty>
-</ng-template>
 
 <ng-template #totalTemplate
   let-total>Tổng cộng {{ total }} bản ghi</ng-template>

@@ -12,5 +12,6 @@ export interface IDepartment {
   Code?: string;
   Name: string;
   IdLevel?: string;
+  LevelName?: string;
   Description?: string;
 }

@@ -91,6 +91,7 @@
                     class="bm-font-head-4s">
                     {{ column.name }}
                   </th>
+                  <th [nzWidth]="'5%'">#</th>
                 </tr>
               </thead>
               <tbody>
@@ -110,11 +111,22 @@
                   <td>{{item.Dob | date:'dd/MM/YYYY'}}</td>
                   <td>{{item.Address}}</td>
                   <td>{{item.Phone}}</td>
-                  <td>{{item.IdPosition}}</td>
+                  <td>{{item.PositionName}}</td>
                   <td>
                     <nz-switch [(ngModel)]="item.Active"
                       [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
                       (ngModelChange)="handlerActiveChange($event, item)"></nz-switch>
+                  </td>
+                  <td><span nz-tooltip
+                      [nzTooltipTitle]="resetPasswordTemplate"
+                      (click)="handlerResetPassword($event, item.Id)"
+                      class="bm-color-009cdb bm-cursor-pointer">
+                      <span nz-icon
+                        nzType="undo"
+                        nzTheme="outline"></span></span>
+                    <ng-template #resetPasswordTemplate>
+                      <div class="bm-max-h-100px bm-overflow-auto">Khôi phục mật khẩu mặc định</div>
+                    </ng-template>
                   </td>
                 </tr>
               </tbody>

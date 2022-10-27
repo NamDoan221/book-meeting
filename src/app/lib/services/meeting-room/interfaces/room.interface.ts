@@ -1,11 +1,11 @@
-export interface IParamsGetListRoom {
+export interface IParamsGetListMeetingRoom {
   page: number;
   pageSize: number;
   search?: string;
   active?: boolean;
 }
 
-export interface IRoom {
+export interface IMeetingRoom {
   Id?: string;
   Active?: boolean;
   Domain?: string;

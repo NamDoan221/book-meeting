@@ -1,25 +1,22 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { UserCanActive } from './lib/services/auth/auth.service';
 import { BmNotFoundComponent } from './not-found/not-found.component';
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: '' },
   {
     path: 'login',
     loadChildren: () =>
-      import('./login/login.module').then((m) => m.BmLoginModule),
+      import('./login/login.module').then((m) => m.BmLoginModule)
   },
   {
     path: 'signup',
     loadChildren: () =>
-      import('./sign-up/sign-up.module').then((m) => m.BmSignUpModule),
+      import('./sign-up/sign-up.module').then((m) => m.BmSignUpModule)
   },
   {
     path: '',
-    canActivate: [UserCanActive],
     loadChildren: () =>
-      import('./layout/layout.module').then((m) => m.BmLayoutModule),
+      import('./layout/layout.module').then((m) => m.BmLayoutModule)
   },
   {
     path: '**',

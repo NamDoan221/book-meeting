@@ -50,11 +50,15 @@
         class="bm-border-general bm-border-radius-4px bm-p-12px bm-bg-ffffff bm-percent-max-width-65 bm-min-width-800px"
         [ngClass]="{'bm-mb-12px': !last}">
         <div class="bm-mb-4px">
-          <span class="bm-font-head-5s">{{function.Name}}</span>
+          <!-- <span class="bm-font-head-5s">{{function.Name}}</span> -->
+          <label nz-checkbox
+            [ngModel]="function.checked"
+            (ngModelChange)="handlerUpdateRole($event, function)"><span>{{function.Name}}</span></label>
         </div>
         <div *ngIf="function.FunctionChilds?.length"
-          class="d-flex justify-content-between">
-          <div *ngFor="let childFunction of function.FunctionChilds">
+          class="row">
+          <div *ngFor="let childFunction of function.FunctionChilds"
+            class="col-3">
             <label nz-checkbox
               [ngModel]="childFunction.checked"
               (ngModelChange)="handlerUpdateRole($event, childFunction)"><span>{{childFunction.Name}}</span></label>

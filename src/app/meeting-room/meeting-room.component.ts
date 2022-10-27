@@ -6,8 +6,8 @@ import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
-import { IParamsGetListRoom, IRoom } from '../lib/services/room/interfaces/room.interface';
-import { RoomService } from '../lib/services/room/room.service';
+import { IParamsGetListMeetingRoom, IMeetingRoom } from '../lib/services/meeting-room/interfaces/room.interface';
+import { MeetingRoomService } from '../lib/services/meeting-room/meeting-room.service';
 import { BmMeetingRoomAddEditComponent } from './add-edit/add-edit.component';
 
 @Component({
@@ -19,12 +19,12 @@ export class BmMeetingRoomComponent implements OnInit {
   firstCall: boolean;
   loading: boolean;
   total: number;
-  listMeetingRoom: IRoom[];
+  listMeetingRoom: IMeetingRoom[];
   columnConfig: string[];
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
   onSearch: Subject<string> = new Subject();
-  params: IParamsGetListRoom;
+  params: IParamsGetListMeetingRoom;
   keyToggleLoading: string;
   tabs: ITab[];
   selectedTab: number;
@@ -37,7 +37,7 @@ export class BmMeetingRoomComponent implements OnInit {
 
   constructor(
     private drawerService: NzDrawerService,
-    private roomService: RoomService,
+    private meetingRoomService: MeetingRoomService,
     private nzMessageService: NzMessageService
   ) {
     this.firstCall = true;
@@ -83,7 +83,7 @@ export class BmMeetingRoomComponent implements OnInit {
     }
     this.loading = true;
     try {
-      const result = await this.roomService.getListRoom(this.params);
+      const result = await this.meetingRoomService.getListMeetingRoom(this.params);
       this.listMeetingRoom = result.Value;
       this.total = result.Total;
     } catch (error) {
@@ -98,12 +98,12 @@ export class BmMeetingRoomComponent implements OnInit {
     this.addOrEdit(undefined);
   }
 
-  handlerEditMeetingRoom(event: Event, item: IRoom) {
+  handlerEditMeetingRoom(event: Event, item: IMeetingRoom) {
     event.stopPropagation();
     this.addOrEdit(item);
   }
 
-  addOrEdit(room: IRoom) {
+  addOrEdit(room: IMeetingRoom) {
     if (this.isOpenDraw) {
       return;
     }
@@ -162,10 +162,10 @@ export class BmMeetingRoomComponent implements OnInit {
     this.getListMeetingRoom();
   }
 
-  async handlerActiveChange(event: boolean, item: IRoom) {
+  async handlerActiveChange(event: boolean, item: IMeetingRoom) {
     this.keyToggleLoading = item.Id;
     try {
-      const result = await this.roomService.changeStatusRoom(item.Id);
+      const result = await this.meetingRoomService.changeStatusMeetingRoom(item.Id);
       if (result.success) {
         item.Active = event;
         this.listMeetingRoom = this.listMeetingRoom.filter(element => element.Id !== item.Id)

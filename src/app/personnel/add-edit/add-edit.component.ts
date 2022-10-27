@@ -39,7 +39,7 @@ export class BmPersonnelAddEditComponent implements OnInit {
   @Input() personnel: IPersonnel;
   @Input() modeEdit: boolean;
 
-  @Output() saveSuccess = new EventEmitter<any>();
+  @Output() saveSuccess = new EventEmitter<IPersonnel>();
 
   constructor(
     private fb: FormBuilder,
@@ -80,7 +80,7 @@ export class BmPersonnelAddEditComponent implements OnInit {
       IdPosition: [this.personnel?.IdPosition ?? '', [Validators.required]],
       Active: [this.personnel?.Active ?? true, [Validators.required]]
     });
-    this.onSearchPosition.pipe(debounceTime(500), filter(value => value === this.paramsGetPosition.search)).subscribe((value) => {
+    this.onSearchPosition.pipe(debounceTime(500), filter(value => value !== this.paramsGetPosition.search)).subscribe((value) => {
       this.searchPosition(value);
     });
     this.getListPosition();
@@ -164,7 +164,8 @@ export class BmPersonnelAddEditComponent implements OnInit {
     try {
       const result = await this.personnelService[this.modeEdit ? 'updatePersonnel' : 'createPersonnel'](body);
       if (result.success) {
-        this.saveSuccess.emit({ ...body, Id: result.result ?? this.personnel.Id });
+        const positionName = this.listPosition.find(item => item.Id === body.IdPosition)?.Name;
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.personnel.Id, PositionName: positionName });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }

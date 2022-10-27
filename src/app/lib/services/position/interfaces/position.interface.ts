@@ -15,4 +15,6 @@ export interface IPosition {
   IdLevel?: string;
   Description?: string;
   IdDepartment?: string;
+  LevelName?: string;
+  DepartmentName?: string;
 }

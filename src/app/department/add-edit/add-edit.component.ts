@@ -74,7 +74,8 @@ export class BmDepartmentAddEditComponent implements OnInit {
     try {
       const result = await this.departmentService[this.modeEdit ? 'updateDepartment' : 'createDepartment'](body);
       if (result.success) {
-        this.saveSuccess.emit({ ...body, Id: result.result ?? this.department.Id });
+        const levelName = this.listDepartmentLevel.find(item => item.Id === body.IdLevel)?.Name;
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.department.Id, LevelName: levelName });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }

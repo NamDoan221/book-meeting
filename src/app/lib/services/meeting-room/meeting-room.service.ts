@@ -1,18 +1,18 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../base.service';
-import { IParamsGetListRoom, IRoom } from './interfaces/room.interface';
+import { IParamsGetListMeetingRoom, IMeetingRoom } from './interfaces/room.interface';
 
 @Injectable({
   providedIn: 'root',
 })
-export class RoomService extends BaseService {
+export class MeetingRoomService extends BaseService {
 
   constructor() {
     super();
   }
 
-  public getListRoom(params: IParamsGetListRoom): Promise<any> {
+  public getListMeetingRoom(params: IParamsGetListMeetingRoom): Promise<any> {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Room`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
@@ -25,7 +25,7 @@ export class RoomService extends BaseService {
     });
   }
 
-  public createRoom(body: IRoom): Promise<any> {
+  public createMeetingRoom(body: IMeetingRoom): Promise<any> {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Room`, body).subscribe({
         next: result => {
@@ -38,7 +38,7 @@ export class RoomService extends BaseService {
     });
   }
 
-  public updateRoom(body: IRoom): Promise<any> {
+  public updateMeetingRoom(body: IMeetingRoom): Promise<any> {
     const id = body.Id;
     delete body.Id;
     return new Promise((resolve, reject) => {
@@ -53,7 +53,7 @@ export class RoomService extends BaseService {
     });
   }
 
-  public changeStatusRoom(id: string): Promise<any> {
+  public changeStatusMeetingRoom(id: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Room/${id}/toggle`, undefined).subscribe({
         next: result => {

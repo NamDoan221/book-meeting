@@ -16,6 +16,7 @@ export interface IRole {
   Description?: string;
   IsMenu?: boolean;
   Icon?: string;
+  Url?: string;
   RoleChilds?: IRoleChild[];
 }
 

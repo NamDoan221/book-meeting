@@ -41,11 +41,6 @@ export const menuDefault = (): IFunction[] => {
         Name: 'Điểm danh',
         Url: '/attendance',
         IsMenu: false,
-      },
-      {
-        Name: 'Dữ liệu khuôn mặt',
-        Url: '/face-data',
-        IsMenu: false,
       }
     ]
   },

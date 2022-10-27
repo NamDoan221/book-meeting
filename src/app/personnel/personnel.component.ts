@@ -304,6 +304,19 @@ export class BmPersonnelComponent implements OnInit {
     }
   }
 
+  async handlerResetPassword(event: boolean, id: string) {
+    try {
+      const result = await this.personnelService.resetPasswordPersonnel(id);
+      if (result.success) {
+        this.nzMessageService.success('Thao tác thành công.');
+        return;
+      }
+      this.nzMessageService.error('Thao tác không thành công.');
+    } catch (error) {
+      this.nzMessageService.error('Thao tác không thành công.');
+    }
+  }
+
   handlerTabChange(event) {
     this.selectedTab = event.index;
     this.params.active = event.index === 0;

@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ConstantDefines } from 'src/app/lib/defines/constant.define';
-import { IRoom } from 'src/app/lib/services/room/interfaces/room.interface';
-import { RoomService } from 'src/app/lib/services/room/room.service';
+import { IMeetingRoom } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
+import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
 
 @Component({
   selector: 'bm-meeting-room-add-edit',
@@ -14,14 +14,14 @@ export class BmMeetingRoomAddEditComponent implements OnInit {
   meetingRoomForm: FormGroup;
   loading: boolean;
 
-  @Input() room: IRoom;
+  @Input() room: IMeetingRoom;
   @Input() modeEdit: boolean;
 
-  @Output() saveSuccess = new EventEmitter<IRoom>();
+  @Output() saveSuccess = new EventEmitter<IMeetingRoom>();
 
   constructor(
     private fb: FormBuilder,
-    private roomService: RoomService,
+    private meetingRoomService: MeetingRoomService,
     private nzMessageService: NzMessageService
   ) {
     this.loading = false;
@@ -57,7 +57,7 @@ export class BmMeetingRoomAddEditComponent implements OnInit {
       body.Id = this.room.Id;
     }
     try {
-      const result = await this.roomService[this.modeEdit ? 'updateRoom' : 'createRoom'](body);
+      const result = await this.meetingRoomService[this.modeEdit ? 'updateMeetingRoom' : 'createMeetingRoom'](body);
       if (result.success) {
         this.saveSuccess.emit({ ...body, Id: result.result ?? this.room.Id });
         this.nzMessageService.success('Thao tác thành công.');

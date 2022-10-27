@@ -13,7 +13,9 @@ import { IBodyChangeInfo, IBodyLogin, IBodyRegisterAccount, IPassWord, IToken } 
 })
 export class AuthService extends BaseService {
 
-  constructor() {
+  constructor(
+    private nzMessageService: NzMessageService
+  ) {
     super();
   }
 
@@ -170,37 +172,31 @@ export class AuthService extends BaseService {
 
   public checkPermission(path: string) {
     const roles = this.decodeToken().Roles;
-    console.log(roles);
+    const findRoleByPath = roles.find(role => role.Url === path);
+    if (!findRoleByPath) {
+      this.nzMessageService.error('Bạn không có quyền truy cập chức năng này.');
+      if (roles.length) {
+        this.router.navigateByUrl(roles[0].Url);
+        return false;
+      }
+      return false;
+    }
     return true;
   }
 }
 
 @Injectable()
 export class UserCanActive implements CanActivate {
-  constructor(
-    private auth: AuthService,
-    private router: Router,
-    private nzMessageService: NzMessageService
-  ) { }
+
+  constructor(private auth: AuthService) { }
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    let path: string = window.location.pathname === DOMAIN_SITE() ? state.url.split('?')[0] : window.location.pathname;
-    console.log(route, state);
-
-    if (!this.checkLogin()) {
+    if (!this.auth.verifyToken()) {
       return false;
     }
-
-    if (!this.auth.checkPermission(path)) {
+    if (!this.auth.checkPermission(state.url)) {
       return false;
     }
     return true;
-  }
-
-  checkLogin(): boolean {
-    if (this.auth.verifyToken()) {
-      return true;
-    }
-    return false;
   }
 }

@@ -131,14 +131,18 @@ export class BmFunctionComponent implements OnInit {
       const result = await this.functionService.getListFunction(this.params);
       this.listFunction = result.Value;
       this.total = result.Total;
-      this.listFunction.forEach(item => {
-        this.mapOfExpandedData[item.Id] = this.convertTreeToList(item);
-      });
+      this.refreshTable();
     } catch (error) {
       console.log(error);
     } finally {
       this.loading = false;
     }
+  }
+
+  refreshTable() {
+    this.listFunction.forEach(item => {
+      this.mapOfExpandedData[item.Id] = this.convertTreeToList(item);
+    });
   }
 
   handlerAddSubFunction(event: Event, parentId: string) {
@@ -187,14 +191,13 @@ export class BmFunctionComponent implements OnInit {
         }
         if (!data.IdParent) {
           this.listFunction = [data, ...this.listFunction];
+          this.refreshTable();
           return;
         }
         const functionUpdate = this.listFunction.find(item => item.Id === data.IdParent);
         if (functionUpdate) {
           functionUpdate.FunctionChilds = [data, ...functionUpdate.FunctionChilds];
-          this.listFunction.forEach(item => {
-            this.mapOfExpandedData[item.Id] = this.convertTreeToList(item);
-          });
+          this.refreshTable();
         }
       });
     });
@@ -226,13 +229,25 @@ export class BmFunctionComponent implements OnInit {
     this.getListFunction();
   }
 
+  updateListFunctionAfterChangeActive(item: IFunction) {
+    if (!item.IdParent) {
+      this.listFunction = this.listFunction.filter(element => element.Id !== item.Id);
+      return;
+    }
+    const functionUpdate = this.listFunction.find(func => func.Id === item.IdParent);
+    if (functionUpdate) {
+      functionUpdate.FunctionChilds = functionUpdate.FunctionChilds.filter(child => child.Id !== item.Id);
+    }
+  }
+
   async handlerActiveChange(event: boolean, item: IFunction) {
     this.keyToggleLoading = item.Id;
     try {
       const result = await this.functionService.changeStatusFunction(item.Id);
       if (result.success) {
         item.Active = event;
-        this.listFunction = this.listFunction.filter(element => element.Id !== item.Id)
+        this.updateListFunctionAfterChangeActive(item);
+        this.refreshTable();
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }

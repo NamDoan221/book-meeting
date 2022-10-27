@@ -18,5 +18,6 @@ export interface IPersonnel {
   Gender: number;
   Dob: string;
   IdPosition: string;
+  PositionName: string;
   Active: boolean;
 }

@@ -82,11 +82,12 @@ export class BmRoleComponent implements OnInit {
 
   mergeFunctionAndRole() {
     this.listFunction = this.listFunction.map(functionItem => {
+      const functionItemInRole = this.listRole?.find(role => role.IdFunction === functionItem.Id);
       return {
         ...functionItem,
+        checked: !!functionItemInRole,
         FunctionChilds: functionItem.FunctionChilds?.map(functionChild => {
           let check = false;
-          const functionItemInRole = this.listRole?.find(role => role.IdFunction === functionItem.Id);
           if (functionItemInRole) {
             const functionItemInRoleChild = functionItemInRole.RoleChilds?.find(role => role.IdFunction === functionChild.Id);
             if (functionItemInRoleChild) {

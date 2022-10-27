@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 import { FunctionService } from 'src/app/lib/services/function/function.service';
 import { IFunction } from 'src/app/lib/services/function/interfaces/function.interface';
-import { IRoom } from 'src/app/lib/services/room/interfaces/room.interface';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
@@ -19,7 +18,7 @@ export class BmFunctionAddEditComponent implements OnInit {
   @Input() function: IFunction;
   @Input() modeEdit: boolean;
 
-  @Output() saveSuccess = new EventEmitter<IRoom>();
+  @Output() saveSuccess = new EventEmitter<IFunction>();
 
   constructor(
     private fb: FormBuilder,
@@ -34,7 +33,7 @@ export class BmFunctionAddEditComponent implements OnInit {
       Name: [this.function?.Name ?? '', [Validators.required]],
       Url: [this.function?.Url ?? ''], // Validators.pattern('^\/+([a-zA-Z])+$')
       Description: [this.function?.Description ?? ''],
-      IsMenu: [{ value: this.function?.IsMenu ?? (this.parentId ? false : true), disabled: !!this.parentId || this.function.IdParent }],
+      IsMenu: [{ value: this.function?.IsMenu ?? (this.parentId ? false : true), disabled: !!this.parentId || this.function?.IdParent }],
       Code: [this.function?.Code ?? '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
       Active: [this.function?.Active ?? true]
     });

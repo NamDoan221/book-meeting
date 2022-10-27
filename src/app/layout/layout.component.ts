@@ -77,10 +77,6 @@ export class BmLayoutComponent implements OnInit {
       }
       return;
     }
-    // if (url === '/personnel') {
-    //   this.nzMessageService.error('Bạn không có quyền truy cập chức năng này.');
-    //   return false;
-    // }
     this.currentPath = url;
     this.router.navigate([url]);
   }

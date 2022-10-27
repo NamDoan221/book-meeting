@@ -61,7 +61,7 @@ export class BmPositionAddEditComponent implements OnInit {
       Active: [this.position?.Active || true]
     });
     this.getListDepartmentLevel();
-    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value === this.paramsGetDepartment.search)).subscribe((value) => {
+    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
       this.searchDepartment(value);
     });
     this.getListDepartment();
@@ -135,7 +135,9 @@ export class BmPositionAddEditComponent implements OnInit {
     try {
       const result = await this.positionService[this.modeEdit ? 'updatePosition' : 'createPosition'](body);
       if (result.success) {
-        this.saveSuccess.emit({ ...body, Id: result.result ?? this.position.Id });
+        const levelName = this.listDepartmentLevel.find(item => item.Id === body.IdLevel)?.Name;
+        const departmentName = this.listDepartment.find(item => item.Id === body.IdDepartment)?.Name;
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.position.Id, LevelName: levelName, DepartmentName: departmentName });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
