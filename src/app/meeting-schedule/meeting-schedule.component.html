@@ -9,13 +9,6 @@
           nzType="plus"
           nzTheme="outline"></i>Thêm lịch họp</button>
     </div>
-    <nz-range-picker class="bm-w-503px"
-      [nzShowTime]="{ nzFormat: 'HH:mm' }"
-      nzFormat="yyyy-MM-dd HH:mm"
-      ngModel
-      (ngModelChange)="onChange($event)"
-      (nzOnCalendarChange)="onCalendarChange($event)"
-      (nzOnOk)="onOk($event)"></nz-range-picker>
     <nz-input-group class="bm-max-w-503px"
       [nzSuffix]="suffixIconSearch">
       <input type="text"
@@ -28,8 +21,68 @@
         nzType="search"></i>
     </ng-template>
   </div>
-  <div class="h-100 bm-mt-12px">
-    <div class="h-100"
+  <div class="h-100 bm-mt-12px d-flex">
+    <div class="h-100 w-15 bm-bg-ffffff bm-pt-12px bm-px-12px bm-border-general">
+      <div class="bm-mb-4px">Thời gian</div>
+      <nz-range-picker class="w-100"
+        [nzAllowClear]="false"
+        [nzShowTime]="{ nzFormat: 'HH:mm' }"
+        nzFormat="yyyy-MM-dd HH:mm"
+        [ngModel]="defaultFilterTime"
+        (ngModelChange)="onFilterTimeChange($event)">
+      </nz-range-picker>
+      <div class="bm-mt-12px">
+        <div class="bm-mb-4px">Phòng ban</div>
+        <nz-select class="w-100"
+          [nzShowSearch]="true"
+          [nzAllowClear]="true"
+          [nzServerSearch]="true"
+          [(ngModel)]="params.idDepartment"
+          [nzPlaceHolder]="'Chọn phòng ban'"
+          [nzNotFoundContent]="notFoundDepartmentTemplate"
+          (ngModelChange)="handlerSelectDepartment()"
+          (nzOnSearch)="handlerSearchDepartment($event)"
+          (nzScrollToBottom)="handlerScrollBottomDepartment()">
+          <nz-option *ngFor="let item of listDepartment"
+            [nzValue]="item.Id"
+            [nzLabel]="item.Name">
+          </nz-option>
+        </nz-select>
+        <ng-template #notFoundDepartmentTemplate>
+          <div class="d-flex align-items-center justify-content-center">
+            <span *ngIf="!loadingDepartment">{{paramsGetDepartment.search ? 'Không có kết quả' : 'Chưa có phòng ban nào trong danh sách'}}</span>
+            <nz-spin *ngIf="loadingDepartment"
+              nzSimple></nz-spin>
+          </div>
+        </ng-template>
+      </div>
+      <div class="bm-mt-12px">
+        <div class="bm-mb-4px">Người quản lý</div>
+        <nz-select class="w-100"
+          [nzShowSearch]="true"
+          [nzAllowClear]="true"
+          [nzServerSearch]="true"
+          [(ngModel)]="params.idCreator"
+          [nzPlaceHolder]="'Chọn người quản lý'"
+          [nzNotFoundContent]="notFoundPersonnelTemplate"
+          (ngModelChange)="handlerSelectPersonnel()"
+          (nzOnSearch)="handlerSearchPersonnel($event)"
+          (nzScrollToBottom)="handlerScrollBottomPersonnel()">
+          <nz-option *ngFor="let item of listPersonnel"
+            [nzValue]="item.Id"
+            [nzLabel]="item.FullName">
+          </nz-option>
+        </nz-select>
+        <ng-template #notFoundPersonnelTemplate>
+          <div class="d-flex align-items-center justify-content-center">
+            <span *ngIf="!loadingPersonnel">{{paramsGetPersonnel.search ? 'Không có kết quả' : 'Chưa có người quản lý nào trong danh sách'}}</span>
+            <nz-spin *ngIf="loadingPersonnel"
+              nzSimple></nz-spin>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+    <div class="h-100 w-85 bm-ml-12px"
       *ngIf="listMeetingSchedule && listMeetingSchedule.length">
       <nz-table #meetingScheduleTable
         [nzScroll]="{ y: 'calc(100vh - 220px)' }"
@@ -38,8 +91,8 @@
         [nzTotal]="total"
         [nzPageSize]="params.pageSize"
         [nzPageIndex]="params.page"
-        [nzLoading]="loading"
         [nzShowTotal]="totalTemplate"
+        [nzLoading]="loading"
         [nzSize]="'middle'"
         [nzBordered]="true"
         nzShowPagination
@@ -52,17 +105,31 @@
               class="bm-font-head-4s">
               {{ column }}
             </th>
+            <th [nzWidth]="'5%'">#</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let item of meetingScheduleTable.data;  let i=index">
             <td class="bm-color-009cdb bm-cursor-pointer"
               (click)="handlerEditMeetingSchedule($event, item)">{{item.Title}}</td>
-            <td>{{item.EstStartTime | date: 'yyyy-MM-dd HH:mm'}}</td>
+            <td>{{item.EstStartTime | date: 'dd/MM/yyyy HH:mm'}}
+              <span nz-tooltip
+                *ngIf="item.EstStartTime | CheckTimeStartMeetingSchedulePipe"
+                [nzTooltipTitle]="timeTemplate">
+                <span nz-icon
+                  class="bm-color-ff5454 bm-ml-4px"
+                  [nzType]="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:false:true"></span>
+              </span>
+              <ng-template #timeTemplate
+                let-content>
+                <div class="bm-max-h-100px bm-overflow-auto">{{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:true}}</div>
+              </ng-template>
+            </td>
             <td>{{item.EstDuration}} Phút</td>
-            <td>{{item.IdRoom}}</td>
-            <td>{{item.IdCreator}}</td>
-            <td>{{10}}</td>
+            <td>{{item.RoomName}}</td>
+            <td>{{item.CreatorName}} ({{item.CreatorPosition}})</td>
+            <td>{{item.DepartmentName}}</td>
+            <td>{{item.CountAttendee}}</td>
             <td>
               <div class="bm-overflow-hidden text-truncate">
                 <span nz-tooltip
@@ -76,7 +143,19 @@
                 <div class="bm-max-h-100px bm-overflow-auto">{{ content }}</div>
               </ng-template>
             </td>
-            <td>{{item.Status}}</td>
+            <td>{{item.StatusName}}</td>
+            <td><span nz-tooltip
+                [nzTooltipTitle]="addPersonnelTemplate"
+                (click)="handlerAddPersonnel($event, item)"
+                class="bm-color-009cdb bm-cursor-pointer">
+                <span nz-icon
+                  nzType="user-add"
+                  nzTheme="outline"></span>
+              </span>
+              <ng-template #addPersonnelTemplate>
+                <div class="bm-max-h-100px bm-overflow-auto">Thêm người tham gia</div>
+              </ng-template>
+            </td>
           </tr>
         </tbody>
       </nz-table>

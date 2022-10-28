@@ -39,17 +39,17 @@ export class MeetingScheduleService extends BaseService {
   }
 
   public updateMeetingSchedule(body: IMeetingSchedule): Promise<any> {
-    //   const id = body.Id;
-    //   delete body.Id;
+    const id = body.Id;
+    delete body.Id;
     return new Promise((resolve, reject) => {
-      //     this.put(`${this.domain}/Position/${id}`, body).subscribe({
-      //       next: result => {
-      //         return resolve(result);
-      //       },
-      //       error: err => {
-      //         reject(err);
-      //       }
-      //     });
+      this.put(`${this.domain}/Mschedule/${id}`, body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
     });
   }
 

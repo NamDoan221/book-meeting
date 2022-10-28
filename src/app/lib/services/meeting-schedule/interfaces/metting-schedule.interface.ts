@@ -14,12 +14,16 @@ export interface IMeetingSchedule {
   Code?: string;
   Title: string;
   Content?: string;
+  CreatorPosition?: string;
   IdRoom?: string;
+  RoomName?: string;
   IdCreator?: string;
+  CreatorName?: string;
   EstStartTime?: string;
   EstEndTime?: string;
   EstDuration: number;
   IsSyncGGCalendar: boolean;
   IsGGMeetRoom: boolean;
   Status?: string;
+  DepartmentName?: string;
 }

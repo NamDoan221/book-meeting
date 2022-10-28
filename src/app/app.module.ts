@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app.routing';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NZ_I18N } from 'ng-zorro-antd/i18n';
+import { NzI18nService, NZ_I18N } from 'ng-zorro-antd/i18n';
 import { vi_VN } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
@@ -53,7 +53,8 @@ export function HttpLoaderFactory(http: HttpClient): any {
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(private translate: TranslateService) {
+  constructor(private translate: TranslateService, private i18n: NzI18nService) {
     this.translate.setDefaultLang('vi');
+    this.i18n.setLocale(vi_VN);
   }
 }

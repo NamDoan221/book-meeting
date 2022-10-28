@@ -21,6 +21,8 @@ export interface IToken {
   Active: boolean;
   Phone: string;
   Id: string;
+  PositionName: string;
+  DepartmentName: string;
   Roles: IRole[];
 }
 

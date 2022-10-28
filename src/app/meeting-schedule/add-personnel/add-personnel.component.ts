@@ -14,10 +14,10 @@ import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfac
 import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
 
 @Component({
-  selector: 'bm-meeting-schedule-add_edit',
-  templateUrl: './add-edit.component.html'
+  selector: 'bm-meeting-schedule-add_personnel',
+  templateUrl: './add-personnel.component.html'
 })
-export class BmMeetingScheduleAddEditComponent implements OnInit {
+export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
 
   meetingScheduleForm: FormGroup;
   listPosition: any[];
@@ -76,7 +76,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     }
   };
 
-  @Input() meetingSchedule: any;
+  @Input() meetingSchedule: IMeetingSchedule;
   @Input() modeEdit: boolean;
 
   @ViewChild('endDatePicker') endDatePicker!: NzDatePickerComponent;
@@ -99,8 +99,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.listMeetingRoom = [];
     this.paramsGetMeetingRoom = {
       page: 1,
-      pageSize: 20,
-      active: true
+      pageSize: 20
     }
     this.loadingMeetingRoom = true;
     this.firstCallMeetingRoom = true;
@@ -184,8 +183,8 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.loading = true;
     const body = {
       ...this.meetingScheduleForm.value,
-      EstEndTime: dayjs(this.meetingScheduleForm.value.EstStartTime).add(this.meetingScheduleForm.value.EstDuration, 'minute'),
-      IdCreator: this.meetingSchedule?.IdCreator ?? this.authService.decodeToken().Id
+      EstEndTime: dayjs(this.meetingScheduleForm.value.EstStartTime).add(this.meetingScheduleForm.value.EstStartTime.EstDuration, 'minute'),
+      IdCreator: this.meetingSchedule.IdCreator ?? this.authService.decodeToken().Id
     }
     if (this.modeEdit) {
       body.Id = this.meetingSchedule.Id;
@@ -197,7 +196,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
         const creatorPosition = this.authService.decodeToken().PositionName;
         const departmentName = this.authService.decodeToken().DepartmentName;
         const roomName = this.listMeetingRoom.find(item => item.Id === body.IdRoom)?.Name;
-        this.saveSuccess.emit({ ...body, Id: result.result ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, CreatorPosition: creatorPosition, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.meetingSchedule.Id, CreatorName: creatorName, RoomName: roomName, CreatorPosition: creatorPosition, DepartmentName: departmentName });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }

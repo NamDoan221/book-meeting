@@ -128,6 +128,17 @@
                       <div class="bm-max-h-100px bm-overflow-auto">Khôi phục mật khẩu mặc định</div>
                     </ng-template>
                   </td>
+                  <td><span nz-tooltip
+                      [nzTooltipTitle]="addDataFaceTemplate"
+                      (click)="handlerAddDataFace($event, item.Id)"
+                      class="bm-color-009cdb bm-cursor-pointer">
+                      <span nz-icon
+                        nzType="user-add"
+                        nzTheme="outline"></span></span>
+                    <ng-template #addDataFaceTemplate>
+                      <div class="bm-max-h-100px bm-overflow-auto">Thêm dữ liệu khuôn mặt</div>
+                    </ng-template>
+                  </td>
                 </tr>
               </tbody>
             </nz-table>

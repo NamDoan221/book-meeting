@@ -304,7 +304,8 @@ export class BmPersonnelComponent implements OnInit {
     }
   }
 
-  async handlerResetPassword(event: boolean, id: string) {
+  async handlerResetPassword(event: Event, id: string) {
+    event.stopPropagation();
     try {
       const result = await this.personnelService.resetPasswordPersonnel(id);
       if (result.success) {
@@ -322,5 +323,9 @@ export class BmPersonnelComponent implements OnInit {
     this.params.active = event.index === 0;
     this.firstCall = true;
     this.getListPersonnel();
+  }
+
+  handlerAddDataFace(event: Event, id: string) {
+    event.stopPropagation();
   }
 }

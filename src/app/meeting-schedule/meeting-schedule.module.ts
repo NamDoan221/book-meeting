@@ -17,6 +17,11 @@ import { BmMeetingScheduleAddEditComponent } from './add-edit/add-edit.component
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzTagModule } from 'ng-zorro-antd/tag';
+import { CheckTimeStartMeetingSchedulePipeModule } from './pipes/check-time-start.pipe';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { BmMeetingScheduleAddPersonnelComponent } from './add-personnel/add-personnel.component';
+import { CheckStatusMeetingSchedulePipeModule } from './pipes/check-status.pipe';
 
 export const routes: Routes = [
   {
@@ -43,11 +48,16 @@ export const routes: Routes = [
     NzSelectModule,
     NzInputNumberModule,
     NzToolTipModule,
-    NzDatePickerModule
+    NzDatePickerModule,
+    NzTagModule,
+    NzSpinModule,
+    CheckTimeStartMeetingSchedulePipeModule,
+    CheckStatusMeetingSchedulePipeModule
   ],
   declarations: [
     BmMeetingScheduleComponent,
-    BmMeetingScheduleAddEditComponent
+    BmMeetingScheduleAddEditComponent,
+    BmMeetingScheduleAddPersonnelComponent
   ]
 })
 export class BmMeetingScheduleModule { }
