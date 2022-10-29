@@ -18,7 +18,9 @@ import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { BmPersonnelAddEditComponent } from './add-edit/add-edit.component';
+import { BmPersonnelDataFaceComponent } from './data-face/data-face.component';
 import { BmPersonnelComponent } from './personnel.component';
+import { CheckDataFacePersonnelPipeModule } from './pipes/check-data-face.pipe';
 
 export const routes: Routes = [
   {
@@ -47,11 +49,13 @@ export const routes: Routes = [
     NzTabsModule,
     NzSwitchModule,
     NzSpinModule,
-    NzDatePickerModule
+    NzDatePickerModule,
+    CheckDataFacePersonnelPipeModule
   ],
   declarations: [
     BmPersonnelComponent,
-    BmPersonnelAddEditComponent
+    BmPersonnelAddEditComponent,
+    BmPersonnelDataFaceComponent
   ]
 })
 export class BmPersonnelModule { }

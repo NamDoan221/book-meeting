@@ -1,17 +1,15 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { differenceInCalendarDays } from 'date-fns';
 import * as dayjs from 'dayjs';
-import { DisabledTimeFn, NzDatePickerComponent } from 'ng-zorro-antd/date-picker';
+import { NzDatePickerComponent } from 'ng-zorro-antd/date-picker';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
-import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
-import { IParamsGetListMeetingRoom, IMeetingRoom } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
-import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
 import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
 import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
+import { IParamsGetListPersonnel, IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
+import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
 
 @Component({
   selector: 'bm-meeting-schedule-add_personnel',
@@ -22,59 +20,15 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   meetingScheduleForm: FormGroup;
   listPosition: any[];
   loading: boolean;
-  listPersonnel: any[];
-  listMemberSelected: any[];
+  listPersonnelJoin: IPersonnel[];
+  disableChangePersonnelJoin: boolean;
 
-  totalMeetingRoom: number;
-  listMeetingRoom: IMeetingRoom[];
-  onSearchMeetingRoom: Subject<string> = new Subject();
-  paramsGetMeetingRoom: IParamsGetListMeetingRoom;
-  loadingMeetingRoom: boolean;
-  firstCallMeetingRoom: boolean;
-
-  pageSize: number;
-  total: number;
-  pageIndexGroup: number;
-  today = new Date();
-
-  range(start: number, end: number): number[] {
-    const result: number[] = [];
-    for (let i = start; i < end; i++) {
-      result.push(i);
-    }
-    return result;
-  }
-
-  disabledDate = (current: Date): boolean => differenceInCalendarDays(current, this.today) < 0;
-
-  disabledDateTime: DisabledTimeFn = (current: Date) => {
-    const currentCompareToday = differenceInCalendarDays(current, this.today) > 0;
-    const currentHours = current?.getHours();
-    const currentMinutes = current?.getMinutes();
-    let numberDisableHours = 0;
-    let numberDisableMinutes = 0;
-    if (!currentCompareToday) {
-      const minutes = this.today.getMinutes() + 15;
-      const hours = this.today.getHours();
-      if (currentHours && currentHours > hours) {
-        numberDisableHours = hours;
-        if (minutes > 59) {
-          numberDisableHours = hours + 1;
-          numberDisableMinutes = minutes - 59;
-        }
-      } else if (minutes <= 59) {
-        numberDisableHours = hours;
-        numberDisableMinutes = minutes;
-      } else {
-        numberDisableHours = hours + 1;
-      }
-    }
-    return {
-      nzDisabledHours: () => this.range(0, numberDisableHours),
-      nzDisabledMinutes: () => this.range(0, numberDisableMinutes),
-      nzDisabledSeconds: () => []
-    }
-  };
+  totalPersonnel: number;
+  listPersonnel: IPersonnel[];
+  onSearchPersonnel: Subject<string> = new Subject();
+  paramsGetPersonnel: IParamsGetListPersonnelFreeTime;
+  loadingPersonnel: boolean;
+  firstCallPersonnel: boolean;
 
   @Input() meetingSchedule: IMeetingSchedule;
   @Input() modeEdit: boolean;
@@ -85,79 +39,88 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private meetingRoomService: MeetingRoomService,
+    private personnelService: PersonnelService,
     private meetingScheduleService: MeetingScheduleService,
     private nzMessageService: NzMessageService,
     private authService: AuthService
   ) {
-    this.total = 2;
-    this.pageSize = 20;
-    this.pageIndexGroup = 1;
-    this.listMemberSelected = [];
+    this.listPersonnelJoin = [];
     this.loading = false;
 
-    this.listMeetingRoom = [];
-    this.paramsGetMeetingRoom = {
+    this.listPersonnel = [];
+    this.paramsGetPersonnel = {
       page: 1,
-      pageSize: 20
+      pageSize: 20,
+      from: dayjs().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      search: ''
     }
-    this.loadingMeetingRoom = true;
-    this.firstCallMeetingRoom = true;
+    this.loadingPersonnel = true;
+    this.firstCallPersonnel = true;
+    this.disableChangePersonnelJoin = false;
   }
 
   ngOnInit(): void {
-    this.initData();
-    this.onSearchMeetingRoom.pipe(debounceTime(500), filter(value => value !== this.paramsGetMeetingRoom.search)).subscribe((value) => {
-      this.searchMeetingRoom(value);
-    });
-    this.getListMeetingRoom();
-  }
-
-  initData() {
-    this.meetingScheduleForm = this.fb.group({
-      Title: [this.meetingSchedule?.Title || '', [Validators.required]],
-      Code: [this.meetingSchedule?.Code || '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
-      EstStartTime: [this.meetingSchedule?.EstStartTime ? new Date(this.meetingSchedule?.EstStartTime) : null, [Validators.required]],
-      EstDuration: [this.meetingSchedule?.EstDuration ? this.meetingSchedule?.EstDuration : '', [Validators.required]],
-      IdRoom: [this.meetingSchedule?.IdRoom || '', [Validators.required]],
-      Content: [this.meetingSchedule?.Content || '']
-    });
-  }
-
-  handlerSearchMeetingRoom(event: string) {
-    this.paramsGetMeetingRoom.page = 1;
-    this.onSearchMeetingRoom.next(event);
-  }
-
-  handlerScrollBottomMeetingRoom() {
-    if (this.loadingMeetingRoom || !this.totalMeetingRoom || this.totalMeetingRoom <= this.listMeetingRoom.length) {
-      return;
+    if (this.meetingSchedule && (dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) > 0 && dayjs(this.meetingSchedule.EstStartTime).diff(dayjs(), 'minute', false) < 0) || dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) < 0) {
+      this.disableChangePersonnelJoin = true;
     }
-    this.paramsGetMeetingRoom.page += 1;
-    this.getListMeetingRoom();
+    this.onSearchPersonnel.pipe(debounceTime(500), filter(value => value !== this.paramsGetPersonnel.search)).subscribe((value) => {
+      this.searchPersonnel(value);
+    });
+    this.getListPersonnel();
+    this.getDetailMeetingSchedule();
   }
 
-  searchMeetingRoom(value: string) {
-    const text = value.trim();
-    !text ? delete this.paramsGetMeetingRoom.search : (this.paramsGetMeetingRoom.search = text);
-    this.listMeetingRoom = [];
-    this.getListMeetingRoom();
-  }
-
-  async getListMeetingRoom() {
-    if (this.loadingMeetingRoom && !this.firstCallMeetingRoom) {
-      return;
-    }
-    this.firstCallMeetingRoom = false;
+  async getDetailMeetingSchedule() {
     try {
-      this.loadingMeetingRoom = true;
-      const result = await this.meetingRoomService.getListMeetingRoom(this.paramsGetMeetingRoom);
-      this.totalMeetingRoom = result.Total;
-      this.listMeetingRoom.push(...result.Value);
+      const result = await this.meetingScheduleService.getDetailMeetingSchedule(this.meetingSchedule.Id);
+      console.log(result);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  handlerKeyUp(event) {
+
+  }
+
+  handlerSearchPersonnel(event: string) {
+    this.paramsGetPersonnel.page = 1;
+    this.onSearchPersonnel.next(event);
+  }
+
+  handlerScrollBottomPersonnel() {
+    if (this.loadingPersonnel || !this.totalPersonnel || this.totalPersonnel <= this.listPersonnel.length) {
+      return;
+    }
+    this.paramsGetPersonnel.page += 1;
+    this.getListPersonnel();
+  }
+
+  searchPersonnel(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetPersonnel.search : (this.paramsGetPersonnel.search = text);
+    this.listPersonnel = [];
+    this.getListPersonnel();
+  }
+
+  async getListPersonnel() {
+    if (this.loadingPersonnel && !this.firstCallPersonnel) {
+      return;
+    }
+    this.firstCallPersonnel = false;
+    try {
+      this.loadingPersonnel = true;
+      const result = await this.personnelService.getListPersonnelFreeTime(this.paramsGetPersonnel);
+      this.totalPersonnel = result.Total;
+      this.listPersonnel.push(...result.Value);
+      console.log(this.listPersonnel);
+
     } catch (error) {
       console.log(error);
     } finally {
-      this.loadingMeetingRoom = false;
+      this.loadingPersonnel = false;
     }
   }
 
@@ -165,8 +128,17 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
 
   }
 
-  handlerChangeMember(event) {
-    this.listMemberSelected = event;
+  handlerAddPersonnelToMeetingSchedule(event: boolean, personnel: IPersonnel, index: number) {
+    if (event) {
+      this.listPersonnelJoin.push(personnel);
+      return;
+    }
+    this.listPersonnelJoin.splice(index, 1);
+  }
+
+  handlerRemovePersonnelJoin(event: Event, index: number) {
+    event.stopPropagation();
+    this.listPersonnelJoin.splice(index, 1);
   }
 
   async handlerUpdate(event: Event) {
@@ -191,15 +163,15 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     }
     try {
       const result = await this.meetingScheduleService[this.modeEdit ? 'updateMeetingSchedule' : 'createMeetingSchedule'](body);
-      if (result.success) {
-        const creatorName = this.authService.decodeToken().FullName;
-        const creatorPosition = this.authService.decodeToken().PositionName;
-        const departmentName = this.authService.decodeToken().DepartmentName;
-        const roomName = this.listMeetingRoom.find(item => item.Id === body.IdRoom)?.Name;
-        this.saveSuccess.emit({ ...body, Id: result.result ?? this.meetingSchedule.Id, CreatorName: creatorName, RoomName: roomName, CreatorPosition: creatorPosition, DepartmentName: departmentName });
-        this.nzMessageService.success('Thao tác thành công.');
-        return;
-      }
+      // if (result.success) {
+      //   const creatorName = this.authService.decodeToken().FullName;
+      //   const creatorPosition = this.authService.decodeToken().PositionName;
+      //   const departmentName = this.authService.decodeToken().DepartmentName;
+      //   const roomName = this.listPersonnel.find(item => item.Id === body.IdRoom)?.Name;
+      //   this.saveSuccess.emit({ ...body, Id: result.result ?? this.meetingSchedule.Id, CreatorName: creatorName, RoomName: roomName, CreatorPosition: creatorPosition, DepartmentName: departmentName });
+      //   this.nzMessageService.success('Thao tác thành công.');
+      //   return;
+      // }
       this.nzMessageService.error(result.message || 'Thao tác không thành công.');
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');

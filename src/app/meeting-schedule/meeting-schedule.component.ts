@@ -72,12 +72,13 @@ export class BmMeetingScheduleComponent implements OnInit {
       'Mô tả nội dung cuộc họp',
       'Trạng thái'
     ];
-    this.defaultFilterTime = [dayjs().subtract(30, 'day').toISOString(), dayjs().toISOString()];
+    this.defaultFilterTime = [dayjs().subtract(1, 'day').format('YYYY-MM-DDTHH:mm:ss[Z]'), dayjs().add(30, 'day').format('YYYY-MM-DDTHH:mm:ss[Z]')];
     this.params = {
       page: 1,
       pageSize: 20,
       from: this.defaultFilterTime[0],
-      to: this.defaultFilterTime[1]
+      to: this.defaultFilterTime[1],
+      search: ''
     };
     this.firstCall = false;
 
@@ -86,7 +87,8 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.paramsGetDepartment = {
       page: 1,
       pageSize: 20,
-      active: true
+      active: true,
+      search: ''
     }
     this.loadingDepartment = true;
     this.firstCallDepartment = true;
@@ -96,7 +98,8 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.paramsGetPersonnel = {
       page: 1,
       pageSize: 20,
-      active: true
+      active: true,
+      search: ''
     }
     this.loadingPersonnel = true;
     this.firstCallPersonnel = true;
@@ -112,8 +115,16 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.onSearchPersonnel.pipe(debounceTime(500), filter(value => value !== this.paramsGetPersonnel.search)).subscribe((value) => {
       this.searchPersonnel(value);
     });
+    this.getListDepartment();
+    this.getListPersonnel();
     this.getListMeetingSchedule();
   }
+  options = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'];
+
+  handleIndexChange(e: number): void {
+    console.log(e);
+  }
+
 
   searchMeetingSchedule(value: string) {
     const text = value.trim();
@@ -151,9 +162,9 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.onSearch.next(event.target.value);
   }
 
-  onFilterTimeChange(result: Date): void {
-    this.params.from = dayjs(result[0]).toISOString();
-    this.params.to = dayjs(result[1]).toISOString();
+  onFilterTimeChange(result: Date[]): void {
+    this.params.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.params.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss[Z]');
     this.getListMeetingSchedule();
   }
 
@@ -196,6 +207,9 @@ export class BmMeetingScheduleComponent implements OnInit {
           return;
         }
         this.listMeetingSchedule = [data, ...this.listMeetingSchedule];
+        setTimeout(() => {
+          this.handlerAddPersonnel({ stopPropagation: () => { } } as Event, data);
+        }, 500);
       });
     });
 
@@ -250,8 +264,11 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.getListDepartment();
   }
 
-  handlerSelectDepartment() {
+  handlerSelectDepartment(event: string) {
     this.firstCall = true;
+    this.paramsGetPersonnel.idDepartment = event;
+    this.params.idCreator = undefined;
+    this.getListPersonnel();
     this.getListMeetingSchedule();
   }
 

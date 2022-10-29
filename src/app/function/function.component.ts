@@ -59,7 +59,8 @@ export class BmFunctionComponent implements OnInit {
     this.params = {
       page: 1,
       pageSize: 20,
-      active: true
+      active: true,
+      search: ''
     };
     this.selectedTab = 0;
     this.tabs = TabsDefault();

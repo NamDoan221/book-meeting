@@ -81,7 +81,7 @@ export const menuDefault = (): IFunction[] => {
       },
       {
         Name: 'Đăng xuất',
-        Url: 'logout',
+        Url: '/logout',
         IsMenu: false,
       }
     ]

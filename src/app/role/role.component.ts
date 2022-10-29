@@ -42,10 +42,12 @@ export class BmRoleComponent implements OnInit {
     this.params = {
       page: 1,
       pageSize: 100,
+      search: '',
       active: true
     };
     this.paramsGetListRole = {
-      active: true
+      active: true,
+      search: ''
     };
 
     this.loadingPosition = false;

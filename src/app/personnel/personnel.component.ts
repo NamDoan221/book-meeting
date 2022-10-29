@@ -7,11 +7,16 @@ import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
 import { IColumnItem } from '../lib/interfaces/table.interfaces';
+import { DataFaceService } from '../lib/services/dataface/dataface.service';
 import { IParamsGetListPersonnel, IPersonnel } from '../lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from '../lib/services/personnel/personnel.service';
 import { IParamsGetListPosition, IPosition } from '../lib/services/position/interfaces/position.interface';
 import { PositionService } from '../lib/services/position/position.service';
 import { BmPersonnelAddEditComponent } from './add-edit/add-edit.component';
+import * as uuid from 'uuid';
+import { BmPersonnelDataFaceComponent } from './data-face/data-face.component';
+import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
+import { DepartmentService } from '../lib/services/department/department.service';
 
 @Component({
   selector: 'bm-personnel',
@@ -21,7 +26,8 @@ export class BmPersonnelComponent implements OnInit {
   firstCall: boolean;
   loading: boolean;
   columnConfig: IColumnItem[];
-  isOpenDraw: boolean;
+  isOpenDrawAddEdit: boolean;
+  isOpenDrawDataFace: boolean;
   drawerRefGlobal: NzDrawerRef;
   keyToggleLoading: string;
   onSearch: Subject<string> = new Subject();
@@ -43,17 +49,29 @@ export class BmPersonnelComponent implements OnInit {
   listOfData: readonly any[] = [];
   setOfCheckedId = new Set<number>();
 
+  keyFetchDataFace: string;
+
+  totalDepartment: number;
+  listDepartment: IDepartment[];
+  onSearchDepartment: Subject<string> = new Subject();
+  paramsGetDepartment: IParamsGetListDepartment;
+  firstCallDepartment: boolean;
+  loadingDepartment: boolean;
+
   constructor(
     private drawerService: NzDrawerService,
     private positionService: PositionService,
     private nzMessageService: NzMessageService,
-    private personnelService: PersonnelService
+    private personnelService: PersonnelService,
+    private dataFaceService: DataFaceService,
+    private departmentService: DepartmentService
   ) {
     this.firstCall = true;
     this.loading = false;
     this.totalPersonnel = 0;
     this.totalPosition = 0;
-    this.isOpenDraw = false;
+    this.isOpenDrawAddEdit = false;
+    this.isOpenDrawDataFace = false;
     this.columnConfig = [{
       name: 'Họ và tên',
       width: '18%'
@@ -88,17 +106,30 @@ export class BmPersonnelComponent implements OnInit {
     this.firstCallPosition = true;
     this.paramsGetPosition = {
       page: 1,
-      pageSize: 20
+      pageSize: 20,
+      search: ''
     }
     this.checked = false;
     this.showDelete = false;
     this.params = {
       page: 1,
       pageSize: 20,
-      active: true
+      active: true,
+      search: ''
     };
     this.selectedTab = 0;
     this.tabs = TabsDefault();
+
+    this.totalDepartment = 0;
+    this.listDepartment = [];
+    this.paramsGetDepartment = {
+      page: 1,
+      pageSize: 20,
+      active: true,
+      search: ''
+    };
+    this.loadingDepartment = true;
+    this.firstCallDepartment = true;
   }
 
   async ngOnInit(): Promise<void> {
@@ -108,6 +139,11 @@ export class BmPersonnelComponent implements OnInit {
     this.onSearchPosition.pipe(debounceTime(500), filter(value => value !== this.paramsGetPosition.search)).subscribe((value) => {
       this.searchPosition(value);
     });
+    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
+      this.searchDepartment(value);
+    });
+    this.getListDepartment();
+    this.getListPosition();
     this.getListPersonnel();
   }
 
@@ -165,7 +201,7 @@ export class BmPersonnelComponent implements OnInit {
     }
   }
 
-  handlerScrollBottom() {
+  handlerScrollBottomPosition() {
     if (this.loadingPosition || !this.totalPosition || this.totalPosition <= this.listPosition.length) {
       return;
     }
@@ -226,10 +262,10 @@ export class BmPersonnelComponent implements OnInit {
   }
 
   addOrEdit(personnel: IPersonnel) {
-    if (this.isOpenDraw) {
+    if (this.isOpenDrawAddEdit) {
       return;
     }
-    this.isOpenDraw = true;
+    this.isOpenDrawAddEdit = true;
     this.drawerRefGlobal = this.drawerService.create<BmPersonnelAddEditComponent>({
       nzBodyStyle: { overflow: 'auto' },
       nzMaskClosable: false,
@@ -245,9 +281,9 @@ export class BmPersonnelComponent implements OnInit {
     });
 
     this.drawerRefGlobal.afterOpen.subscribe(() => {
-      this.isOpenDraw = true;
+      this.isOpenDrawAddEdit = true;
       this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
-        this.isOpenDraw = false;
+        this.isOpenDrawAddEdit = false;
         this.drawerRefGlobal.close();
         if (personnel) {
           Object.assign(personnel, data);
@@ -258,7 +294,7 @@ export class BmPersonnelComponent implements OnInit {
     });
 
     this.drawerRefGlobal.afterClose.subscribe(data => {
-      this.isOpenDraw = false;
+      this.isOpenDrawAddEdit = false;
       this.drawerRefGlobal.close();
     });
   }
@@ -325,7 +361,101 @@ export class BmPersonnelComponent implements OnInit {
     this.getListPersonnel();
   }
 
-  handlerAddDataFace(event: Event, id: string) {
+  handlerAddDataFace(event: Event, id: string, hasFace: boolean) {
     event.stopPropagation();
+    if (this.isOpenDrawDataFace) {
+      return;
+    }
+    this.isOpenDrawDataFace = true;
+    this.drawerRefGlobal = this.drawerService.create<BmPersonnelDataFaceComponent>({
+      nzBodyStyle: { overflow: 'auto' },
+      nzMaskClosable: false,
+      nzWidth: '50vw',
+      nzClosable: true,
+      nzKeyboard: true,
+      nzTitle: hasFace ? `Cập nhật dữ liệu khuôn mặt` : 'Thêm dữ liệu khuôn mặt',
+      nzContent: BmPersonnelDataFaceComponent,
+      nzContentParams: {
+        idPersonnel: id,
+        modeEdit: hasFace
+      }
+    });
+
+    this.drawerRefGlobal.afterOpen.subscribe(() => {
+      this.isOpenDrawDataFace = true;
+      this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
+        this.isOpenDrawDataFace = false;
+        this.drawerRefGlobal.close();
+        if (data) {
+          this.keyFetchDataFace = uuid();
+        }
+      });
+    });
+
+    this.drawerRefGlobal.afterClose.subscribe(data => {
+      this.isOpenDrawDataFace = false;
+      this.drawerRefGlobal.close();
+    });
+  }
+
+  async handlerDeleteDataFace(event: Event, id: string) {
+    event.stopPropagation();
+    try {
+      const result = await this.dataFaceService.deleteDataFace(id);
+      if (result.success) {
+        this.keyFetchDataFace = uuid();
+        this.nzMessageService.success('Thao tác thành công.');
+        return;
+      }
+      this.nzMessageService.error('Thao tác không thành công.');
+    } catch (error) {
+      this.nzMessageService.error('Thao tác không thành công.');
+    }
+  }
+
+  async getListDepartment() {
+    if (this.loadingDepartment && !this.firstCallDepartment) {
+      return;
+    }
+    this.firstCallDepartment = false;
+    try {
+      this.loadingDepartment = true;
+      const result = await this.departmentService.getListDepartment(this.paramsGetDepartment);
+      this.totalDepartment = result.Total;
+      this.listDepartment.push(...result.Value);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingDepartment = false;
+      this.loading = false;
+    }
+  }
+
+  searchDepartment(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetDepartment.search : (this.paramsGetDepartment.search = text);
+    this.listDepartment = [];
+    this.getListDepartment();
+  }
+
+  handlerSelectDepartment(event: string) {
+    this.firstCall = true;
+    this.paramsGetPosition.idDepartment = event;
+    this.params.idPosition = undefined;
+    this.getListPosition();
+    this.getListPersonnel();
+  }
+
+  handlerSearchDepartment(event: string) {
+    this.paramsGetDepartment.page = 1;
+    this.onSearchDepartment.next(event);
+  }
+
+  handlerScrollBottomDepartment() {
+    if (this.loadingDepartment || !this.totalDepartment || this.totalDepartment <= this.listDepartment.length) {
+      return;
+    }
+    this.paramsGetDepartment.page += 1;
+    this.getListDepartment();
   }
 }

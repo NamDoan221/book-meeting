@@ -1,7 +1,7 @@
 export interface IParamsGetListPosition {
   page: number;
   pageSize: number;
-  search?: string;
+  search: string;
   active?: boolean;
   idDepartment?: string;
 }

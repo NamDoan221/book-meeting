@@ -37,7 +37,7 @@ export class BmLayoutComponent implements OnInit {
   async buildMenu() {
     const roles = this.auth.decodeToken().Roles;
     try {
-      const result = await this.functionService.getListFunction({ page: 1, pageSize: 100, active: true });
+      const result = await this.functionService.getListFunction({ page: 1, pageSize: 100, active: true, search: '' });
       const functionByRole = result.Value.filter(item => roles.find(role => role.IdFunction === item.Id));
       menuDefault().forEach(item => {
         const functionChilds = [];
@@ -67,7 +67,7 @@ export class BmLayoutComponent implements OnInit {
     if (!url) {
       return;
     }
-    if (url === 'logout') {
+    if (url === '/logout') {
       try {
         const result = await this.auth.logout();
         this.cacheService.clearAll();

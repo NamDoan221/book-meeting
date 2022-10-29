@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../base.service';
-import { IMeetingSchedule, IParamsGetListMeetingSchedule } from './interfaces/metting-schedule.interface';
+import { IBodyAddPersonnelToMeetingSchedule, IMeetingSchedule, IParamsGetListMeetingSchedule } from './interfaces/metting-schedule.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -53,16 +53,42 @@ export class MeetingScheduleService extends BaseService {
     });
   }
 
-  // public changeStatusPosition(id: string): Promise<any> {
-  //   return new Promise((resolve, reject) => {
-  //     this.put(`${this.domain}/Position/${id}/toggle`, undefined).subscribe({
-  //       next: result => {
-  //         return resolve(result);
-  //       },
-  //       error: err => {
-  //         reject(err);
-  //       }
-  //     });
-  //   });
-  // }
+  public getDetailMeetingSchedule(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.get(`${this.domain}/Mschedule/${id}/detail`).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  public getDetailAttendanceMeetingSchedule(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.get(`${this.domain}/Mschedule/${id}/detail-attendance`).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  public addPersonnelToMeetingSchedule(body: IBodyAddPersonnelToMeetingSchedule): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.post(`${this.domain}/Mschedule/detail`, body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
 }

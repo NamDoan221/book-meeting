@@ -83,12 +83,15 @@ export class BmPositionComponent implements OnInit {
     this.params = {
       page: 1,
       pageSize: 20,
-      active: true
-    }
+      active: true,
+      search: ''
+    };
     this.paramsGetDepartment = {
       page: 1,
-      pageSize: 20
-    }
+      pageSize: 20,
+      active: true,
+      search: ''
+    };
     this.loadingDepartment = true;
     this.firstCallDepartment = true;
     this.checked = false;
@@ -104,6 +107,7 @@ export class BmPositionComponent implements OnInit {
     this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
       this.searchDepartment(value);
     });
+    this.getListDepartment();
     this.getListPosition();
   }
 

@@ -36,7 +36,8 @@ import {
   BellOutline,
   HomeOutline,
   UndoOutline,
-  UserAddOutline
+  UserAddOutline,
+  UserSwitchOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -74,7 +75,8 @@ const icons = [
   BellOutline,
   HomeOutline,
   UndoOutline,
-  UserAddOutline
+  UserAddOutline,
+  UserSwitchOutline
 ];
 @NgModule({
   imports: [NzIconModule],

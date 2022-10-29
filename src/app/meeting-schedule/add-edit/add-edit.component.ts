@@ -6,9 +6,8 @@ import { DisabledTimeFn, NzDatePickerComponent } from 'ng-zorro-antd/date-picker
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
-import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
-import { IParamsGetListMeetingRoom, IMeetingRoom } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
+import { IMeetingRoom, IParamsGetListMeetingRoomFreeTime } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
 import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
 import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
 import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
@@ -20,22 +19,18 @@ import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/me
 export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   meetingScheduleForm: FormGroup;
-  listPosition: any[];
   loading: boolean;
-  listPersonnel: any[];
-  listMemberSelected: any[];
 
   totalMeetingRoom: number;
   listMeetingRoom: IMeetingRoom[];
   onSearchMeetingRoom: Subject<string> = new Subject();
-  paramsGetMeetingRoom: IParamsGetListMeetingRoom;
+  paramsGetMeetingRoom: IParamsGetListMeetingRoomFreeTime;
   loadingMeetingRoom: boolean;
   firstCallMeetingRoom: boolean;
 
-  pageSize: number;
-  total: number;
-  pageIndexGroup: number;
   today = new Date();
+  rangeChange: boolean;
+  durationChange: boolean;
 
   range(start: number, end: number): number[] {
     const result: number[] = [];
@@ -90,20 +85,21 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     private nzMessageService: NzMessageService,
     private authService: AuthService
   ) {
-    this.total = 2;
-    this.pageSize = 20;
-    this.pageIndexGroup = 1;
-    this.listMemberSelected = [];
     this.loading = false;
 
     this.listMeetingRoom = [];
     this.paramsGetMeetingRoom = {
       page: 1,
       pageSize: 20,
+      search: '',
+      from: dayjs().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss[Z]'),
       active: true
     }
     this.loadingMeetingRoom = true;
     this.firstCallMeetingRoom = true;
+    this.rangeChange = false;
+    this.durationChange = false;
   }
 
   ngOnInit(): void {
@@ -118,11 +114,52 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.meetingScheduleForm = this.fb.group({
       Title: [this.meetingSchedule?.Title || '', [Validators.required]],
       Code: [this.meetingSchedule?.Code || '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
-      EstStartTime: [this.meetingSchedule?.EstStartTime ? new Date(this.meetingSchedule?.EstStartTime) : null, [Validators.required]],
+      RangeTime: [this.meetingSchedule?.EstStartTime && this.meetingSchedule?.EstEndTime ? [new Date(this.meetingSchedule?.EstStartTime), new Date(this.meetingSchedule?.EstEndTime)] : [], [Validators.required]],
       EstDuration: [this.meetingSchedule?.EstDuration ? this.meetingSchedule?.EstDuration : '', [Validators.required]],
       IdRoom: [this.meetingSchedule?.IdRoom || '', [Validators.required]],
       Content: [this.meetingSchedule?.Content || '']
     });
+    this.meetingSchedule?.EstStartTime && (this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).format('YYYY-MM-DDTHH:mm:ss[Z]'));
+    this.meetingSchedule?.EstEndTime && (this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss[Z]'));
+  }
+
+  rangeTimeChange(result: Date[]) {
+    if (this.durationChange) {
+      return;
+    }
+    this.rangeChange = true;
+    setTimeout(() => {
+      this.rangeChange = false;
+    }, 250);
+    const duration = dayjs(result[1]).diff(dayjs(result[0]), 'minute', false);
+    this.meetingScheduleForm.controls.EstDuration.setValue(duration);
+    this.refreshMeetingRoomWhenChangeTime(result);
+  }
+
+  durationTimeChange(event: number) {
+    if (this.rangeChange) {
+      return;
+    }
+    this.durationChange = true;
+    setTimeout(() => {
+      this.durationChange = false;
+    }, 250);
+    if (this.meetingScheduleForm.controls.RangeTime.value.length) {
+      const rangeTime = [dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).toDate(), dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).add(event, 'minute').toDate()];
+      this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
+      this.refreshMeetingRoomWhenChangeTime(rangeTime);
+      return;
+    }
+    const rangeTime = [dayjs().add(15, 'minute').toDate(), dayjs().add(15 + event, 'minute').toDate()];
+    this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
+    this.refreshMeetingRoomWhenChangeTime(rangeTime);
+  }
+
+  refreshMeetingRoomWhenChangeTime(result: Date[]) {
+    this.paramsGetMeetingRoom.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.paramsGetMeetingRoom.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.listMeetingRoom = [];
+    this.getListMeetingRoom();
   }
 
   handlerSearchMeetingRoom(event: string) {
@@ -152,7 +189,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.firstCallMeetingRoom = false;
     try {
       this.loadingMeetingRoom = true;
-      const result = await this.meetingRoomService.getListMeetingRoom(this.paramsGetMeetingRoom);
+      const result = await this.meetingRoomService.getListMeetingRoomFreeTime(this.paramsGetMeetingRoom);
       this.totalMeetingRoom = result.Total;
       this.listMeetingRoom.push(...result.Value);
     } catch (error) {
@@ -160,14 +197,6 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     } finally {
       this.loadingMeetingRoom = false;
     }
-  }
-
-  handlerScrollBottom(event) {
-
-  }
-
-  handlerChangeMember(event) {
-    this.listMemberSelected = event;
   }
 
   async handlerUpdate(event: Event) {
@@ -182,9 +211,10 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       return;
     }
     this.loading = true;
-    const body = {
+    const body: IMeetingSchedule = {
       ...this.meetingScheduleForm.value,
-      EstEndTime: dayjs(this.meetingScheduleForm.value.EstStartTime).add(this.meetingScheduleForm.value.EstDuration, 'minute'),
+      EstStartTime: dayjs(this.meetingScheduleForm.value.RangeTime[0]).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      EstEndTime: dayjs(this.meetingScheduleForm.value.RangeTime[1]).format('YYYY-MM-DDTHH:mm:ss[Z]'),
       IdCreator: this.meetingSchedule?.IdCreator ?? this.authService.decodeToken().Id
     }
     if (this.modeEdit) {
@@ -194,10 +224,10 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       const result = await this.meetingScheduleService[this.modeEdit ? 'updateMeetingSchedule' : 'createMeetingSchedule'](body);
       if (result.success) {
         const creatorName = this.authService.decodeToken().FullName;
-        const creatorPosition = this.authService.decodeToken().PositionName;
+        const positionName = this.authService.decodeToken().PositionName;
         const departmentName = this.authService.decodeToken().DepartmentName;
         const roomName = this.listMeetingRoom.find(item => item.Id === body.IdRoom)?.Name;
-        this.saveSuccess.emit({ ...body, Id: result.result ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, CreatorPosition: creatorPosition, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
+        this.saveSuccess.emit({ ...body, Id: result.result ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }

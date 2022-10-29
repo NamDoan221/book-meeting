@@ -1,8 +1,9 @@
 export interface IParamsGetListPersonnel {
   page: number;
   pageSize: number;
-  search?: string;
+  search: string;
   idPosition?: string;
+  idDepartment?: string;
   active?: boolean;
 }
 
@@ -20,4 +21,15 @@ export interface IPersonnel {
   IdPosition: string;
   PositionName: string;
   Active: boolean;
+}
+
+export interface IParamsGetListPersonnelFreeTime {
+  page: number;
+  pageSize: number;
+  from: string;
+  to: string;
+  search: string;
+  idPosition?: string;
+  active?: boolean;
+  idDepartment?: string;
 }

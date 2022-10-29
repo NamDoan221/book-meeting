@@ -62,7 +62,9 @@ export class BmPersonnelAddEditComponent implements OnInit {
     ];
     this.paramsGetPosition = {
       page: 1,
-      pageSize: 20
+      pageSize: 20,
+      search: '',
+      active: true
     }
     this.loadingPosition = true;
     this.firstCallPosition = true;

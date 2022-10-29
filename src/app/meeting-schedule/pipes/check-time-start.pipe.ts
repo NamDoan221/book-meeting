@@ -1,6 +1,9 @@
 import { NgModule, Pipe, PipeTransform } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as dayjs from 'dayjs';
+import * as utc from 'dayjs/plugin/utc';
+dayjs.extend(utc)
+
 
 @Pipe({ name: 'CheckTimeStartMeetingSchedulePipe' })
 export class CheckTimeStartMeetingSchedulePipe implements PipeTransform {

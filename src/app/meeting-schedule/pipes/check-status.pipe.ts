@@ -7,8 +7,6 @@ export class CheckStatusMeetingSchedulePipe implements PipeTransform {
   transform(timeStart: string, timeEnd: string, duration: number) {
     const compareTimeStartWithNow = dayjs(timeStart).diff(dayjs(), 'minute', false);
     const compareTimeEndWithNow = dayjs(timeEnd).diff(dayjs(), 'minute', false);
-    console.log(compareTimeStartWithNow, compareTimeEndWithNow, duration);
-
     if (compareTimeStartWithNow > 0 && compareTimeStartWithNow > duration) {
       return `Sự kiên này sẽ diễn ra lúc ${dayjs(timeStart).format('HH:mm DD/MM/YYYY')} và kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
     }

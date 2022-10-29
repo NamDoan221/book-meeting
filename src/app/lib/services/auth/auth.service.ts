@@ -76,7 +76,7 @@ export class AuthService extends BaseService {
   }
 
   public logout(): Promise<any> {
-    const token = this.decodeToken().JwtToken;
+    const token = this.decodeToken().RefreshToken;
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Account/revoke-token`, { Token: token }).subscribe({
         next: result => {

@@ -5,9 +5,6 @@
     </div>
     <div class="d-flex">
       <div class="d-flex align-items-center bm-mr-12px">
-        <nz-form-label [nzNoColon]="true">
-          Chức vụ
-        </nz-form-label>
         <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
           [nzServerSearch]="true"
@@ -50,7 +47,6 @@
         class="bm-border-general bm-border-radius-4px bm-p-12px bm-bg-ffffff bm-percent-max-width-65 bm-min-width-800px"
         [ngClass]="{'bm-mb-12px': !last}">
         <div class="bm-mb-4px">
-          <!-- <span class="bm-font-head-5s">{{function.Name}}</span> -->
           <label nz-checkbox
             [ngModel]="function.checked"
             (ngModelChange)="handlerUpdateRole($event, function)"><span>{{function.Name}}</span></label>

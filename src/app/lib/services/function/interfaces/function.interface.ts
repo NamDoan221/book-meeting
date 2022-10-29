@@ -1,7 +1,7 @@
 export interface IParamsGetListFunction {
   page: number;
   pageSize: number;
-  search?: string;
+  search: string;
   active?: boolean;
 }
 

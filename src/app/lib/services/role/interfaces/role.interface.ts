@@ -1,6 +1,6 @@
 export interface IParamsGetListRole {
   idPosition?: string;
-  search?: string;
+  search: string;
   active?: boolean;
 }
 

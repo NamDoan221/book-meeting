@@ -1,7 +1,7 @@
 export interface IParamsGetListMeetingSchedule {
   page: number;
   pageSize: number;
-  search?: string;
+  search: string;
   from?: string;
   to?: string;
   idDepartment?: string;
@@ -14,7 +14,7 @@ export interface IMeetingSchedule {
   Code?: string;
   Title: string;
   Content?: string;
-  CreatorPosition?: string;
+  PositionName?: string;
   IdRoom?: string;
   RoomName?: string;
   IdCreator?: string;
@@ -25,5 +25,11 @@ export interface IMeetingSchedule {
   IsSyncGGCalendar: boolean;
   IsGGMeetRoom: boolean;
   Status?: string;
+  StatusName?: string;
   DepartmentName?: string;
+}
+
+export interface IBodyAddPersonnelToMeetingSchedule {
+  idAccount: string;
+  idMeetingSchedule: string;
 }

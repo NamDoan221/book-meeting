@@ -17,25 +17,46 @@
     </div>
     <div class="d-flex">
       <div class="d-flex align-items-center bm-mr-12px">
-        <nz-form-label [nzNoColon]="true">
-          Chức vụ
-        </nz-form-label>
+        <nz-select class="bm-w-200px"
+          [nzShowSearch]="true"
+          [nzAllowClear]="true"
+          [nzServerSearch]="true"
+          [(ngModel)]="params.idDepartment"
+          [nzPlaceHolder]="'Chọn phòng ban'"
+          [nzNotFoundContent]="notFoundDepartmentTemplate"
+          (ngModelChange)="handlerSelectDepartment($event)"
+          (nzOnSearch)="handlerSearchDepartment($event)"
+          (nzScrollToBottom)="handlerScrollBottomDepartment()">
+          <nz-option *ngFor="let item of listDepartment"
+            [nzValue]="item.Id"
+            [nzLabel]="item.Name">
+          </nz-option>
+        </nz-select>
+        <ng-template #notFoundDepartmentTemplate>
+          <div class="d-flex align-items-center justify-content-center">
+            <span *ngIf="!loadingDepartment">{{paramsGetDepartment.search ? 'Không có kết quả' : 'Chưa có phòng ban nào trong danh sách'}}</span>
+            <nz-spin *ngIf="loadingDepartment"
+              nzSimple></nz-spin>
+          </div>
+        </ng-template>
+      </div>
+      <div class="d-flex align-items-center bm-mr-12px">
         <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
           [nzAllowClear]="true"
           [nzServerSearch]="true"
           [(ngModel)]="params.idPosition"
           [nzPlaceHolder]="'Chọn chức vụ'"
-          [nzNotFoundContent]="notFoundContentTemplate"
+          [nzNotFoundContent]="notFoundPositionTemplate"
           (ngModelChange)="handlerSelectPosition()"
           (nzOnSearch)="handlerSearchPosition($event)"
-          (nzScrollToBottom)="handlerScrollBottom()">
+          (nzScrollToBottom)="handlerScrollBottomPosition()">
           <nz-option *ngFor="let item of listPosition"
             [nzValue]="item.Id"
             [nzLabel]="item.Name">
           </nz-option>
         </nz-select>
-        <ng-template #notFoundContentTemplate>
+        <ng-template #notFoundPositionTemplate>
           <div class="d-flex align-items-center justify-content-center">
             <span *ngIf="!loadingPosition">{{paramsGetPosition.search ? 'Không có kết quả' : 'Chưa có chức vụ nào trong danh sách'}}</span>
             <nz-spin *ngIf="loadingPosition"
@@ -117,27 +138,49 @@
                       [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
                       (ngModelChange)="handlerActiveChange($event, item)"></nz-switch>
                   </td>
-                  <td><span nz-tooltip
-                      [nzTooltipTitle]="resetPasswordTemplate"
-                      (click)="handlerResetPassword($event, item.Id)"
-                      class="bm-color-009cdb bm-cursor-pointer">
-                      <span nz-icon
-                        nzType="undo"
-                        nzTheme="outline"></span></span>
-                    <ng-template #resetPasswordTemplate>
-                      <div class="bm-max-h-100px bm-overflow-auto">Khôi phục mật khẩu mặc định</div>
-                    </ng-template>
-                  </td>
-                  <td><span nz-tooltip
-                      [nzTooltipTitle]="addDataFaceTemplate"
-                      (click)="handlerAddDataFace($event, item.Id)"
-                      class="bm-color-009cdb bm-cursor-pointer">
-                      <span nz-icon
-                        nzType="user-add"
-                        nzTheme="outline"></span></span>
-                    <ng-template #addDataFaceTemplate>
-                      <div class="bm-max-h-100px bm-overflow-auto">Thêm dữ liệu khuôn mặt</div>
-                    </ng-template>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div>
+                        <span nz-tooltip
+                          [nzTooltipTitle]="resetPasswordTemplate"
+                          (click)="handlerResetPassword($event, item.Id)"
+                          class="bm-color-009cdb bm-cursor-pointer">
+                          <span nz-icon
+                            nzType="undo"
+                            nzTheme="outline"></span></span>
+                        <ng-template #resetPasswordTemplate>
+                          <div class="bm-max-h-100px bm-overflow-auto">Khôi phục mật khẩu mặc định</div>
+                        </ng-template>
+                      </div>
+                      <div class="bm-ml-8px">
+                        <span class="d-none"
+                          *ngIf="item.Id | CheckDataFacePersonnelPipe:keyFetchDataFace | async as hasFace"></span>
+                        <span nz-tooltip
+                          [nzTooltipTitle]="addDataFaceTemplate"
+                          (click)="handlerAddDataFace($event, item.Id, hasFace)"
+                          class="bm-color-009cdb bm-cursor-pointer">
+                          <span nz-icon
+                            [nzType]="hasFace ? 'user-switch' : 'user-add'"
+                            nzTheme="outline"></span></span>
+                        <ng-template #addDataFaceTemplate>
+                          <div class="bm-max-h-100px bm-overflow-auto">{{hasFace ? 'Cập nhật dữ liệu khuôn mặt' : 'Thêm dữ liệu khuôn mặt'}}</div>
+                        </ng-template>
+                      </div>
+                      <div class="bm-ml-8px"
+                        *ngIf="item.Id | CheckDataFacePersonnelPipe:keyFetchDataFace | async">
+                        <span nz-tooltip
+                          [nzTooltipTitle]="deleteDataFaceTemplate"
+                          (click)="handlerDeleteDataFace($event, item.Id)"
+                          class="bm-color-009cdb bm-cursor-pointer">
+                          <span nz-icon
+                            class="bm-color-ff5454"
+                            nzType="delete"
+                            nzTheme="outline"></span></span>
+                        <ng-template #deleteDataFaceTemplate>
+                          <div class="bm-max-h-100px bm-overflow-auto">{{'Xoá dữ liệu khuôn mặt'}}</div>
+                        </ng-template>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               </tbody>

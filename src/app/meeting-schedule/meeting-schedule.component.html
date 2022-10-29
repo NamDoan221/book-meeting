@@ -9,38 +9,25 @@
           nzType="plus"
           nzTheme="outline"></i>Thêm lịch họp</button>
     </div>
-    <nz-input-group class="bm-max-w-503px"
-      [nzSuffix]="suffixIconSearch">
-      <input type="text"
-        nz-input
-        placeholder="Tìm theo tên lịch họp"
-        (keyup)="handlerKeyUp($event)" />
-    </nz-input-group>
-    <ng-template #suffixIconSearch>
-      <i nz-icon
-        nzType="search"></i>
-    </ng-template>
-  </div>
-  <div class="h-100 bm-mt-12px d-flex">
-    <div class="h-100 w-15 bm-bg-ffffff bm-pt-12px bm-px-12px bm-border-general">
-      <div class="bm-mb-4px">Thời gian</div>
-      <nz-range-picker class="w-100"
-        [nzAllowClear]="false"
-        [nzShowTime]="{ nzFormat: 'HH:mm' }"
-        nzFormat="yyyy-MM-dd HH:mm"
-        [ngModel]="defaultFilterTime"
-        (ngModelChange)="onFilterTimeChange($event)">
-      </nz-range-picker>
-      <div class="bm-mt-12px">
-        <div class="bm-mb-4px">Phòng ban</div>
-        <nz-select class="w-100"
+    <div class="d-flex">
+      <div class="d-flex align-items-center bm-mr-12px">
+        <nz-range-picker class="w-100"
+          [nzAllowClear]="false"
+          [nzShowTime]="{ nzFormat: 'HH:mm' }"
+          nzFormat="dd/MM/yyyy HH:mm"
+          [ngModel]="defaultFilterTime"
+          (ngModelChange)="onFilterTimeChange($event)">
+        </nz-range-picker>
+      </div>
+      <div class="d-flex align-items-center bm-mr-12px">
+        <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
           [nzAllowClear]="true"
           [nzServerSearch]="true"
           [(ngModel)]="params.idDepartment"
           [nzPlaceHolder]="'Chọn phòng ban'"
           [nzNotFoundContent]="notFoundDepartmentTemplate"
-          (ngModelChange)="handlerSelectDepartment()"
+          (ngModelChange)="handlerSelectDepartment($event)"
           (nzOnSearch)="handlerSearchDepartment($event)"
           (nzScrollToBottom)="handlerScrollBottomDepartment()">
           <nz-option *ngFor="let item of listDepartment"
@@ -56,9 +43,8 @@
           </div>
         </ng-template>
       </div>
-      <div class="bm-mt-12px">
-        <div class="bm-mb-4px">Người quản lý</div>
-        <nz-select class="w-100"
+      <div class="d-flex align-items-center bm-mr-12px">
+        <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
           [nzAllowClear]="true"
           [nzServerSearch]="true"
@@ -81,8 +67,25 @@
           </div>
         </ng-template>
       </div>
+      <div>
+        <nz-input-group class="bm-w-503px"
+          [nzSuffix]="suffixIconSearch">
+          <input type="text"
+            nz-input
+            placeholder="Tìm theo tên lịch họp"
+            (keyup)="handlerKeyUp($event)" />
+        </nz-input-group>
+        <ng-template #suffixIconSearch>
+          <i nz-icon
+            nzType="search"></i>
+        </ng-template>
+      </div>
     </div>
-    <div class="h-100 w-85 bm-ml-12px"
+  </div>
+  <nz-segmented [nzOptions]="options"
+    (nzValueChange)="handleIndexChange($event)"></nz-segmented>
+  <div class="h-100 w-100 bm-mt-12px">
+    <div class="h-100 w-100"
       *ngIf="listMeetingSchedule && listMeetingSchedule.length">
       <nz-table #meetingScheduleTable
         [nzScroll]="{ y: 'calc(100vh - 220px)' }"
@@ -105,13 +108,21 @@
               class="bm-font-head-4s">
               {{ column }}
             </th>
-            <th [nzWidth]="'5%'">#</th>
+            <th [nzWidth]="'2%'">#</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of meetingScheduleTable.data;  let i=index">
-            <td class="bm-color-009cdb bm-cursor-pointer"
-              (click)="handlerEditMeetingSchedule($event, item)">{{item.Title}}</td>
+          <tr *ngFor="let item of meetingScheduleTable.data; index as i">
+            <td>
+              <div class="bm-color-009cdb bm-cursor-pointer bm-overflow-hidden text-truncate"
+                (click)="handlerEditMeetingSchedule($event, item)">
+                <span nz-tooltip
+                  [nzTooltipTitle]="contentTemplate"
+                  [nzTooltipTitleContext]="{ $implicit: item.Title }">
+                  {{item.Title}}
+                </span>
+              </div>
+            </td>
             <td>{{item.EstStartTime | date: 'dd/MM/yyyy HH:mm'}}
               <span nz-tooltip
                 *ngIf="item.EstStartTime | CheckTimeStartMeetingSchedulePipe"
@@ -127,7 +138,7 @@
             </td>
             <td>{{item.EstDuration}} Phút</td>
             <td>{{item.RoomName}}</td>
-            <td>{{item.CreatorName}} ({{item.CreatorPosition}})</td>
+            <td>{{item.CreatorName}} ({{item.PositionName}})</td>
             <td>{{item.DepartmentName}}</td>
             <td>{{item.CountAttendee}}</td>
             <td>

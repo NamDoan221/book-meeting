@@ -21,7 +21,7 @@ export class BmPositionAddEditComponent implements OnInit {
   loading: boolean;
   loadingDepartment: boolean;
   firstCallDepartment: boolean;
-  listDepartmentLevel: IDataItemGetByTypeDictionary[];
+  listPositionLevel: IDataItemGetByTypeDictionary[];
   totalDepartment: number;
   listDepartment: IDepartment[];
   paramsGetDepartment: IParamsGetListDepartment;
@@ -41,12 +41,14 @@ export class BmPositionAddEditComponent implements OnInit {
   ) {
     this.loading = false;
     this.loadingDepartment = true;
-    this.listDepartmentLevel = [];
+    this.listPositionLevel = [];
     this.listDepartment = [];
     this.totalDepartment = 0;
     this.paramsGetDepartment = {
       page: 1,
-      pageSize: 20
+      pageSize: 20,
+      search: '',
+      active: true
     }
     this.firstCallDepartment = true;
   }
@@ -60,17 +62,17 @@ export class BmPositionAddEditComponent implements OnInit {
       Code: [this.position?.Code || '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
       Active: [this.position?.Active || true]
     });
-    this.getListDepartmentLevel();
+    this.getListPositionLevel();
     this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
       this.searchDepartment(value);
     });
     this.getListDepartment();
   }
 
-  async getListDepartmentLevel() {
+  async getListPositionLevel() {
     try {
-      const result = await this.dictionaryService.getListDataByTypeDictionary('DEPARTMENT_LEVEL');
-      this.listDepartmentLevel = result;
+      const result = await this.dictionaryService.getListDataByTypeDictionary('POSITION_LEVEL');
+      this.listPositionLevel = result;
     } catch (error) {
       console.log(error);
     }
@@ -135,7 +137,7 @@ export class BmPositionAddEditComponent implements OnInit {
     try {
       const result = await this.positionService[this.modeEdit ? 'updatePosition' : 'createPosition'](body);
       if (result.success) {
-        const levelName = this.listDepartmentLevel.find(item => item.Id === body.IdLevel)?.Name;
+        const levelName = this.listPositionLevel.find(item => item.Id === body.IdLevel)?.Name;
         const departmentName = this.listDepartment.find(item => item.Id === body.IdDepartment)?.Name;
         this.saveSuccess.emit({ ...body, Id: result.result ?? this.position.Id, LevelName: levelName, DepartmentName: departmentName });
         this.nzMessageService.success('Thao tác thành công.');

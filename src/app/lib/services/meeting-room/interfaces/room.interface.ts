@@ -1,7 +1,16 @@
 export interface IParamsGetListMeetingRoom {
   page: number;
   pageSize: number;
-  search?: string;
+  search: string;
+  active?: boolean;
+}
+
+export interface IParamsGetListMeetingRoomFreeTime {
+  page: number;
+  pageSize: number;
+  from: string;
+  to: string;
+  search: string;
   active?: boolean;
 }
 
