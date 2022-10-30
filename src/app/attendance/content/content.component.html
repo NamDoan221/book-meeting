@@ -51,7 +51,8 @@
       <tr *ngFor="let item of departmentTable.data;  let i=index">
         <td>{{item.FullName}}</td>
         <td><label nz-checkbox
-            [(ngModel)]="item.AttendanceTime"></label>
+            class="bm-pointer-events-none"
+            [ngModel]="item.AttendanceTime || (item.Id | CheckAttendancePipe:attendanceId:keyFetch)"></label>
         </td>
       </tr>
     </tbody>

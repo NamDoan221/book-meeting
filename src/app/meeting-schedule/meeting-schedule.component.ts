@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import * as dayjs from 'dayjs';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
-import { AuthService } from '../lib/services/auth/auth.service';
 import { DepartmentService } from '../lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
 import { IMeetingSchedule, IParamsGetListMeetingSchedule } from '../lib/services/meeting-schedule/interfaces/metting-schedule.interface';
@@ -14,6 +13,7 @@ import { IParamsGetListPersonnel, IPersonnel } from '../lib/services/personnel/i
 import { PersonnelService } from '../lib/services/personnel/personnel.service';
 import { BmMeetingScheduleAddEditComponent } from './add-edit/add-edit.component';
 import { BmMeetingScheduleAddPersonnelComponent } from './add-personnel/add-personnel.component';
+import { BmMeetingScheduleAttendanceComponent } from './attendance/attendance.component';
 
 @Component({
   selector: 'bm-meeting-schedule',
@@ -25,6 +25,7 @@ export class BmMeetingScheduleComponent implements OnInit {
   columnConfig: string[];
   isOpenDrawAddEdit: boolean;
   isOpenDrawAddPersonnel: boolean;
+  isOpenDrawAttendance: boolean;
   drawerRefGlobal: NzDrawerRef;
   options: string[];
   selectedFilterTimeIndex: number;
@@ -52,9 +53,8 @@ export class BmMeetingScheduleComponent implements OnInit {
   paramsGetPersonnel: IParamsGetListPersonnel;
 
   constructor(
-    private auth: AuthService,
     private drawerService: NzDrawerService,
-    private notification: NzNotificationService,
+    private route: Router,
     private departmentService: DepartmentService,
     private meetingScheduleService: MeetingScheduleService,
     private personnelService: PersonnelService
@@ -64,6 +64,7 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.listMeetingSchedule = [];
     this.isOpenDrawAddEdit = false;
     this.isOpenDrawAddPersonnel = false;
+    this.isOpenDrawAttendance = false;
     this.columnConfig = [
       'Tên cuộc họp',
       'Thời gian diễn ra',
@@ -71,7 +72,7 @@ export class BmMeetingScheduleComponent implements OnInit {
       'Phòng họp',
       'Người quản lý cuộc họp',
       'Phòng ban',
-      'Số người được tham gia',
+      'Số nhân viên được tham gia',
       'Mô tả nội dung cuộc họp',
       'Trạng thái'
     ];
@@ -381,6 +382,44 @@ export class BmMeetingScheduleComponent implements OnInit {
 
     this.drawerRefGlobal.afterClose.subscribe(data => {
       this.isOpenDrawAddPersonnel = false;
+      this.drawerRefGlobal.close();
+    });
+  }
+
+  handlerAttendance(event: Event, meetingSchedule: IMeetingSchedule) {
+    event.stopPropagation();
+    if (this.isOpenDrawAttendance) {
+      return;
+    }
+    this.isOpenDrawAttendance = true;
+    this.drawerRefGlobal = this.drawerService.create<BmMeetingScheduleAttendanceComponent>({
+      nzBodyStyle: { overflow: 'auto' },
+      nzMaskClosable: false,
+      nzWidth: '100vw',
+      nzClosable: true,
+      nzKeyboard: true,
+      nzTitle: `Điểm danh`,
+      nzContent: BmMeetingScheduleAttendanceComponent,
+      nzContentParams: {
+        meetingSchedule: meetingSchedule
+      }
+    });
+
+    this.drawerRefGlobal.afterOpen.subscribe(() => {
+      this.isOpenDrawAttendance = true;
+      this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
+        this.isOpenDrawAttendance = false;
+        this.drawerRefGlobal.close();
+        if (meetingSchedule) {
+          Object.assign(meetingSchedule, data);
+          return;
+        }
+        this.listMeetingSchedule = [data, ...this.listMeetingSchedule];
+      });
+    });
+
+    this.drawerRefGlobal.afterClose.subscribe(data => {
+      this.isOpenDrawAttendance = false;
       this.drawerRefGlobal.close();
     });
   }

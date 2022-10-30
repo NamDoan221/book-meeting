@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { differenceInCalendarDays } from 'date-fns';
 import * as dayjs from 'dayjs';
-import { DisabledTimeFn, NzDatePickerComponent } from 'ng-zorro-antd/date-picker';
+import { DisabledTimeFn } from 'ng-zorro-antd/date-picker';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
@@ -73,8 +73,6 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   @Input() meetingSchedule: any;
   @Input() modeEdit: boolean;
-
-  @ViewChild('endDatePicker') endDatePicker!: NzDatePickerComponent;
 
   @Output() saveSuccess = new EventEmitter<IMeetingSchedule>();
 

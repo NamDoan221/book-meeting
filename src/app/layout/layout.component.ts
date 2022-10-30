@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../lib/services/auth/auth.service';
+import { IToken } from '../lib/services/auth/interfaces/auth.interfaces';
 import { CacheService } from '../lib/services/cache.service';
 import { FunctionService } from '../lib/services/function/function.service';
 import { IFunction } from '../lib/services/function/interfaces/function.interface';
@@ -17,6 +18,7 @@ export class BmLayoutComponent implements OnInit {
   public isCollapsed: boolean;
   menuData: IFunction[];
   currentPath: string;
+  accountFromCache: IToken;
 
   constructor(
     private router: Router,
@@ -30,6 +32,7 @@ export class BmLayoutComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.accountFromCache = this.auth.decodeToken();
     this.buildMenu();
     this.currentPath = this.router.url;
   }

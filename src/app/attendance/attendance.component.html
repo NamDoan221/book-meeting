@@ -1,6 +1,8 @@
 <div class="w-100 h-100 d-flex">
   <div class="h-100 bm-border-right-general bm-px-12px w-35">
-    <bm-meeting-schedule-content (startAttendance)="handlerStartAttendance($event)"
+    <bm-meeting-schedule-content [attendanceId]="attendanceId"
+      [keyFetch]="keyFetch"
+      (startAttendance)="handlerStartAttendance($event)"
       (stopAttendance)="handlerStopAttendance()"
       (loadDataTrainComplete)="handlerLoadingDataTrainComplete($event)"
       (saveSuccess)="handlerSave()"></bm-meeting-schedule-content>

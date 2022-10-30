@@ -143,4 +143,17 @@ export class MeetingScheduleService extends BaseService {
       });
     });
   }
+
+  public endAttendance(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.put(`${this.domain}/Mschedule/${id}/end`, {}).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
 }

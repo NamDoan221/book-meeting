@@ -90,7 +90,7 @@
     <div class="h-100 w-100"
       *ngIf="listMeetingSchedule && listMeetingSchedule.length">
       <nz-table #meetingScheduleTable
-        [nzScroll]="{ y: 'calc(100vh - 253px)' }"
+        [nzScroll]="{ y: 'calc(100vh - 262px)' }"
         [nzFrontPagination]="false"
         [nzData]="listMeetingSchedule"
         [nzTotal]="total"
@@ -110,7 +110,7 @@
               class="bm-font-head-4s">
               {{ column }}
             </th>
-            <th [nzWidth]="'2%'">#</th>
+            <th [nzWidth]="'4%'">#</th>
           </tr>
         </thead>
         <tbody>
@@ -167,6 +167,18 @@
               </span>
               <ng-template #addPersonnelTemplate>
                 <div class="bm-max-h-100px bm-overflow-auto">Thêm người tham gia</div>
+              </ng-template>
+              <span nz-tooltip
+                *ngIf="!(item.EstStartTime | CheckTimeStartMeetingSchedulePipe)"
+                [nzTooltipTitle]="attendanceTemplate"
+                (click)="handlerAttendance($event, item)"
+                class="bm-color-009cdb bm-cursor-pointer bm-ml-12px">
+                <span nz-icon
+                  nzType="scan"
+                  nzTheme="outline"></span>
+              </span>
+              <ng-template #attendanceTemplate>
+                <div class="bm-max-h-100px bm-overflow-auto">Điểm danh</div>
               </ng-template>
             </td>
           </tr>

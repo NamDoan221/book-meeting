@@ -18,6 +18,7 @@ import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { BmMeetingAttendanceComponent } from './attendance.component';
 import { BmMeetingAttendanceContentComponent } from './content/content.component';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { CheckAttendancePipeModule } from './content/pipes/check-attendance.pipe';
 
 export const routes: Routes = [
   {
@@ -45,7 +46,8 @@ export const routes: Routes = [
     NzInputNumberModule,
     NzToolTipModule,
     NzDatePickerModule,
-    NzCheckboxModule
+    NzCheckboxModule,
+    CheckAttendancePipeModule
   ],
   declarations: [
     BmMeetingAttendanceComponent,

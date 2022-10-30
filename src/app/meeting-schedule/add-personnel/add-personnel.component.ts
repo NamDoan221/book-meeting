@@ -1,6 +1,5 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import * as dayjs from 'dayjs';
-import { NzDatePickerComponent } from 'ng-zorro-antd/date-picker';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
@@ -54,8 +53,6 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   @Input() meetingSchedule: IMeetingSchedule;
   @Input() modeEdit: boolean;
 
-  @ViewChild('endDatePicker') endDatePicker!: NzDatePickerComponent;
-
   @Output() saveSuccess = new EventEmitter<IMeetingSchedule>();
 
   constructor(
@@ -108,7 +105,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     if (this.meetingSchedule &&
       (dayjs(this.meetingSchedule.EstEndTime).utc().diff(dayjs().utc(), 'minute', false) > 0 && dayjs(this.meetingSchedule.EstStartTime).utc().diff(dayjs().utc(), 'minute', false) < 0) ||
       dayjs(this.meetingSchedule.EstEndTime).utc().diff(dayjs().utc(), 'minute', false) < 0 ||
@@ -129,8 +126,8 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     });
     this.getListDepartment();
     this.getListPosition();
+    await this.getDetailMeetingSchedule();
     this.getListPersonnel();
-    this.getDetailMeetingSchedule();
   }
 
   searchDetail(value: string) {
@@ -214,7 +211,14 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
       this.loadingPersonnel = true;
       const result = await this.personnelService.getListPersonnelFreeTime(this.paramsGetPersonnel);
       this.totalPersonnel = result.Total;
-      this.listPersonnel.push(...result.Value);
+      this.listPersonnel.push(...result.Value?.map(item => {
+        const id = item.Id;
+        return {
+          ...item,
+          IdAccount: item.Id,
+          Id: this.listPersonnelJoin.find(item => item.IdAccount === id)?.Id || id
+        }
+      }));
     } catch (error) {
       console.log(error);
     } finally {
@@ -222,20 +226,20 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     }
   }
 
-  handlerAddPersonnelToMeetingSchedule(event: boolean, personnel: IPersonnel, index: number) {
+  handlerAddPersonnelToMeetingSchedule(event: boolean, personnel: IPersonnel) {
     if (event) {
-      this.listPersonnelJoin.push(personnel);
-      this.handlerUpdate(personnel.Id);
+      this.handlerUpdate(personnel);
+      this.listPersonnelJoin = [...this.listPersonnelJoin, personnel];
       return;
     }
-    this.listPersonnelJoin.splice(index, 1);
     this.handlerDelete(personnel.Id);
+    this.listPersonnelJoin = this.listPersonnelJoin.filter(item => item.IdAccount !== personnel.IdAccount);
   }
 
-  handlerRemovePersonnelJoin(event: Event, personnel: IPersonnel, index: number) {
+  handlerRemovePersonnelJoin(event: Event, personnel: IPersonnel) {
     event.stopPropagation();
-    this.listPersonnelJoin.splice(index, 1);
     this.handlerDelete(personnel.Id);
+    this.listPersonnelJoin = this.listPersonnelJoin.filter(item => item.IdAccount !== personnel.IdAccount);
   }
 
   async handlerDelete(id: string) {
@@ -254,11 +258,12 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     }
   }
 
-  async handlerUpdate(id: string) {
+  async handlerUpdate(personnel: IPersonnel) {
     try {
       this.loading = true;
-      const result = await this.meetingScheduleService.addPersonnelToMeetingSchedule({ idMeetingSchedule: this.meetingSchedule.Id, idAccount: id });
+      const result = await this.meetingScheduleService.addPersonnelToMeetingSchedule({ idMeetingSchedule: this.meetingSchedule.Id, idAccount: personnel.IdAccount });
       if (result.success) {
+        personnel.Id = result.result;
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }

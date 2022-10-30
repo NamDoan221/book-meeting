@@ -21,6 +21,7 @@ import { BmPersonnelAddEditComponent } from './add-edit/add-edit.component';
 import { BmPersonnelDataFaceComponent } from './data-face/data-face.component';
 import { BmPersonnelComponent } from './personnel.component';
 import { CheckDataFacePersonnelPipeModule } from './pipes/check-data-face.pipe';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 
 export const routes: Routes = [
   {
@@ -50,7 +51,8 @@ export const routes: Routes = [
     NzSwitchModule,
     NzSpinModule,
     NzDatePickerModule,
-    CheckDataFacePersonnelPipeModule
+    CheckDataFacePersonnelPipeModule,
+    NzPopconfirmModule
   ],
   declarations: [
     BmPersonnelComponent,

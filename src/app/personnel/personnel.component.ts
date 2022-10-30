@@ -342,8 +342,7 @@ export class BmPersonnelComponent implements OnInit {
     }
   }
 
-  async handlerResetPassword(event: Event, id: string) {
-    event.stopPropagation();
+  async handlerResetPassword(id: string) {
     try {
       const result = await this.personnelService.resetPasswordPersonnel(id);
       if (result.success) {
@@ -363,7 +362,7 @@ export class BmPersonnelComponent implements OnInit {
     this.getListPersonnel();
   }
 
-  handlerAddDataFace(event: Event, id: string, hasFace: boolean) {
+  handlerAddDataFace(event: Event, personnel: IPersonnel) {
     event.stopPropagation();
     if (this.isOpenDrawDataFace) {
       return;
@@ -375,11 +374,11 @@ export class BmPersonnelComponent implements OnInit {
       nzWidth: '50vw',
       nzClosable: true,
       nzKeyboard: true,
-      nzTitle: hasFace ? `Cập nhật dữ liệu khuôn mặt` : 'Thêm dữ liệu khuôn mặt',
+      nzTitle: personnel.SpecificHasFace ? `Cập nhật dữ liệu khuôn mặt` : 'Thêm dữ liệu khuôn mặt',
       nzContent: BmPersonnelDataFaceComponent,
       nzContentParams: {
-        idPersonnel: id,
-        modeEdit: hasFace
+        idPersonnel: personnel.Id,
+        modeEdit: personnel.SpecificHasFace
       }
     });
 
@@ -400,12 +399,12 @@ export class BmPersonnelComponent implements OnInit {
     });
   }
 
-  async handlerDeleteDataFace(event: Event, id: string) {
-    event.stopPropagation();
+  async handlerDeleteDataFace(personnel: IPersonnel) {
     try {
-      const result = await this.dataFaceService.deleteDataFace(id);
+      const result = await this.dataFaceService.deleteDataFace(personnel.Id);
       if (result.success) {
         this.keyFetchDataFace = uuid();
+        personnel.SpecificHasFace = false;
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }

@@ -1,7 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as dayjs from 'dayjs';
-import { NzDatePickerComponent } from 'ng-zorro-antd/date-picker';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
@@ -32,6 +31,9 @@ export class BmMeetingAttendanceContentComponent implements OnInit {
   firstCall: boolean;
   params: IParamsGetListMeetingSchedule;
   onSearch: Subject<string> = new Subject();
+
+  @Input() attendanceId: string[];
+  @Input() keyFetch: string[];
 
   @Output() loadDataTrainComplete = new EventEmitter<any[]>();
   @Output() saveSuccess = new EventEmitter<any>();
@@ -71,11 +73,13 @@ export class BmMeetingAttendanceContentComponent implements OnInit {
     this.params = {
       page: 1,
       pageSize: 20,
+      status: 'MS_DEFAULT',
       from: dayjs().subtract(5, 'minute').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-      to: dayjs().add(5, 'minute').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      to: dayjs().add(10, 'month').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
       search: '',
       idCreator: this.authService.decodeToken().Id
     };
+    this.attendanceId = [];
   }
 
   ngOnInit(): void {

@@ -53,8 +53,18 @@
             nz-icon
             [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'"></i>
         </div>
-        <div class="d-flex align-items-center">
-          <nz-badge [nzCount]="100"
+        <div class="d-flex align-items-center bm-mr-12px">
+          <span nz-tooltip
+            [nzTooltipTitle]="contentTemplate">
+            <img [src]="accountFromCache.AvatarUrl || 'https://t3.ftcdn.net/jpg/02/09/37/00/360_F_209370065_JLXhrc5inEmGl52SyvSPeVB23hB6IjrR.jpg'"
+              alt=""
+              class="bm-w-40px bm-h-40px bm-border-radius-50em bm-border-general bm-mr-12px">
+          </span>
+          <ng-template #contentTemplate>
+            {{accountFromCache.PositionName}}: {{accountFromCache.FullName}}
+          </ng-template>
+          <nz-badge class="bm-mt-10px"
+            [nzCount]="100"
             nzSize="small">
             <i class="notification"
               nz-icon

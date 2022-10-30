@@ -23,6 +23,7 @@ export interface IPersonnel {
   Active: boolean;
   IdAccount: string;
   AttendanceTime: string;
+  SpecificHasFace?: boolean;
 }
 
 export interface IParamsGetListPersonnelFreeTime {

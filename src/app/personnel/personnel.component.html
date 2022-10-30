@@ -143,37 +143,42 @@
                       <div>
                         <span nz-tooltip
                           [nzTooltipTitle]="resetPasswordTemplate"
-                          (click)="handlerResetPassword($event, item.Id)"
                           class="bm-color-009cdb bm-cursor-pointer">
                           <span nz-icon
+                            nz-popconfirm
+                            nzPopconfirmTitle="Bạn có chắc chắn muốn khôi phục mật khẩu mặc định?"
+                            nzPopconfirmPlacement="bottom"
+                            (nzOnConfirm)="handlerResetPassword(item.Id)"
                             nzType="undo"
-                            nzTheme="outline"></span></span>
+                            nzTheme="outline"></span>
+                        </span>
                         <ng-template #resetPasswordTemplate>
                           <span class="bm-max-h-100px bm-overflow-auto">Khôi phục mật khẩu mặc định</span>
                         </ng-template>
                       </div>
-                      <div class="bm-ml-8px">
-                        <span class="d-none"
-                          *ngIf="item.Id | CheckDataFacePersonnelPipe:keyFetchDataFace | async as hasFace"></span>
+                      <div class="bm-ml-12px">
                         <span nz-tooltip
                           [nzTooltipTitle]="addDataFaceTemplate"
-                          (click)="handlerAddDataFace($event, item.Id, hasFace)"
+                          (click)="handlerAddDataFace($event, item)"
                           class="bm-color-009cdb bm-cursor-pointer">
                           <span nz-icon
-                            [nzType]="hasFace ? 'user-switch' : 'user-add'"
+                            [nzType]="'smile'"
                             nzTheme="outline"></span></span>
                         <ng-template #addDataFaceTemplate>
-                          <span class="bm-max-h-100px bm-overflow-auto">{{hasFace ? 'Cập nhật dữ liệu khuôn mặt' : 'Thêm dữ liệu khuôn mặt'}}</span>
+                          <span class="bm-max-h-100px bm-overflow-auto">{{(item | CheckDataFacePersonnelPipe:keyFetchDataFace | async) ? 'Cập nhật dữ liệu khuôn mặt' : 'Thêm dữ liệu khuôn mặt'}}</span>
                         </ng-template>
                       </div>
-                      <div class="bm-ml-8px"
-                        *ngIf="item.Id | CheckDataFacePersonnelPipe:keyFetchDataFace | async">
+                      <div class="bm-ml-12px"
+                        *ngIf="item | CheckDataFacePersonnelPipe:keyFetchDataFace | async">
                         <span nz-tooltip
                           [nzTooltipTitle]="deleteDataFaceTemplate"
-                          (click)="handlerDeleteDataFace($event, item.Id)"
                           class="bm-color-009cdb bm-cursor-pointer">
                           <span nz-icon
                             class="bm-color-ff5454"
+                            nz-popconfirm
+                            nzPopconfirmTitle="Bạn có chắc chắn muốn xoá dữ liệu khuôn mặt?"
+                            nzPopconfirmPlacement="bottom"
+                            (nzOnConfirm)="handlerDeleteDataFace(item)"
                             nzType="delete"
                             nzTheme="outline"></span></span>
                         <ng-template #deleteDataFaceTemplate>

@@ -194,7 +194,7 @@ export class UserCanActive implements CanActivate {
     if (!this.auth.verifyToken()) {
       return false;
     }
-    if (!this.auth.checkPermission(state.url)) {
+    if (!this.auth.checkPermission(state.url.split('?')[0])) {
       return false;
     }
     return true;

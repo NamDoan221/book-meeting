@@ -25,6 +25,7 @@ import { CheckStatusMeetingSchedulePipeModule } from './pipes/check-status.pipe'
 import { CheckPersonnelJoinMeetingSchedulePipeModule } from './pipes/check-personnel-join.pipe';
 import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { BmMeetingScheduleAttendanceComponent } from './attendance/attendance.component';
 
 export const routes: Routes = [
   {
@@ -63,7 +64,8 @@ export const routes: Routes = [
   declarations: [
     BmMeetingScheduleComponent,
     BmMeetingScheduleAddEditComponent,
-    BmMeetingScheduleAddPersonnelComponent
+    BmMeetingScheduleAddPersonnelComponent,
+    BmMeetingScheduleAttendanceComponent
   ]
 })
 export class BmMeetingScheduleModule { }

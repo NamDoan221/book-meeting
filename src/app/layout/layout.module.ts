@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { IconsProviderModule } from '../lib/icon-ant/icons-provider.module';
 import { BmLayoutComponent } from './layout.component';
 import { BmLayoutRoutingModule } from './layout.routing';
@@ -14,7 +15,8 @@ import { BmLayoutRoutingModule } from './layout.routing';
     IconsProviderModule,
     NzLayoutModule,
     NzMenuModule,
-    NzBadgeModule
+    NzBadgeModule,
+    NzToolTipModule
   ],
   declarations: [
     BmLayoutComponent

@@ -11,8 +11,9 @@
           <!-- [nzSrc]="tempAccount.avatar" -->
         </div>
         <div class="bm-ml-20px d-flex flex-column justify-content-center">
-          <div class="bm-mb-8px">
-            <span>{{tempAccount.FullName}}</span>
+          <div class="bm-mb-8px d-flex flex-column">
+            <span class="bm-font-head-4s bm-mb-4px">{{tempAccount.FullName}}</span>
+            <span>Chức vụ: <span class="bm-font-head-5s">{{tempAccount.PositionName}} ({{tempAccount.DepartmentName}})</span></span>
           </div>
           <div>
             <button nz-button

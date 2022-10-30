@@ -66,7 +66,7 @@
             [nzTooltipTitleContext]="{ $implicit: 'Phòng ban' }">
             <span nz-icon
               class="bm-color-009cdb bm-mr-4px"
-              nzType="bank"
+              nzType="home"
               nzTheme="outline"></span>
           </span>
           <span class="bm-font-head-5s">{{meetingSchedule.DepartmentName}}</span>
@@ -146,12 +146,13 @@
             <div class="w-100 h-100 position-relative">
               <div class="w-100 h-100 position-absolute bm-overflow-auto"
                 (scroll)="handlerScrollBottomPersonnel($event)">
-                <div *ngFor="let personnel of listPersonnel; index as i"
-                  class="bm-pl-12px bm-py-6px bm-border-bottom-general">
+                <div *ngFor="let personnel of listPersonnel"
+                  class="d-flex flex-column bm-pl-12px bm-py-6px bm-border-bottom-general">
                   <label nz-checkbox
                     [nzDisabled]="disableChangePersonnelJoin"
-                    [ngModel]="personnel.Id | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelJoin"
-                    (ngModelChange)="handlerAddPersonnelToMeetingSchedule($event, personnel, index)">{{personnel.FullName}}</label>
+                    [ngModel]="personnel.IdAccount | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelJoin"
+                    (ngModelChange)="handlerAddPersonnelToMeetingSchedule($event, personnel)">{{personnel.FullName}}</label>
+                  <span class="bm-ml-24px">Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>
                 </div>
                 <div class="h-100 w-100 d-flex align-items-center justify-content-center"
                   *ngIf="!listPersonnel || !listPersonnel.length">
@@ -203,7 +204,7 @@
                       class="bm-cursor-pointer bm-color-ff5454"
                       *ngIf="!disableChangePersonnelJoin"
                       nzType="close-circle"
-                      (click)="handlerRemovePersonnelJoin($event, personnel,  i)"
+                      (click)="handlerRemovePersonnelJoin($event, personnel)"
                       nzTheme="outline"></span>
                   </div>
                   <div class="h-100 w-100 d-flex align-items-center justify-content-center"
