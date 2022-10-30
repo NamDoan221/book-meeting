@@ -16,7 +16,18 @@ import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { BmNotFoundComponent } from './not-found/not-found.component';
 import { NzMessageModule } from 'ng-zorro-antd/message';
+import * as dayjs from 'dayjs';
+import * as utc from 'dayjs/plugin/utc';
+import * as duration from 'dayjs/plugin/duration';
+import * as quarterOfYear from 'dayjs/plugin/quarterOfYear';
+import * as isoWeek from 'dayjs/plugin/isoWeek';
+import * as relativeTime from 'dayjs/plugin/relativeTime';
 
+dayjs.extend(relativeTime)
+dayjs.extend(isoWeek)
+dayjs.extend(utc);
+dayjs.extend(duration);
+dayjs.extend(quarterOfYear)
 registerLocaleData(vi);
 
 export function HttpLoaderFactory(http: HttpClient): any {

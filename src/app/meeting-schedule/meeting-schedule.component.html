@@ -10,16 +10,7 @@
           nzTheme="outline"></i>Thêm lịch họp</button>
     </div>
     <div class="d-flex">
-      <div class="d-flex align-items-center bm-mr-12px">
-        <nz-range-picker class="w-100"
-          [nzAllowClear]="false"
-          [nzShowTime]="{ nzFormat: 'HH:mm' }"
-          nzFormat="dd/MM/yyyy HH:mm"
-          [ngModel]="defaultFilterTime"
-          (ngModelChange)="onFilterTimeChange($event)">
-        </nz-range-picker>
-      </div>
-      <div class="d-flex align-items-center bm-mr-12px">
+      <div class="bm-mr-12px">
         <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
           [nzAllowClear]="true"
@@ -43,7 +34,7 @@
           </div>
         </ng-template>
       </div>
-      <div class="d-flex align-items-center bm-mr-12px">
+      <div class="bm-mr-12px">
         <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
           [nzAllowClear]="true"
@@ -82,13 +73,24 @@
       </div>
     </div>
   </div>
-  <nz-segmented [nzOptions]="options"
-    (nzValueChange)="handleIndexChange($event)"></nz-segmented>
-  <div class="h-100 w-100 bm-mt-12px">
+  <div class="d-flex bm-mt-12px">
+    <nz-segmented [ngClass]="{'bm-border-radius-top-right-0 bm-border-radius-bottom-right-0': selectedFilterTimeIndex === 5}"
+      [nzOptions]="options"
+      [(ngModel)]="selectedFilterTimeIndex"
+      (nzValueChange)="handleFilterTimeChange($event)"></nz-segmented>
+    <nz-range-picker *ngIf="selectedFilterTimeIndex === 5"
+      [nzAllowClear]="false"
+      [nzShowTime]="{ nzFormat: 'HH:mm' }"
+      nzFormat="dd/MM/yyyy HH:mm"
+      [(ngModel)]="defaultFilterTime"
+      (ngModelChange)="handlerSelectedFilterTime($event)">
+    </nz-range-picker>
+  </div>
+  <div class="h-100 w-100">
     <div class="h-100 w-100"
       *ngIf="listMeetingSchedule && listMeetingSchedule.length">
       <nz-table #meetingScheduleTable
-        [nzScroll]="{ y: 'calc(100vh - 220px)' }"
+        [nzScroll]="{ y: 'calc(100vh - 253px)' }"
         [nzFrontPagination]="false"
         [nzData]="listMeetingSchedule"
         [nzTotal]="total"
@@ -128,12 +130,12 @@
                 *ngIf="item.EstStartTime | CheckTimeStartMeetingSchedulePipe"
                 [nzTooltipTitle]="timeTemplate">
                 <span nz-icon
-                  class="bm-color-ff5454 bm-ml-4px"
+                  class="bm-ml-4px {{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:false:false:true}}"
                   [nzType]="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:false:true"></span>
               </span>
               <ng-template #timeTemplate
                 let-content>
-                <div class="bm-max-h-100px bm-overflow-auto">{{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:true}}</div>
+                <span class="bm-max-h-100px bm-overflow-auto">{{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:true}}</span>
               </ng-template>
             </td>
             <td>{{item.EstDuration}} Phút</td>
@@ -151,7 +153,7 @@
               </div>
               <ng-template #contentTemplate
                 let-content>
-                <div class="bm-max-h-100px bm-overflow-auto">{{ content }}</div>
+                <span class="bm-max-h-100px bm-overflow-auto">{{ content }}</span>
               </ng-template>
             </td>
             <td>{{item.StatusName}}</td>

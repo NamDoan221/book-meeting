@@ -92,8 +92,8 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       page: 1,
       pageSize: 20,
       search: '',
-      from: dayjs().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      from: dayjs().utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      to: dayjs().add(5, 'day').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
       active: true
     }
     this.loadingMeetingRoom = true;
@@ -119,8 +119,8 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       IdRoom: [this.meetingSchedule?.IdRoom || '', [Validators.required]],
       Content: [this.meetingSchedule?.Content || '']
     });
-    this.meetingSchedule?.EstStartTime && (this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).format('YYYY-MM-DDTHH:mm:ss[Z]'));
-    this.meetingSchedule?.EstEndTime && (this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss[Z]'));
+    this.meetingSchedule?.EstStartTime && (this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'));
+    this.meetingSchedule?.EstEndTime && (this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'));
   }
 
   rangeTimeChange(result: Date[]) {
@@ -131,7 +131,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     setTimeout(() => {
       this.rangeChange = false;
     }, 250);
-    const duration = dayjs(result[1]).diff(dayjs(result[0]), 'minute', false);
+    const duration = dayjs(result[1]).utc().diff(dayjs(result[0]).utc(), 'minute', false);
     this.meetingScheduleForm.controls.EstDuration.setValue(duration);
     this.refreshMeetingRoomWhenChangeTime(result);
   }
@@ -145,19 +145,19 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       this.durationChange = false;
     }, 250);
     if (this.meetingScheduleForm.controls.RangeTime.value.length) {
-      const rangeTime = [dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).toDate(), dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).add(event, 'minute').toDate()];
+      const rangeTime = [dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).utc().toDate(), dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).add(event, 'minute').utc().toDate()];
       this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
       this.refreshMeetingRoomWhenChangeTime(rangeTime);
       return;
     }
-    const rangeTime = [dayjs().add(15, 'minute').toDate(), dayjs().add(15 + event, 'minute').toDate()];
+    const rangeTime = [dayjs().add(15, 'minute').utc().toDate(), dayjs().add(15 + event, 'minute').utc().toDate()];
     this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
     this.refreshMeetingRoomWhenChangeTime(rangeTime);
   }
 
   refreshMeetingRoomWhenChangeTime(result: Date[]) {
-    this.paramsGetMeetingRoom.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss[Z]');
-    this.paramsGetMeetingRoom.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.paramsGetMeetingRoom.from = dayjs(result[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.paramsGetMeetingRoom.to = dayjs(result[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
     this.listMeetingRoom = [];
     this.getListMeetingRoom();
   }
@@ -213,8 +213,8 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.loading = true;
     const body: IMeetingSchedule = {
       ...this.meetingScheduleForm.value,
-      EstStartTime: dayjs(this.meetingScheduleForm.value.RangeTime[0]).format('YYYY-MM-DDTHH:mm:ss[Z]'),
-      EstEndTime: dayjs(this.meetingScheduleForm.value.RangeTime[1]).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      EstStartTime: dayjs(this.meetingScheduleForm.value.RangeTime[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      EstEndTime: dayjs(this.meetingScheduleForm.value.RangeTime[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
       IdCreator: this.meetingSchedule?.IdCreator ?? this.authService.decodeToken().Id
     }
     if (this.modeEdit) {

@@ -21,6 +21,8 @@ export interface IPersonnel {
   IdPosition: string;
   PositionName: string;
   Active: boolean;
+  IdAccount: string;
+  AttendanceTime: string;
 }
 
 export interface IParamsGetListPersonnelFreeTime {

@@ -25,6 +25,19 @@ export class MeetingScheduleService extends BaseService {
     });
   }
 
+  public getListMeetingScheduleCreator(params: IParamsGetListMeetingSchedule): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.get(`${this.domain}/Mschedule/creator`, new HttpParams({ fromObject: { ...params } })).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
   public createMeetingSchedule(body: IMeetingSchedule): Promise<any> {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Mschedule`, body).subscribe({
@@ -53,9 +66,9 @@ export class MeetingScheduleService extends BaseService {
     });
   }
 
-  public getDetailMeetingSchedule(id: string): Promise<any> {
+  public getDetailMeetingSchedule(id: string, params: { search: string, active: boolean }): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.get(`${this.domain}/Mschedule/${id}/detail`).subscribe({
+      this.get(`${this.domain}/Mschedule/${id}/detail`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
           return resolve(result);
         },
@@ -82,6 +95,45 @@ export class MeetingScheduleService extends BaseService {
   public addPersonnelToMeetingSchedule(body: IBodyAddPersonnelToMeetingSchedule): Promise<any> {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Mschedule/detail`, body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  public deletePersonnelInMeetingSchedule(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.delete(`${this.domain}/Mschedule/${id}/detail`).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  public updateStatusAttendance(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.put(`${this.domain}/Mschedule/${id}/detail-status`, {}, new HttpParams({ fromObject: { code: 'MSD_PRESENT' } })).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  public startAttendance(id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.put(`${this.domain}/Mschedule/${id}/start`, {}).subscribe({
         next: result => {
           return resolve(result);
         },

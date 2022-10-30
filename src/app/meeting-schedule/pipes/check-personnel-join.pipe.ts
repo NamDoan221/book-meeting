@@ -8,7 +8,7 @@ export class CheckPersonnelJoinMeetingSchedulePipe implements PipeTransform {
     if (!personnelId || !listPersonnelJoin?.length) {
       return false;
     }
-    return !!listPersonnelJoin.find(item => item.Id === personnelId);
+    return !!listPersonnelJoin.find(item => item.IdAccount === personnelId);
   }
 }
 

@@ -34,12 +34,14 @@ export class BmPersonnelComponent implements OnInit {
   listPersonnel: IPersonnel[];
   totalPersonnel: number;
   params: IParamsGetListPersonnel;
+
   totalPosition: number;
   listPosition: IPosition[];
   onSearchPosition: Subject<string> = new Subject();
   paramsGetPosition: IParamsGetListPosition;
   loadingPosition: boolean;
   firstCallPosition: boolean;
+
   tabs: ITab[];
   selectedTab: number;
 

@@ -17,7 +17,8 @@ import { BmMeetingScheduleAddPersonnelComponent } from './add-personnel/add-pers
 
 @Component({
   selector: 'bm-meeting-schedule',
-  templateUrl: './meeting-schedule.component.html'
+  templateUrl: './meeting-schedule.component.html',
+  styleUrls: ['./meeting-schedule.component.scss']
 })
 export class BmMeetingScheduleComponent implements OnInit {
 
@@ -25,6 +26,8 @@ export class BmMeetingScheduleComponent implements OnInit {
   isOpenDrawAddEdit: boolean;
   isOpenDrawAddPersonnel: boolean;
   drawerRefGlobal: NzDrawerRef;
+  options: string[];
+  selectedFilterTimeIndex: number;
 
   loading: boolean;
   total: number;
@@ -72,7 +75,7 @@ export class BmMeetingScheduleComponent implements OnInit {
       'Mô tả nội dung cuộc họp',
       'Trạng thái'
     ];
-    this.defaultFilterTime = [dayjs().subtract(1, 'day').format('YYYY-MM-DDTHH:mm:ss[Z]'), dayjs().add(30, 'day').format('YYYY-MM-DDTHH:mm:ss[Z]')];
+    this.defaultFilterTime = [dayjs().startOf('month').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'), dayjs().endOf('month').utc().format('YYYY-MM-DDTHH:mm:ss[Z]')];
     this.params = {
       page: 1,
       pageSize: 20,
@@ -80,7 +83,7 @@ export class BmMeetingScheduleComponent implements OnInit {
       to: this.defaultFilterTime[1],
       search: ''
     };
-    this.firstCall = false;
+    this.firstCall = true;
 
     this.totalDepartment = 0;
     this.listDepartment = [];
@@ -103,6 +106,8 @@ export class BmMeetingScheduleComponent implements OnInit {
     }
     this.loadingPersonnel = true;
     this.firstCallPersonnel = true;
+    this.options = ['Ngày', 'Tuần', 'Tháng', 'Quý', 'Năm', 'Tự chọn'];
+    this.selectedFilterTimeIndex = 2;
   }
 
   ngOnInit(): void {
@@ -119,12 +124,33 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.getListPersonnel();
     this.getListMeetingSchedule();
   }
-  options = ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'];
 
-  handleIndexChange(e: number): void {
-    console.log(e);
+  handleFilterTimeChange(e: number) {
+    let timeKey;
+    switch (e) {
+      case 0:
+        timeKey = 'day';
+        break;
+      case 1:
+        timeKey = 'isoWeek';
+        break;
+      case 2:
+        timeKey = 'month';
+        break;
+      case 3:
+        timeKey = 'quarter';
+        break;
+      case 4:
+        timeKey = 'year';
+        break;
+      case 5:
+        return;
+    }
+    this.defaultFilterTime = [dayjs().startOf(timeKey).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'), dayjs().endOf(timeKey).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')];
+    this.params.from = this.defaultFilterTime[0];
+    this.params.to = this.defaultFilterTime[1];
+    this.getListMeetingSchedule();
   }
-
 
   searchMeetingSchedule(value: string) {
     const text = value.trim();
@@ -162,9 +188,12 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.onSearch.next(event.target.value);
   }
 
-  onFilterTimeChange(result: Date[]): void {
-    this.params.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss[Z]');
-    this.params.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss[Z]');
+  handlerSelectedFilterTime(result: Date[]): void {
+    if (dayjs(this.params.from).isSame(dayjs(result[0])) && dayjs(this.params.to).isSame(dayjs(result[1]))) {
+      return;
+    }
+    this.params.from = dayjs(result[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.params.to = dayjs(result[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
     this.getListMeetingSchedule();
   }
 
@@ -220,9 +249,6 @@ export class BmMeetingScheduleComponent implements OnInit {
   }
 
   handlerQueryParamsChange(params: NzTableQueryParams): void {
-    if (!params) {
-      return;
-    }
     if (!params || this.firstCall) {
       this.firstCall = false;
       return;

@@ -27,6 +27,9 @@ export interface IMeetingSchedule {
   Status?: string;
   StatusName?: string;
   DepartmentName?: string;
+  CreateDate?: string;
+  CreatorAvatar?: string;
+  StatusCode?: string;
 }
 
 export interface IBodyAddPersonnelToMeetingSchedule {

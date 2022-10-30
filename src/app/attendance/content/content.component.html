@@ -6,17 +6,20 @@
       <nz-form-item class="bm-mt-16px bm-mb-0">
         <nz-form-control [nzErrorTip]="'Lịch họp không thể để trống!'">
           <nz-form-label [nzNoColon]="true"
-            [nzFor]="'meeting_schedule'">
+            [nzFor]="'meetingSchedule'">
             Lịch họp
           </nz-form-label>
           <nz-select [nzShowSearch]="true"
-            [formControlName]="'meeting_schedule'"
+            [nzServerSearch]="true"
+            [formControlName]="'meetingSchedule'"
             [nzPlaceHolder]="'Chọn lịch họp'"
             [nzNotFoundContent]="'Không có dữ liệu'"
-            (nzScrollToBottom)="handlerScrollBottom($event)">
+            (nzOnSearch)="handlerSearchMeetingSchedule($event)"
+            (nzScrollToBottom)="handlerScrollBottom($event)"
+            (ngModelChange)="handlerChooseMeetingSchedule($event)">
             <nz-option *ngFor="let item of listMeetingSchedule"
-              [nzValue]="item.id"
-              [nzLabel]="item.name">
+              [nzValue]="item.Id"
+              [nzLabel]="item.Title">
             </nz-option>
           </nz-select>
         </nz-form-control>
@@ -46,9 +49,9 @@
     </thead>
     <tbody>
       <tr *ngFor="let item of departmentTable.data;  let i=index">
-        <td>{{item.name}}</td>
+        <td>{{item.FullName}}</td>
         <td><label nz-checkbox
-            [(ngModel)]="item.status"></label>
+            [(ngModel)]="item.AttendanceTime"></label>
         </td>
       </tr>
     </tbody>

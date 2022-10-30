@@ -5,6 +5,7 @@ import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { AuthService } from '../lib/services/auth/auth.service';
+import { MeetingScheduleService } from '../lib/services/meeting-schedule/meting-schedule.service';
 declare var faceapi: any;
 
 @Component({
@@ -28,6 +29,7 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
     value: 'D13CNPM5'
   };
   attendance = [];
+  attendanceId = [];
   faceMatcher: any;
 
   @ViewChild('video') video: ElementRef<HTMLVideoElement>;
@@ -38,7 +40,8 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
     private drawerService: NzDrawerService,
     private notification: NzNotificationService,
     private http: HttpClient,
-    @Inject(PLATFORM_ID) private platform: Object
+    @Inject(PLATFORM_ID) private platform: Object,
+    private meetingScheduleService: MeetingScheduleService
   ) {
     this.loading = false;
     this.total = 2;
@@ -48,25 +51,34 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loadTrainingData();
+    // this.loadTrainingData();
   }
 
-  handlerStartAttendance() {
+  async handlerStartAttendance(event: string) {
+    try {
+      const result = await this.meetingScheduleService.startAttendance(event);
+      console.log(result);
+
+    } catch (error) {
+      console.log(error);
+    }
     this.initModelsFaceApi();
   }
 
   handlerStopAttendance() {
-    if (this.video) {
-      this.video.nativeElement.srcObject && (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop();
-      this.video.nativeElement.pause();
-      this.video.nativeElement.srcObject = null;
-    }
-    if (this.container && this.canvas) {
-      this.container.nativeElement.removeChild(this.canvas);
-    }
-    clearInterval(this.interval);
-    this.interval = undefined;
-    this.canvas = undefined;
+    setTimeout(() => {
+      if (this.video) {
+        this.video.nativeElement.srcObject && (this.video.nativeElement.srcObject as MediaStream).getVideoTracks()[0].stop();
+        this.video.nativeElement.pause();
+        this.video.nativeElement.srcObject = null;
+      }
+      if (this.container && this.canvas) {
+        this.container.nativeElement.removeChild(this.canvas);
+      }
+      clearInterval(this.interval);
+      this.interval = undefined;
+      this.canvas = undefined;
+    }, 1000)
   }
 
   async initModelsFaceApi() {
@@ -90,6 +102,17 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
     // const text = await response.text();
     return JSON.stringify(result);
   };
+
+  handlerLoadingDataTrainComplete(event: any[]) {
+    const faceDescriptors = [];
+    event.forEach((i) => {
+      const Arr32 = i.descriptors.map((item) => {
+        return new Float32Array(Object.values(item));
+      });
+      faceDescriptors.push(new faceapi.LabeledFaceDescriptors(JSON.stringify(i.label), Arr32));
+    });
+    this.faceMatcher = new faceapi.FaceMatcher(faceDescriptors, 0.56);
+  }
 
   async loadTrainingData() {
     const faceDescriptors = [];
@@ -163,6 +186,7 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
         this.container.nativeElement.append(this.canvas);
         const displaySize = { width: video.videoWidth, height: video.videoHeight };
         faceapi.matchDimensions(this.canvas, displaySize);
+        this.attendanceId = [];
         this.interval = setInterval(async () => {
           if (!this.canvas) {
             return;
@@ -183,32 +207,41 @@ export class BmMeetingAttendanceComponent implements OnInit, OnDestroy {
             //   .getContext("2d")
             //   .drawImage(video, 0, 0, canvas_data.width, canvas_data.height);
             console.log(resizedDetections);
-
             resizedDetections.forEach((detection) => {
               let bestMatch: { label?: string } = {};
               bestMatch = this.faceMatcher.findBestMatch(detection.descriptor);
-              console.log(bestMatch);
+              // console.log(bestMatch);
 
-              let studentInfo = JSON.parse(
+              let personnel = JSON.parse(
                 bestMatch.label !== "unknown" ? bestMatch.label : "{}"
               );
-              // if (bestMatch !== "unknown") {
-              //   let findIndex = attendance.findIndex((i) => studentInfo.id === i.id);
-              //   if (findIndex > -1) {
-              //     attendance[findIndex].checked = true;
-              //     renderStudentList();
-              //   }
-              // }
+              if (bestMatch !== "unknown" && !this.attendanceId.find(item => item === personnel.Id)) {
+                // console.log('vào', attendanceId);
 
+                this.attendanceId.push(personnel.Id);
+              }
               const box = detection.detection.box;
               const drawBox = new faceapi.draw.DrawBox(box, {
-                label: studentInfo.name,
+                label: personnel.FullName,
               });
               drawBox.draw(this.canvas);
             });
           }
-        }, 100)
+        }, 250)
       })
+    }
+  }
+
+  async handlerSave() {
+    const allDetection = [];
+    for (let id of this.attendanceId) {
+      allDetection.push(this.meetingScheduleService.updateStatusAttendance(id));
+    }
+    try {
+      const detectionFace = await Promise.all(allDetection);
+      console.log(detectionFace);
+    } catch (error) {
+      console.log(error);
     }
   }
 

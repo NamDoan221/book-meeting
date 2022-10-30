@@ -38,11 +38,11 @@ export class BmLayoutComponent implements OnInit {
     const roles = this.auth.decodeToken().Roles;
     try {
       const result = await this.functionService.getListFunction({ page: 1, pageSize: 100, active: true, search: '' });
-      const functionByRole = result.Value.filter(item => roles.find(role => role.IdFunction === item.Id));
+      const functionByRole = result.Value?.filter(item => roles?.find(role => role.IdFunction === item.Id));
       menuDefault().forEach(item => {
         const functionChilds = [];
         item.FunctionChilds?.forEach(child => {
-          if (!!functionByRole.find(element => element.IsMenu && element.Url === child.Url)) {
+          if (!!functionByRole?.find(element => element.IsMenu && element.Url === child.Url)) {
             functionChilds.push({
               ...child,
               IsMenu: true

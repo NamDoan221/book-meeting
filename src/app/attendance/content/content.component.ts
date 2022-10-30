@@ -1,7 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import * as dayjs from 'dayjs';
 import { NzDatePickerComponent } from 'ng-zorro-antd/date-picker';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { Subject } from 'rxjs';
+import { debounceTime, filter } from 'rxjs/operators';
+import { AuthService } from 'src/app/lib/services/auth/auth.service';
+import { IMeetingSchedule, IParamsGetListMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
+import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
 
 @Component({
   selector: 'bm-meeting-schedule-content',
@@ -10,25 +16,32 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 export class BmMeetingAttendanceContentComponent implements OnInit {
 
   meetingScheduleForm: FormGroup;
-  listMeetingSchedule: any[];
   listPosition: any[];
   loading: boolean;
   listPersonnel: any[];
   listMemberSelected: any[];
   pageSize: number;
-  total: number;
   pageIndexGroup: number;
   columnConfig: string[];
   modeEdit: boolean;
   meetingSchedule: any;
   modeStartCam: boolean;
 
+  total: number;
+  listMeetingSchedule: IMeetingSchedule[];
+  firstCall: boolean;
+  params: IParamsGetListMeetingSchedule;
+  onSearch: Subject<string> = new Subject();
+
+  @Output() loadDataTrainComplete = new EventEmitter<any[]>();
   @Output() saveSuccess = new EventEmitter<any>();
-  @Output() startAttendance = new EventEmitter<any>();
+  @Output() startAttendance = new EventEmitter<string>();
   @Output() stopAttendance = new EventEmitter<any>();
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private meetingScheduleService: MeetingScheduleService,
+    private authService: AuthService
   ) {
     this.modeStartCam = false;
     this.total = 2;
@@ -54,35 +67,54 @@ export class BmMeetingAttendanceContentComponent implements OnInit {
       'Tên nhân viên',
       'Trạng thái điểm danh',
     ];
+    this.listMeetingSchedule = [];
+    this.params = {
+      page: 1,
+      pageSize: 20,
+      from: dayjs().subtract(5, 'minute').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      to: dayjs().add(5, 'minute').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      search: '',
+      idCreator: this.authService.decodeToken().Id
+    };
   }
 
   ngOnInit(): void {
-    this.getData();
-    this.initData();
-  }
-
-  initData() {
     this.meetingScheduleForm = this.fb.group({
-      meeting_schedule: ['', [Validators.required]]
+      meetingSchedule: ['', [Validators.required]]
     });
+    this.onSearch.pipe(debounceTime(1500), filter(value => value !== this.params.search)).subscribe((value) => {
+      this.searchMeetingSchedule(value);
+    });
+    this.getListMeetingSchedule();
   }
 
-  getData() {
-    const data = [];
-    const data2 = [];
-    for (let i = 0; i < 100; i++) {
-      data.push({
-        name: `Lịch ${i}`,
-        id: `Lịch ${i}`
-      });
-      data2.push({
-        name: `Nv ${i}`,
-        id: `Nv ${i}`,
-        status: false
-      })
+  searchMeetingSchedule(value: string) {
+    const text = value.trim();
+    !text ? delete this.params.search : (this.params.search = text);
+    this.listMeetingSchedule = [];
+    this.firstCall = true;
+    this.getListMeetingSchedule();
+  }
+
+  async getListMeetingSchedule() {
+    if (this.loading) {
+      return;
     }
-    this.listMeetingSchedule = data;
-    this.listPersonnel = data2;
+    try {
+      this.loading = true;
+      const result = await this.meetingScheduleService.getListMeetingScheduleCreator(this.params);
+      this.total = result.Total;
+      this.listMeetingSchedule = result.Value;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  handlerSearchMeetingSchedule(event: string) {
+    this.params.page = 1;
+    this.onSearch.next(event);
   }
 
   handlerScrollBottom(event: any) {
@@ -91,6 +123,25 @@ export class BmMeetingAttendanceContentComponent implements OnInit {
 
   handlerChangeMember(event) {
     this.listMemberSelected = event;
+  }
+
+  async handlerChooseMeetingSchedule(event: string) {
+    try {
+      const result = await this.meetingScheduleService.getDetailAttendanceMeetingSchedule(event);
+      this.listPersonnel = result.Value;
+      const dataTrain = [...(result.Value ?? [])].map(item => {
+        return {
+          label: {
+            Id: item.Id,
+            FullName: item.FullName
+          },
+          descriptors: JSON.parse(item.DataTrain)
+        }
+      })
+      this.loadDataTrainComplete.emit(dataTrain);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   handlerUpdate(event: Event) {
@@ -134,7 +185,7 @@ export class BmMeetingAttendanceContentComponent implements OnInit {
         });
         return;
       }
-      this.startAttendance.emit();
+      this.startAttendance.emit(this.meetingScheduleForm.value.meetingSchedule);
       this.modeStartCam = !this.modeStartCam;
       return;
     }

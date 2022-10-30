@@ -1,5 +1,5 @@
 $prefixCss: bm-;
-$border-radius: 50em 0 3px 4px 5px 6px 7px 8px 10px 11px 12px 13px 14px 15px 16px 20px 22px 30px 32px 50px;
+$border-radius: 50em 0 3px 4px 5px 6px 7px 8px 10px 11px 12px 13px 14px 15px 16px 20px 22px 28px 30px 32px 50px;
 $border: none;
 $margin-or-padding: auto -20px -12px -10px -6px -4px 0 1px 2px 3px 4px 5px 6px 7px 8px 9px 10px 12px 13px 14px 15px 16px
   17px 18px 20px 22px 23px 24px 26px 28px 29px 30px 32px 34px 36px 37px 38px 40px 42px 43px 45px 46px 48px 49px 50px 52px
@@ -26,9 +26,10 @@ $box-shadow-block: 0 1px 2px 0 rgba(78, 78, 78, 0.3);
 $flex-justify-content: baseline center end start left right stretch space-between;
 $flex-align-items: baseline center end start left right unset;
 $flex-direction: column row;
-$colors: eee ff5454 4a4a4a 29c7cc 5db200 ffffff 6fd100 4cb7ff 009cdb fbb107 c4c4c4 e6e8ed e6eef5 ebf1fa f7f8fa e5e5e5
-  f44336 f57c00 fbc02d 7ed321 5cae22 7b4eff 6de01b 2e92ff 007dff f8fcff 8657ff ebf0f5 ffc500 5ece0d ff5667 8358cb 4a6da7
-  f2f4f8 ff6e6e 4d70a9 f2f5f7 19344a 008547 606060 f1f0f0 f9fbfc f85061 6F44E9 c9c9c9 10a4b3 000 1890ff;
+$colors: 999999 333333 0000000a eee ff5454 4a4a4a 29c7cc 5db200 ffffff 6fd100 4cb7ff 009cdb fbb107 c4c4c4 e6e8ed e6eef5
+  ebf1fa f7f8fa e5e5e5 f44336 f57c00 fbc02d 7ed321 5cae22 7b4eff 6de01b 2e92ff 007dff f8fcff 8657ff ebf0f5 ffc500 5ece0d
+  ff5667 8358cb 4a6da7 f2f4f8 ff6e6e 4d70a9 f2f5f7 19344a 008547 606060 f1f0f0 f9fbfc f85061 6F44E9 c9c9c9 10a4b3 000
+  1890ff;
 $colors-start-double-zero: baa4 9cdb b7ff;
 $cursor: pointer default text move copy help none;
 $word-breaks: break-word;

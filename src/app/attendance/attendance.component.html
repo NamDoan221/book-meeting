@@ -1,7 +1,9 @@
 <div class="w-100 h-100 d-flex">
   <div class="h-100 bm-border-right-general bm-px-12px w-35">
-    <bm-meeting-schedule-content (startAttendance)="handlerStartAttendance()"
-      (stopAttendance)="handlerStopAttendance()"></bm-meeting-schedule-content>
+    <bm-meeting-schedule-content (startAttendance)="handlerStartAttendance($event)"
+      (stopAttendance)="handlerStopAttendance()"
+      (loadDataTrainComplete)="handlerLoadingDataTrainComplete($event)"
+      (saveSuccess)="handlerSave()"></bm-meeting-schedule-content>
   </div>
   <div class="bm-mx-12px w-65 h-100 position-relative d-flex justify-content-center align-items-center"
     #container>
