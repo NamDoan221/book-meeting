@@ -38,6 +38,19 @@ export class MeetingScheduleService extends BaseService {
     });
   }
 
+  public getListMeetingSchedulePersonal(params: IParamsGetListMeetingSchedule): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.get(`${this.domain}/Mschedule/personal`, new HttpParams({ fromObject: { ...params } })).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
   public createMeetingSchedule(body: IMeetingSchedule): Promise<any> {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Mschedule`, body).subscribe({

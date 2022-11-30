@@ -158,19 +158,10 @@ export class AuthService extends BaseService {
   }
 
   public refreshToken(body: { refreshToken: string }) {
-    return new Promise((resolve, reject) => {
-      this.post('Auth/refresh-tokens', body).subscribe({
-        next: result => {
-          return resolve(result);
-        },
-        error: err => {
-          reject(err);
-        }
-      });
-    });
+    return this.post(`${this.domain}/Auth/refresh-tokens`, body)
   }
 
-  public checkPermission(path: string) {
+  public checkPermission(path: string, action?: string) {
     const roles = this.decodeToken().Roles;
     const findRoleByPath = roles.find(role => role.Url === path);
     if (!findRoleByPath) {
@@ -179,6 +170,14 @@ export class AuthService extends BaseService {
         this.router.navigateByUrl(roles[0].Url);
         return false;
       }
+      return false;
+    }
+    if (action) {
+      const childFound = findRoleByPath.RoleChilds.find(child => child.FunctionCode === action);
+      if (childFound && childFound.Active) {
+        return true;
+      }
+      this.nzMessageService.error('Bạn không có quyền truy cập chức năng này.');
       return false;
     }
     return true;

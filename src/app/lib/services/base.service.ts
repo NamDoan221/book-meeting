@@ -33,13 +33,6 @@ export class BaseService {
       'Content-Type': 'application/json',
       'Client-Version': 'v1.0'
     };
-    const token = this.cacheService.getKey(ConstantDefines.TOKEN_KEY);
-    if (token) {
-      const jwtToken = JSON.parse(token).JwtToken;
-      if (jwtToken) {
-        header.Authorization = `Bearer ${jwtToken}`;
-      }
-    }
     const headers = new HttpHeaders(header);
     this.options = { headers: headers, params: this.removeNullValuesFromHttpParams(params) };
   }
@@ -56,60 +49,33 @@ export class BaseService {
     return params;
   }
 
-  private handlerResponse(res: any) {
-    return res;
-  }
-
-  private handlerCatchError(error: any) {
-    if (error.status === 401) {
-      this.redirectToLogin();
-    }
-
-    throw { code: error.status, message: error.message };
-  }
-
   protected get(pathApi: string, params: HttpParams = new HttpParams()): Observable<any> {
     this.setRequestOptions(params);
     const url = `${this.apiUrl}${pathApi}`;
-    return this.http.get(url, this.options).pipe(
-      map(res => this.handlerResponse(res)),
-      catchError(async (err) => this.handlerCatchError(err))
-    );
+    return this.http.get(url, this.options);
   }
 
   protected post(pathApi: string, body: any, params: HttpParams = new HttpParams()): Observable<any> {
     this.setRequestOptions(params);
     const url = `${this.apiUrl}${pathApi}`;
-    return this.http.post(url, body, this.options).pipe(
-      map(res => this.handlerResponse(res)),
-      catchError(async (err) => this.handlerCatchError(err))
-    );
+    return this.http.post(url, body, this.options);
   }
 
   protected put(pathApi: string, body: any, params: HttpParams = new HttpParams()): Observable<any> {
     this.setRequestOptions(params);
     const url = `${this.apiUrl}${pathApi}`;
-    return this.http.put(url, body, this.options).pipe(
-      map(res => this.handlerResponse(res)),
-      catchError(async (err) => this.handlerCatchError(err))
-    );
+    return this.http.put(url, body, this.options);
   }
 
   protected patch(pathApi: string, body: any, params: HttpParams = new HttpParams()): Observable<any> {
     this.setRequestOptions(params);
     const url = `${this.apiUrl}${pathApi}`;
-    return this.http.patch(url, body, this.options).pipe(
-      map(res => this.handlerResponse(res)),
-      catchError(async (err) => this.handlerCatchError(err))
-    );
+    return this.http.patch(url, body, this.options);
   }
 
   protected delete(pathApi: string, params: HttpParams = new HttpParams()): Observable<any> {
     this.setRequestOptions(params);
     const url = `${this.apiUrl}${pathApi}`;
-    return this.http.delete(url, this.options).pipe(
-      map(res => this.handlerResponse(res)),
-      catchError(async (err) => this.handlerCatchError(err))
-    );
+    return this.http.delete(url, this.options);
   }
 }

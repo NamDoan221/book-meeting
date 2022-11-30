@@ -13,6 +13,27 @@
       <div class="bm-mr-12px">
         <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
+          [nzAllowClear]="false"
+          [nzServerSearch]="false"
+          [ngModel]="dataViewSelected"
+          [nzPlaceHolder]="'Chọn phòng ban'"
+          [nzNotFoundContent]="notFoundViewTypeTemplate"
+          (ngModelChange)="handlerSelectViewType($event)">
+          <nz-option *ngFor="let item of dataView"
+            [nzValue]="item.key"
+            [nzLabel]="item.label">
+          </nz-option>
+        </nz-select>
+        <ng-template #notFoundViewTypeTemplate>
+          <div class="d-flex align-items-center justify-content-center">
+            <span>{{'Không có kết quả'}}</span>
+          </div>
+        </ng-template>
+      </div>
+      <div class="bm-mr-12px"
+        *ngIf="dataViewSelected === 'all'">
+        <nz-select class="bm-w-200px"
+          [nzShowSearch]="true"
           [nzAllowClear]="true"
           [nzServerSearch]="true"
           [(ngModel)]="params.idDepartment"
@@ -34,7 +55,8 @@
           </div>
         </ng-template>
       </div>
-      <div class="bm-mr-12px">
+      <div class="bm-mr-12px"
+        *ngIf="dataViewSelected === 'all'">
         <nz-select class="bm-w-200px"
           [nzShowSearch]="true"
           [nzAllowClear]="true"

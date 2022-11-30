@@ -54,6 +54,11 @@ const routes: Routes = [
         path: 'role',
         loadChildren: () =>
           import('../role/role.module').then((m) => m.BmRoleModule)
+      },
+      {
+        path: 'dictionary',
+        loadChildren: () =>
+          import('../dictionary/dictionary.module').then((m) => m.BmDictionaryModule)
       }
     ]
   }

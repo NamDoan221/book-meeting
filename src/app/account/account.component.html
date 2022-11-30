@@ -28,18 +28,27 @@
         <form nz-form
           [formGroup]="accountForm">
           <nz-form-item class="bm-mt-16px bm-mb-0">
-            <nz-form-control>
+            <nz-form-control [nzErrorTip]="phoneErrorTip">
               <nz-form-label [nzNoColon]="true"
-                [nzFor]="'Username'">
-                Tên tài khoản
+                [nzFor]="'Phone'">
+                Số điện thoại
               </nz-form-label>
               <nz-input-group>
                 <input [type]="'text'"
                   nz-input
                   class="bm-border-radius-4px"
-                  formControlName="Username"
-                  placeholder="Nhập tên tài khoản">
+                  formControlName="Phone"
+                  placeholder="Nhập số điện thoại">
               </nz-input-group>
+              <ng-template #phoneErrorTip
+                let-control>
+                <span class="font-size-11"
+                  *ngIf="control.hasError('required')">Số điện thoại không thể để trống!</span>
+                <span class="font-size-11"
+                  *ngIf="control.hasError('pattern')">
+                  Số điện thoại không đúng định dạng!
+                </span>
+              </ng-template>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item class="bm-mt-16px bm-mb-0">
@@ -70,30 +79,6 @@
                   formControlName="FullName"
                   placeholder="Nhập họ và tên">
               </nz-input-group>
-            </nz-form-control>
-          </nz-form-item>
-          <nz-form-item class="bm-mt-16px bm-mb-0">
-            <nz-form-control [nzErrorTip]="phoneErrorTip">
-              <nz-form-label [nzNoColon]="true"
-                [nzFor]="'Phone'">
-                Số điện thoại
-              </nz-form-label>
-              <nz-input-group>
-                <input [type]="'text'"
-                  nz-input
-                  class="bm-border-radius-4px"
-                  formControlName="Phone"
-                  placeholder="Nhập số điện thoại">
-              </nz-input-group>
-              <ng-template #phoneErrorTip
-                let-control>
-                <span class="font-size-11"
-                  *ngIf="control.hasError('required')">Số điện thoại không thể để trống!</span>
-                <span class="font-size-11"
-                  *ngIf="control.hasError('pattern')">
-                  Số điện thoại không đúng định dạng!
-                </span>
-              </ng-template>
             </nz-form-control>
           </nz-form-item>
           <div class="d-flex bm-mt-20px">

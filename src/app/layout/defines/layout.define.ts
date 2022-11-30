@@ -80,6 +80,11 @@ export const menuDefault = (): IFunction[] => {
         IsMenu: false,
       },
       {
+        Name: 'Danh mục',
+        Url: '/dictionary',
+        IsMenu: false,
+      },
+      {
         Name: 'Đăng xuất',
         Url: '/logout',
         IsMenu: false,

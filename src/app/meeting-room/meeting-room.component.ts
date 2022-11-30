@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
+import { AuthService } from '../lib/services/auth/auth.service';
 import { IParamsGetListMeetingRoom, IMeetingRoom } from '../lib/services/meeting-room/interfaces/room.interface';
 import { MeetingRoomService } from '../lib/services/meeting-room/meeting-room.service';
 import { BmMeetingRoomAddEditComponent } from './add-edit/add-edit.component';
@@ -38,7 +39,8 @@ export class BmMeetingRoomComponent implements OnInit {
   constructor(
     private drawerService: NzDrawerService,
     private meetingRoomService: MeetingRoomService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private authService: AuthService
   ) {
     this.firstCall = true;
     this.loading = false;
@@ -96,11 +98,17 @@ export class BmMeetingRoomComponent implements OnInit {
 
   handlerAddMeetingRoom(event: Event) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/meeting-room', 'ADD_MEETING_ROOM')) {
+      return;
+    }
     this.addOrEdit(undefined);
   }
 
   handlerEditMeetingRoom(event: Event, item: IMeetingRoom) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/meeting-room', 'EDIT_MEETING_ROOM')) {
+      return;
+    }
     this.addOrEdit(item);
   }
 
@@ -164,6 +172,10 @@ export class BmMeetingRoomComponent implements OnInit {
   }
 
   async handlerActiveChange(event: boolean, item: IMeetingRoom) {
+    if (!this.authService.checkPermission('/meeting-room', 'EDIT_MEETING_ROOM')) {
+      setTimeout(() => { item.Active = !event }, 0);
+      return;
+    }
     this.keyToggleLoading = item.Id;
     try {
       const result = await this.meetingRoomService.changeStatusMeetingRoom(item.Id);

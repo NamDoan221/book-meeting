@@ -1,27 +1,27 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
-import { AppRoutingModule } from './app.routing';
-import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NzI18nService, NZ_I18N } from 'ng-zorro-antd/i18n';
-import { vi_VN } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
-import vi from '@angular/common/locales/vi';
-import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import vi from '@angular/common/locales/vi';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import * as dayjs from 'dayjs';
+import * as duration from 'dayjs/plugin/duration';
+import * as isoWeek from 'dayjs/plugin/isoWeek';
+import * as quarterOfYear from 'dayjs/plugin/quarterOfYear';
+import * as relativeTime from 'dayjs/plugin/relativeTime';
+import * as utc from 'dayjs/plugin/utc';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzI18nService, NZ_I18N, vi_VN } from 'ng-zorro-antd/i18n';
+import { NzMessageModule } from 'ng-zorro-antd/message';
+import { NzResultModule } from 'ng-zorro-antd/result';
+import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app.routing';
 import { IconsProviderModule } from './lib/icon-ant/icons-provider.module';
 import { UserCanActive } from './lib/services/auth/auth.service';
-import { NzResultModule } from 'ng-zorro-antd/result';
-import { NzButtonModule } from 'ng-zorro-antd/button';
+import { AuthInterceptorProviders } from './lib/services/interceptor/auth.interceptor';
 import { BmNotFoundComponent } from './not-found/not-found.component';
-import { NzMessageModule } from 'ng-zorro-antd/message';
-import * as dayjs from 'dayjs';
-import * as utc from 'dayjs/plugin/utc';
-import * as duration from 'dayjs/plugin/duration';
-import * as quarterOfYear from 'dayjs/plugin/quarterOfYear';
-import * as isoWeek from 'dayjs/plugin/isoWeek';
-import * as relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime)
 dayjs.extend(isoWeek)
@@ -59,7 +59,8 @@ export function HttpLoaderFactory(http: HttpClient): any {
   ],
   providers: [
     { provide: NZ_I18N, useValue: vi_VN },
-    UserCanActive
+    UserCanActive,
+    AuthInterceptorProviders
   ],
   bootstrap: [AppComponent]
 })

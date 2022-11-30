@@ -2,9 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
-import { convertFileToBase64 } from '../lib/defines/function.define';
 import { AuthService } from '../lib/services/auth/auth.service';
-import { PersonnelService } from '../lib/services/personnel/personnel.service';
 
 @Component({
   selector: 'bm-account',
@@ -28,9 +26,8 @@ export class BmAccountComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private auth: AuthService,
-    private nzMessageService: NzMessageService,
-    private personnelService: PersonnelService
+    private authService: AuthService,
+    private nzMessageService: NzMessageService
   ) {
     this.modeUpdatePass = false;
     this.currentPasswordVisible = false;
@@ -48,12 +45,11 @@ export class BmAccountComponent implements OnInit {
   }
 
   async ngOnInit() {
-    const accountFromCache = this.auth.decodeToken();
+    const accountFromCache = this.authService.decodeToken();
     this.accountForm = this.fb.group({
-      Username: [{ value: accountFromCache.Username || '', disabled: true }, [Validators.required]],
       Email: [accountFromCache.Email || '', [Validators.required, Validators.email]],
       FullName: [accountFromCache.FullName || '', [Validators.required]],
-      Phone: [accountFromCache.Phone || '', [Validators.required, Validators.pattern('^(0|84)([0-9]{9})$')]] //^(0|(\+?84))([0-9]{9})$
+      Phone: [{ value: accountFromCache.Phone || '', disabled: true }, [Validators.required, Validators.pattern('^(0|84)([0-9]{9})$')]] //^(0|(\+?84))([0-9]{9})$
     });
     this.tempAccount = { ...accountFromCache };
   }
@@ -76,7 +72,7 @@ export class BmAccountComponent implements OnInit {
     // const url = await convertFileToBase64(event.target.files[0]);
     // console.log(url);
     try {
-      await this.auth.changeAvatar(this.tempAccount.Id, 'http://genk.mediacdn.vn/2016/best-photos-2016-natgeo-national-geographic-7-5846f70467192-880-1481173142742.jpg');
+      await this.authService.changeAvatar(this.tempAccount.Id, 'http://genk.mediacdn.vn/2016/best-photos-2016-natgeo-national-geographic-7-5846f70467192-880-1481173142742.jpg');
       this.nzMessageService.success('Thao tác thành công.');
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');
@@ -99,7 +95,7 @@ export class BmAccountComponent implements OnInit {
     try {
       const body = this.passwordForm.value;
       delete body.confirmPassword;
-      await this.auth.changePassword(this.tempAccount.Id, body);
+      await this.authService.changePassword(this.tempAccount.Id, body);
       this.nzMessageService.success('Thao tác thành công.');
       this.modeUpdatePass = false;
       this.passwordForm.reset();
@@ -112,6 +108,9 @@ export class BmAccountComponent implements OnInit {
   }
 
   async handlerChangeInfo(): Promise<void> {
+    if (!this.authService.checkPermission('/account', 'EDIT_INFO')) {
+      return;
+    }
     if (this.loading) {
       return;
     }
@@ -128,9 +127,9 @@ export class BmAccountComponent implements OnInit {
       ...this.accountForm.value
     }
     try {
-      const result = await this.auth.changeInfo(body, this.tempAccount.Id);
+      const result = await this.authService.changeInfo(body, this.tempAccount.Id);
       this.tempAccount = { ...body };
-      this.auth.setToken(JSON.stringify(this.tempAccount));
+      this.authService.setToken(JSON.stringify(this.tempAccount));
       this.nzMessageService.success('Thao tác thành công.');
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');
@@ -174,6 +173,9 @@ export class BmAccountComponent implements OnInit {
   }
 
   handlerChangeModeUpdatePass() {
+    if (!this.authService.checkPermission('/account', 'EDIT_INFO')) {
+      return;
+    }
     this.modeUpdatePass = true;
   }
 

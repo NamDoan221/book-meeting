@@ -105,6 +105,104 @@
           </ng-template>
         </nz-form-control>
       </nz-form-item>
+      <nz-form-item class="bm-mt-16px bm-mb-0">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'MeetingScheduleDtls'">
+            Người tham gia
+          </nz-form-label>
+          <div class="bm-h-316px w-100 bm-mr-12px d-flex flex-column">
+            <div class="h-100 w-100 bm-border-general d-flex flex-column">
+              <div class="bm-p-12px bm-border-bottom-general">
+                <div class="d-flex bm-mb-4px w-100">
+                  <div class="d-flex align-items-center bm-mr-12px w-50">
+                    <nz-select class="w-100"
+                      [nzShowSearch]="true"
+                      [nzAllowClear]="true"
+                      [nzServerSearch]="true"
+                      [nzPlaceHolder]="'Chọn phòng ban'"
+                      [ngModel]="paramsGetPersonnel.idDepartment"
+                      [ngModelOptions]="{standalone: true}"
+                      [nzNotFoundContent]="notFoundDepartmentTemplate"
+                      (ngModelChange)="handlerSelectDepartment($event)"
+                      (nzOnSearch)="handlerSearchDepartment($event)"
+                      (nzScrollToBottom)="handlerScrollBottomDepartment()">
+                      <nz-option *ngFor="let item of listDepartment"
+                        [nzValue]="item.Id"
+                        [nzLabel]="item.Name">
+                      </nz-option>
+                    </nz-select>
+                    <ng-template #notFoundDepartmentTemplate>
+                      <div class="d-flex align-items-center justify-content-center">
+                        <span *ngIf="!loadingDepartment">{{paramsGetDepartment.search ? 'Không có kết quả' : 'Chưa có phòng ban nào trong danh sách'}}</span>
+                        <nz-spin *ngIf="loadingDepartment"
+                          nzSimple></nz-spin>
+                      </div>
+                    </ng-template>
+                  </div>
+                  <div class="d-flex align-items-center w-50">
+                    <nz-select class="w-100"
+                      [nzShowSearch]="true"
+                      [nzAllowClear]="true"
+                      [nzServerSearch]="true"
+                      [nzPlaceHolder]="'Chọn chức vụ'"
+                      [ngModel]="paramsGetPersonnel.idPosition"
+                      [ngModelOptions]="{standalone: true}"
+                      [nzNotFoundContent]="notFoundPositionTemplate"
+                      (ngModelChange)="handlerSelectPosition()"
+                      (nzOnSearch)="handlerSearchPosition($event)"
+                      (nzScrollToBottom)="handlerScrollBottomPosition()">
+                      <nz-option *ngFor="let item of listPosition"
+                        [nzValue]="item.Id"
+                        [nzLabel]="item.Name">
+                      </nz-option>
+                    </nz-select>
+                    <ng-template #notFoundPositionTemplate>
+                      <div class="d-flex align-items-center justify-content-center">
+                        <span *ngIf="!loadingPosition">{{paramsGetPosition.search ? 'Không có kết quả' : 'Chưa có chức vụ nào trong danh sách'}}</span>
+                        <nz-spin *ngIf="loadingPosition"
+                          nzSimple></nz-spin>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+                <nz-input-group [nzSuffix]="suffixIconSearch">
+                  <input type="text"
+                    nz-input
+                    placeholder="Tìm theo tên nhân viên"
+                    (keyup)="handlerKeyUp($event)" />
+                </nz-input-group>
+                <ng-template #suffixIconSearch>
+                  <i nz-icon
+                    nzType="search"></i>
+                </ng-template>
+              </div>
+              <div class="w-100 h-100 position-relative">
+                <div class="w-100 h-100 position-absolute bm-overflow-auto"
+                  (scroll)="handlerScrollBottomPersonnel($event)">
+                  <div *ngFor="let personnel of listPersonnel"
+                    class="d-flex flex-column bm-pl-12px bm-py-6px bm-border-bottom-general">
+                    <label nz-checkbox
+                      [nzDisabled]="disableChangePersonnelJoin"
+                      [ngModel]="personnel.IdAccount | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelJoin"
+                      (ngModelChange)="handlerAddPersonnelToMeetingSchedule($event, personnel)">{{personnel.FullName}}</label>
+                    <span class="bm-ml-24px">Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>
+                  </div>
+                  <div class="h-100 w-100 d-flex align-items-center justify-content-center"
+                    *ngIf="!listPersonnel || !listPersonnel.length">
+                    <span *ngIf="!loadingPersonnel">{{paramsGetPersonnel.search ? 'Không có kết quả' : 'Chưa có nhân viên nào trong danh sách'}}</span>
+                    <nz-spin *ngIf="loadingPersonnel"
+                      nzTip="Đang tải..."
+                      nzSimple></nz-spin>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="font-size-11 bm-color-ff4d4f"
+            *ngIf="isDirty && !listPersonnelJoin.length">Người tham gia không thể để trống!</div>
+        </nz-form-control>
+      </nz-form-item>
       <nz-form-item class="bm-mb-0 bm-mt-16px">
         <nz-form-control>
           <nz-form-label [nzNoColon]="true"

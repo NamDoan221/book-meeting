@@ -6,6 +6,7 @@ export interface IParamsGetListMeetingSchedule {
   to?: string;
   idDepartment?: string;
   idCreator?: string;
+  idAccount?: string;
   status?: string;
 }
 
@@ -30,6 +31,7 @@ export interface IMeetingSchedule {
   CreateDate?: string;
   CreatorAvatar?: string;
   StatusCode?: string;
+  MeetingScheduleDtls?: string[];
 }
 
 export interface IBodyAddPersonnelToMeetingSchedule {

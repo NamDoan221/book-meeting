@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
+import { AuthService } from '../lib/services/auth/auth.service';
 import { FunctionService } from '../lib/services/function/function.service';
 import { IFunction, IParamsGetListFunction } from '../lib/services/function/interfaces/function.interface';
 import { BmFunctionAddEditComponent } from './add-edit/add-edit.component';
@@ -42,7 +43,8 @@ export class BmFunctionComponent implements OnInit {
   constructor(
     private drawerService: NzDrawerService,
     private functionService: FunctionService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private authService: AuthService
   ) {
     this.firstCall = true;
     this.loading = false;
@@ -148,16 +150,25 @@ export class BmFunctionComponent implements OnInit {
 
   handlerAddSubFunction(event: Event, parentId: string) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/function', 'ADD_FUNCTION')) {
+      return;
+    }
     this.addOrEdit(undefined, parentId);
   }
 
   handlerAddFunction(event: Event) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/function', 'ADD_FUNCTION')) {
+      return;
+    }
     this.addOrEdit(undefined);
   }
 
   handlerEditFunction(event: Event, item: IFunction) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/function', 'EDIT_FUNCTION')) {
+      return;
+    }
     this.addOrEdit(item);
   }
 
@@ -242,6 +253,10 @@ export class BmFunctionComponent implements OnInit {
   }
 
   async handlerActiveChange(event: boolean, item: IFunction) {
+    if (!this.authService.checkPermission('/function', 'EDIT_FUNCTION')) {
+      setTimeout(() => { item.Active = !event }, 0);
+      return;
+    }
     this.keyToggleLoading = item.Id;
     try {
       const result = await this.functionService.changeStatusFunction(item.Id);

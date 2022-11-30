@@ -5,6 +5,7 @@ import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
+import { AuthService } from '../lib/services/auth/auth.service';
 import { DepartmentService } from '../lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
 import { IMeetingSchedule, IParamsGetListMeetingSchedule } from '../lib/services/meeting-schedule/interfaces/metting-schedule.interface';
@@ -29,6 +30,7 @@ export class BmMeetingScheduleComponent implements OnInit {
   drawerRefGlobal: NzDrawerRef;
   options: string[];
   selectedFilterTimeIndex: number;
+  idAccount: string;
 
   loading: boolean;
   total: number;
@@ -37,6 +39,7 @@ export class BmMeetingScheduleComponent implements OnInit {
   params: IParamsGetListMeetingSchedule;
   onSearch: Subject<string> = new Subject();
   defaultFilterTime: string[];
+  functionCallListMeetingSchedule: string;
 
   totalDepartment: number;
   listDepartment: IDepartment[];
@@ -52,12 +55,15 @@ export class BmMeetingScheduleComponent implements OnInit {
   onSearchPersonnel: Subject<string> = new Subject();
   paramsGetPersonnel: IParamsGetListPersonnel;
 
+  dataView: { key: string, label: string }[];
+  dataViewSelected: string;
+
   constructor(
     private drawerService: NzDrawerService,
-    private route: Router,
     private departmentService: DepartmentService,
     private meetingScheduleService: MeetingScheduleService,
-    private personnelService: PersonnelService
+    private personnelService: PersonnelService,
+    private authService: AuthService
   ) {
     this.loading = false;
     this.total = 0;
@@ -109,9 +115,33 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.firstCallPersonnel = true;
     this.options = ['Ngày', 'Tuần', 'Tháng', 'Quý', 'Năm', 'Tự chọn'];
     this.selectedFilterTimeIndex = 2;
+    this.idAccount = this.authService.decodeToken().Id;
+
+    this.dataView = [{
+      key: 'all',
+      label: 'Tất cả lịch họp'
+    },
+    {
+      key: 'creator',
+      label: 'Lịch họp của tôi'
+    },
+    {
+      key: 'personal',
+      label: 'Lịch họp cần tham gia'
+    }];
+    this.dataViewSelected = 'all';
+    this.functionCallListMeetingSchedule = 'getListMeetingSchedule';
   }
 
   ngOnInit(): void {
+    const rolesMeetingSchedule = this.authService.decodeToken().Roles.find(role => role.Url === '/meeting-schedule');
+    const roleViewAll = rolesMeetingSchedule.RoleChilds.find(child => child.FunctionCode === 'VIEW_ALL_SCHEDULE');
+    if (rolesMeetingSchedule && (!roleViewAll || (roleViewAll && !roleViewAll.Active))) {
+      this.dataView.splice(0, 1);
+      this.dataViewSelected = 'creator';
+      this.functionCallListMeetingSchedule = 'getListMeetingScheduleCreator';
+      this.params.idCreator = this.idAccount;
+    }
     this.onSearch.pipe(debounceTime(1500), filter(value => value !== this.params.search)).subscribe((value) => {
       this.searchMeetingSchedule(value);
     });
@@ -121,8 +151,34 @@ export class BmMeetingScheduleComponent implements OnInit {
     this.onSearchPersonnel.pipe(debounceTime(500), filter(value => value !== this.paramsGetPersonnel.search)).subscribe((value) => {
       this.searchPersonnel(value);
     });
-    this.getListDepartment();
-    this.getListPersonnel();
+    if (this.dataViewSelected === 'all') {
+      this.getListDepartment();
+      this.getListPersonnel();
+    }
+    this.getListMeetingSchedule();
+  }
+
+  handlerSelectViewType(event: string) {
+    this.dataViewSelected = event;
+    switch (event) {
+      case 'all':
+        this.functionCallListMeetingSchedule = 'getListMeetingSchedule';
+        delete this.params.idAccount;
+        delete this.params.idCreator;
+        break;
+      case 'creator':
+        this.functionCallListMeetingSchedule = 'getListMeetingScheduleCreator';
+        this.params.idCreator = this.idAccount;
+        delete this.params.idDepartment;
+        delete this.params.idAccount;
+        break;
+      case 'personal':
+        this.functionCallListMeetingSchedule = 'getListMeetingSchedulePersonal';
+        this.params.idAccount = this.idAccount;
+        delete this.params.idDepartment;
+        delete this.params.idCreator;
+        break;
+    }
     this.getListMeetingSchedule();
   }
 
@@ -167,7 +223,7 @@ export class BmMeetingScheduleComponent implements OnInit {
     }
     try {
       this.loading = true;
-      const result = await this.meetingScheduleService.getListMeetingSchedule(this.params);
+      const result = await this.meetingScheduleService[this.functionCallListMeetingSchedule](this.params);
       this.total = result.Total;
       this.listMeetingSchedule = result.Value;
     } catch (error) {
@@ -200,11 +256,17 @@ export class BmMeetingScheduleComponent implements OnInit {
 
   handlerAddMeetingSchedule(event: Event) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/meeting-schedule', 'ADD_SCHEDULE')) {
+      return;
+    }
     this.addOrEdit(undefined);
   }
 
   handlerEditMeetingSchedule(event: Event, item: any) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/meeting-schedule', 'EDIT_SCHEDULE')) {
+      return;
+    }
     this.addOrEdit(item);
   }
 

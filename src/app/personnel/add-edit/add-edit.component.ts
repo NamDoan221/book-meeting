@@ -4,6 +4,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { ConstantDefines } from 'src/app/lib/defines/constant.define';
+import { AuthService } from 'src/app/lib/services/auth/auth.service';
 import { IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
 import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
@@ -45,7 +46,8 @@ export class BmPersonnelAddEditComponent implements OnInit {
     private fb: FormBuilder,
     private personnelService: PersonnelService,
     private positionService: PositionService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private authService: AuthService
   ) {
     this.total = 2;
     this.pageSize = 20;
@@ -143,6 +145,9 @@ export class BmPersonnelAddEditComponent implements OnInit {
 
   async handlerUpdate(event: Event) {
     event.stopPropagation();
+    if (this.modeEdit && !this.authService.checkPermission('/personnel', 'EDIT_PERSONNEL')) {
+      return;
+    }
     if (!this.personnelForm.valid) {
       Object.values(this.personnelForm.controls).forEach(control => {
         if (control.invalid) {

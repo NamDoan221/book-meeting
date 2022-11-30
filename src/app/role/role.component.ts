@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
-import { TabsDefault } from '../lib/defines/tab.define';
-import { ITab } from '../lib/interfaces/tab.interface';
+import { AuthService } from '../lib/services/auth/auth.service';
+import { DepartmentService } from '../lib/services/department/department.service';
+import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
 import { FunctionService } from '../lib/services/function/function.service';
-import { IFunction, IParamsGetListFunction } from '../lib/services/function/interfaces/function.interface';
+import { IParamsGetListFunction } from '../lib/services/function/interfaces/function.interface';
 import { IParamsGetListPosition, IPosition } from '../lib/services/position/interfaces/position.interface';
 import { PositionService } from '../lib/services/position/position.service';
 import { IBodyUpdateRole, IParamsGetListRole, IRole } from '../lib/services/role/interfaces/role.interface';
@@ -32,11 +31,20 @@ export class BmRoleComponent implements OnInit {
   paramsGetPosition: IParamsGetListPosition;
   loadingPosition: boolean;
 
+  totalDepartment: number;
+  listDepartment: IDepartment[];
+  onSearchDepartment: Subject<string> = new Subject();
+  paramsGetDepartment: IParamsGetListDepartment;
+  firstCallDepartment: boolean;
+  loadingDepartment: boolean;
+
   constructor(
     private functionService: FunctionService,
     private nzMessageService: NzMessageService,
     private roleService: RoleService,
-    private positionService: PositionService
+    private positionService: PositionService,
+    private departmentService: DepartmentService,
+    private authService: AuthService
   ) {
     this.loading = true;
     this.params = {
@@ -56,6 +64,17 @@ export class BmRoleComponent implements OnInit {
       pageSize: 20,
       search: ''
     }
+
+    this.totalDepartment = 0;
+    this.listDepartment = [];
+    this.paramsGetDepartment = {
+      page: 1,
+      pageSize: 20,
+      active: true,
+      search: ''
+    };
+    this.loadingDepartment = true;
+    this.firstCallDepartment = true;
   }
 
   async ngOnInit(): Promise<void> {
@@ -65,6 +84,10 @@ export class BmRoleComponent implements OnInit {
     this.onSearchPosition.pipe(debounceTime(500), filter(value => value !== this.paramsGetPosition.search)).subscribe((value) => {
       this.searchPosition(value);
     });
+    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
+      this.searchDepartment(value);
+    });
+    this.getListDepartment();
     this.getListFunction();
     this.getListPosition();
   }
@@ -92,7 +115,7 @@ export class BmRoleComponent implements OnInit {
           let check = false;
           if (functionItemInRole) {
             const functionItemInRoleChild = functionItemInRole.RoleChilds?.find(role => role.IdFunction === functionChild.Id);
-            if (functionItemInRoleChild) {
+            if (functionItemInRoleChild && functionItemInRoleChild.Active) {
               check = true
             }
           }
@@ -137,7 +160,11 @@ export class BmRoleComponent implements OnInit {
     this.onSearch.next(event.target.value);
   }
 
-  async handlerUpdateRole(event: boolean, item: IFunction) {
+  async handlerUpdateRole(event: boolean, item: IFunctionView) {
+    if (!this.authService.checkPermission('/role', 'EDIT_ROLE')) {
+      setTimeout(() => { item.checked = !event }, 0);
+      return;
+    }
     try {
       const body: IBodyUpdateRole = {
         IdPosition: this.paramsGetListRole.idPosition,
@@ -146,12 +173,15 @@ export class BmRoleComponent implements OnInit {
       }
       const result = await this.roleService.updateRole(body);
       if (result.success) {
+        item.checked = event;
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
+      item.checked = !event;
       this.nzMessageService.error('Thao tác không thành công.');
     } catch (error) {
       this.nzMessageService.error('Thao tác không thành công.');
+      item.checked = !event;
     }
   }
 
@@ -195,5 +225,48 @@ export class BmRoleComponent implements OnInit {
     } finally {
       this.loadingPosition = false;
     }
+  }
+
+  async getListDepartment() {
+    if (this.loadingDepartment && !this.firstCallDepartment) {
+      return;
+    }
+    this.firstCallDepartment = false;
+    try {
+      this.loadingDepartment = true;
+      const result = await this.departmentService.getListDepartment(this.paramsGetDepartment);
+      this.totalDepartment = result.Total;
+      this.listDepartment.push(...result.Value);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingDepartment = false;
+      this.loading = false;
+    }
+  }
+
+  searchDepartment(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetDepartment.search : (this.paramsGetDepartment.search = text);
+    this.listDepartment = [];
+    this.getListDepartment();
+  }
+
+  handlerSelectDepartment(event: string) {
+    this.paramsGetPosition.idDepartment = event;
+    this.getListPosition();
+  }
+
+  handlerSearchDepartment(event: string) {
+    this.paramsGetDepartment.page = 1;
+    this.onSearchDepartment.next(event);
+  }
+
+  handlerScrollBottomDepartment() {
+    if (this.loadingDepartment || !this.totalDepartment || this.totalDepartment <= this.listDepartment.length) {
+      return;
+    }
+    this.paramsGetDepartment.page += 1;
+    this.getListDepartment();
   }
 }

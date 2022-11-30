@@ -7,6 +7,7 @@ import { debounceTime, filter } from 'rxjs/operators';
 import { TabsDefault } from '../lib/defines/tab.define';
 import { ITab } from '../lib/interfaces/tab.interface';
 import { IColumnItem } from '../lib/interfaces/table.interfaces';
+import { AuthService } from '../lib/services/auth/auth.service';
 import { DepartmentService } from '../lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
 import { IParamsGetListPosition, IPosition } from '../lib/services/position/interfaces/position.interface';
@@ -47,7 +48,8 @@ export class BmPositionComponent implements OnInit {
     private drawerService: NzDrawerService,
     private positionService: PositionService,
     private departmentService: DepartmentService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private authService: AuthService
   ) {
     this.firstCall = true;
     this.loading = false;
@@ -180,11 +182,17 @@ export class BmPositionComponent implements OnInit {
 
   handlerAddPosition(event: Event) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/position', 'ADD_POSITION')) {
+      return;
+    }
     this.addOrEdit(undefined);
   }
 
   handlerEditPosition(event: Event, item: IPosition) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/position', 'EDIT_POSITION')) {
+      return;
+    }
     this.addOrEdit(item);
   }
 
@@ -285,6 +293,10 @@ export class BmPositionComponent implements OnInit {
   }
 
   async handlerActiveChange(event: boolean, item: IPosition) {
+    if (!this.authService.checkPermission('/position', 'EDIT_POSITION')) {
+      setTimeout(() => { item.Active = !event }, 0);
+      return;
+    }
     this.keyToggleLoading = item.Id;
     try {
       const result = await this.positionService.changeStatusPosition(item.Id);

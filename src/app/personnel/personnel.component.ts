@@ -17,6 +17,7 @@ import * as uuid from 'uuid';
 import { BmPersonnelDataFaceComponent } from './data-face/data-face.component';
 import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
 import { DepartmentService } from '../lib/services/department/department.service';
+import { AuthService } from '../lib/services/auth/auth.service';
 
 @Component({
   selector: 'bm-personnel',
@@ -66,7 +67,8 @@ export class BmPersonnelComponent implements OnInit {
     private nzMessageService: NzMessageService,
     private personnelService: PersonnelService,
     private dataFaceService: DataFaceService,
-    private departmentService: DepartmentService
+    private departmentService: DepartmentService,
+    private authService: AuthService
   ) {
     this.firstCall = true;
     this.loading = false;
@@ -218,6 +220,9 @@ export class BmPersonnelComponent implements OnInit {
 
   handlerAddPersonnel(event: Event) {
     event.stopPropagation();
+    if (!this.authService.checkPermission('/personnel', 'ADD_PERSONNEL')) {
+      return;
+    }
     this.addOrEdit(undefined);
   }
 
@@ -323,6 +328,10 @@ export class BmPersonnelComponent implements OnInit {
   }
 
   async handlerActiveChange(event: boolean, item: IPersonnel) {
+    if (!this.authService.checkPermission('/personnel', 'EDIT_PERSONNEL')) {
+      setTimeout(() => { item.Active = !event }, 0);
+      return;
+    }
     this.keyToggleLoading = item.Id;
     try {
       const result = await this.personnelService.changeStatusPersonnel(item.Id);

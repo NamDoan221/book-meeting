@@ -2,31 +2,26 @@ import { Component, OnInit } from '@angular/core';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { Subject } from 'rxjs';
-import { debounceTime, filter } from 'rxjs/operators';
-import { TabsDefault } from '../lib/defines/tab.define';
 import { AuthService } from '../lib/services/auth/auth.service';
-import { DepartmentService } from '../lib/services/department/department.service';
-import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
-import { BmDepartmentAddEditComponent } from './add-edit/add-edit.component';
+import { DictionaryService } from '../lib/services/dictionary/dictionary.service';
+import { IDictionaryItem } from '../lib/services/dictionary/interfaces/dictionary.interface';
+import { BmDictionaryAddEditComponent } from './add-edit/add-edit.component';
+import { BmDictionaryDetailComponent } from './detail/detail.component';
 
 @Component({
-  selector: 'bm-department',
-  templateUrl: './department.component.html'
+  selector: 'bm-dictionary',
+  templateUrl: './dictionary.component.html'
 })
-export class BmDepartmentComponent implements OnInit {
+export class BmDictionaryComponent implements OnInit {
+
   firstCall: boolean;
   loading: boolean;
   total: number;
-  listDepartment: IDepartment[];
+  listDictionary: IDictionaryItem[];
   columnConfig: string[];
   isOpenDraw: boolean;
   drawerRefGlobal: NzDrawerRef;
-  params: IParamsGetListDepartment;
-  onSearch: Subject<string> = new Subject();
   keyToggleLoading: string;
-  tabs: Array<any>;
-  selectedTab: number;
 
   checked: boolean;
   showDelete: boolean;
@@ -36,57 +31,37 @@ export class BmDepartmentComponent implements OnInit {
 
   constructor(
     private drawerService: NzDrawerService,
-    private departmentService: DepartmentService,
+    private dictionaryService: DictionaryService,
     private nzMessageService: NzMessageService,
     private authService: AuthService
   ) {
     this.firstCall = true;
     this.loading = false;
-    this.total = 0;
     this.isOpenDraw = false;
     this.columnConfig = [
-      'Tên phòng ban',
-      'Mã phòng ban',
-      'Cấp quản lý',
+      'Tên danh mục',
+      'Mã danh mục',
       'Mô tả',
       'Trạng thái'
     ];
-    this.params = {
-      page: 1,
-      pageSize: 20,
-      active: true,
-      search: ''
-    }
-    this.selectedTab = 0;
-    this.tabs = TabsDefault();
     this.showDelete = false;
     this.checked = false;
+    this.total = 0;
   }
 
   ngOnInit(): void {
-    this.onSearch.pipe(debounceTime(1500), filter(value => value !== this.params.search)).subscribe((value) => {
-      this.searchDepartment(value);
-    });
-    this.getListDepartment();
+    this.getListDictionary();
   }
 
-  searchDepartment(value: string) {
-    const text = value.trim();
-    !text ? delete this.params.search : (this.params.search = text);
-    this.listDepartment = [];
-    this.firstCall = true;
-    this.getListDepartment();
-  }
-
-  async getListDepartment() {
+  async getListDictionary() {
     if (this.loading) {
       return;
     }
+    this.loading = true;
     try {
-      this.loading = true;
-      const result = await this.departmentService.getListDepartment(this.params);
-      this.total = result.Total;
-      this.listDepartment = result.Value;
+      const result = await this.dictionaryService.getListTypeDictionary();
+      this.listDictionary = result;
+      this.total = result.length;
     } catch (error) {
       console.log(error);
     } finally {
@@ -94,38 +69,38 @@ export class BmDepartmentComponent implements OnInit {
     }
   }
 
-  handlerAddDepartment(event: Event) {
+  handlerAddDictionary(event: Event) {
     event.stopPropagation();
-    if (!this.authService.checkPermission('/department', 'ADD_DEPARTMENT')) {
+    if (!this.authService.checkPermission('/dictionary', 'ADD_DICTIONARY')) {
       return;
     }
     this.addOrEdit(undefined);
   }
 
-  handlerEditDepartment(event: Event, item: IDepartment) {
+  handlerEditDictionary(event: Event, item: IDictionaryItem) {
     event.stopPropagation();
-    if (!this.authService.checkPermission('/department', 'EDIT_DEPARTMENT')) {
+    if (!this.authService.checkPermission('/dictionary', 'EDIT_DICTIONARY')) {
       return;
     }
     this.addOrEdit(item);
   }
 
-  addOrEdit(department: IDepartment) {
+  addOrEdit(item: IDictionaryItem) {
     if (this.isOpenDraw) {
       return;
     }
     this.isOpenDraw = true;
-    this.drawerRefGlobal = this.drawerService.create<BmDepartmentAddEditComponent>({
+    this.drawerRefGlobal = this.drawerService.create<BmDictionaryAddEditComponent>({
       nzBodyStyle: { overflow: 'auto' },
       nzMaskClosable: false,
       nzWidth: '30vw',
       nzClosable: true,
       nzKeyboard: true,
-      nzTitle: department ? `Sửa phòng ban` : 'Thêm phòng ban',
-      nzContent: BmDepartmentAddEditComponent,
+      nzTitle: item ? `Sửa danh mục` : 'Thêm danh mục',
+      nzContent: BmDictionaryAddEditComponent,
       nzContentParams: {
-        department: department,
-        modeEdit: department ? true : false
+        dictionary: item,
+        modeEdit: item ? true : false
       }
     });
 
@@ -134,11 +109,11 @@ export class BmDepartmentComponent implements OnInit {
       this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
         this.isOpenDraw = false;
         this.drawerRefGlobal.close();
-        if (department) {
-          Object.assign(department, data);
+        if (item) {
+          Object.assign(item, data);
           return;
         }
-        this.listDepartment = [data, ...this.listDepartment];
+        this.listDictionary = [data, ...this.listDictionary];
       });
     });
 
@@ -153,33 +128,23 @@ export class BmDepartmentComponent implements OnInit {
       this.firstCall = false;
       return;
     }
-    this.params.page = params.pageIndex;
-    this.getListDepartment();
+    this.getListDictionary();
   }
 
-  handlerKeyUp(event) {
-    if (this.params.search === event.target.value) {
-      return;
-    }
-    this.params.page = 1;
-    if (event.key === 'Enter') {
-      this.searchDepartment(event.target.value);
-      return;
-    }
-    this.onSearch.next(event.target.value);
-  }
-
-  async handlerActiveChange(event: boolean, item: IDepartment) {
-    if (!this.authService.checkPermission('/department', 'EDIT_DEPARTMENT')) {
+  async handlerActiveChange(event: boolean, item: IDictionaryItem) {
+    if (!this.authService.checkPermission('/dictionary', 'EDIT_DICTIONARY')) {
       setTimeout(() => { item.Active = !event }, 0);
       return;
     }
     this.keyToggleLoading = item.Id;
     try {
-      const result = await this.departmentService.changeStatusDepartment(item.Id);
+      const body = {
+        ...item,
+        Active: event
+      };
+      const result = await this.dictionaryService.updateTypeDictionary(body);
       if (result.success) {
         item.Active = event;
-        this.listDepartment = this.listDepartment.filter(element => element.Id !== item.Id);
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
@@ -193,11 +158,21 @@ export class BmDepartmentComponent implements OnInit {
     }
   }
 
-  handlerTabChange(event) {
-    this.selectedTab = event.index;
-    this.params.active = event.index === 0;
-    this.firstCall = true;
-    this.getListDepartment();
+  async handlerDeleteDictionary(id: string) {
+    if (!this.authService.checkPermission('/dictionary', 'DELETE_DICTIONARY')) {
+      return;
+    }
+    try {
+      const result = await this.dictionaryService.deleteTypeDictionary(id);
+      if (result.success) {
+        this.listDictionary = this.listDictionary.filter(element => element.Id !== id);
+        this.nzMessageService.success('Thao tác thành công.');
+        return;
+      }
+      this.nzMessageService.error('Thao tác không thành công.');
+    } catch (error) {
+      this.nzMessageService.error('Thao tác không thành công.');
+    }
   }
 
   updateCheckedSet(id: number, checked: boolean): void {
@@ -213,7 +188,7 @@ export class BmDepartmentComponent implements OnInit {
     this.showDelete = false;
   }
 
-  handlerDeleteDepartment(event: Event) {
+  handlerDeleteListDictionary(event: Event) {
     event.stopPropagation();
     console.log(this.setOfCheckedId);
   }
@@ -235,5 +210,43 @@ export class BmDepartmentComponent implements OnInit {
 
   refreshCheckedStatus(): void {
     this.checked = this.listOfCurrentPageData.every(item => this.setOfCheckedId.has(item.Id));
+  }
+
+  handlerViewChildDictionary(event: Event, item: IDictionaryItem) {
+    event.stopPropagation();
+    if (this.isOpenDraw) {
+      return;
+    }
+    this.isOpenDraw = true;
+    this.drawerRefGlobal = this.drawerService.create<BmDictionaryDetailComponent>({
+      nzBodyStyle: { overflow: 'auto' },
+      nzMaskClosable: false,
+      nzWidth: '85vw',
+      nzClosable: true,
+      nzKeyboard: true,
+      nzTitle: 'Chi tiết danh mục',
+      nzContent: BmDictionaryDetailComponent,
+      nzContentParams: {
+        dictionary: item
+      }
+    });
+
+    this.drawerRefGlobal.afterOpen.subscribe(() => {
+      this.isOpenDraw = true;
+      this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
+        this.isOpenDraw = false;
+        this.drawerRefGlobal.close();
+        if (item) {
+          Object.assign(item, data);
+          return;
+        }
+        this.listDictionary = [data, ...this.listDictionary];
+      });
+    });
+
+    this.drawerRefGlobal.afterClose.subscribe(data => {
+      this.isOpenDraw = false;
+      this.drawerRefGlobal.close();
+    });
   }
 }

@@ -7,10 +7,16 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
+import { DepartmentService } from 'src/app/lib/services/department/department.service';
+import { IDepartment, IParamsGetListDepartment } from 'src/app/lib/services/department/interfaces/department.interface';
 import { IMeetingRoom, IParamsGetListMeetingRoomFreeTime } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
 import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
 import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
 import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
+import { IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
+import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
+import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
+import { PositionService } from 'src/app/lib/services/position/position.service';
 
 @Component({
   selector: 'bm-meeting-schedule-add_edit',
@@ -20,6 +26,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   meetingScheduleForm: FormGroup;
   loading: boolean;
+  isDirty: boolean;
 
   totalMeetingRoom: number;
   listMeetingRoom: IMeetingRoom[];
@@ -31,6 +38,28 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   today = new Date();
   rangeChange: boolean;
   durationChange: boolean;
+
+  listPersonnelJoin: IPersonnel[];
+  totalPersonnel: number;
+  listPersonnel: IPersonnel[];
+  onSearchPersonnel: Subject<string> = new Subject();
+  paramsGetPersonnel: IParamsGetListPersonnelFreeTime;
+  loadingPersonnel: boolean;
+  firstCallPersonnel: boolean;
+
+  totalDepartment: number;
+  listDepartment: IDepartment[];
+  onSearchDepartment: Subject<string> = new Subject();
+  paramsGetDepartment: IParamsGetListDepartment;
+  firstCallDepartment: boolean;
+  loadingDepartment: boolean;
+
+  totalPosition: number;
+  listPosition: IPosition[];
+  onSearchPosition: Subject<string> = new Subject();
+  paramsGetPosition: IParamsGetListPosition;
+  loadingPosition: boolean;
+  firstCallPosition: boolean;
 
   range(start: number, end: number): number[] {
     const result: number[] = [];
@@ -71,7 +100,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     }
   };
 
-  @Input() meetingSchedule: any;
+  @Input() meetingSchedule: IMeetingSchedule;
   @Input() modeEdit: boolean;
 
   @Output() saveSuccess = new EventEmitter<IMeetingSchedule>();
@@ -81,9 +110,13 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     private meetingRoomService: MeetingRoomService,
     private meetingScheduleService: MeetingScheduleService,
     private nzMessageService: NzMessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private departmentService: DepartmentService,
+    private positionService: PositionService,
+    private personnelService: PersonnelService,
   ) {
     this.loading = false;
+    this.isDirty = false;
 
     this.listMeetingRoom = [];
     this.paramsGetMeetingRoom = {
@@ -98,6 +131,39 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.firstCallMeetingRoom = true;
     this.rangeChange = false;
     this.durationChange = false;
+
+    this.listPersonnelJoin = [];
+    this.listPersonnel = [];
+    this.paramsGetPersonnel = {
+      page: 1,
+      pageSize: 20,
+      from: dayjs().utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      to: dayjs().add(5, 'day').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      search: ''
+    }
+    this.loadingPersonnel = true;
+    this.firstCallPersonnel = true;
+
+    this.totalDepartment = 0;
+    this.listDepartment = [];
+    this.paramsGetDepartment = {
+      page: 1,
+      pageSize: 20,
+      active: true,
+      search: ''
+    };
+    this.loadingDepartment = true;
+    this.firstCallDepartment = true;
+
+    this.totalPosition = 0;
+    this.listPosition = [];
+    this.loadingPosition = true;
+    this.firstCallPosition = true;
+    this.paramsGetPosition = {
+      page: 1,
+      pageSize: 20,
+      search: ''
+    }
   }
 
   ngOnInit(): void {
@@ -105,7 +171,19 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.onSearchMeetingRoom.pipe(debounceTime(500), filter(value => value !== this.paramsGetMeetingRoom.search)).subscribe((value) => {
       this.searchMeetingRoom(value);
     });
+    this.onSearchPosition.pipe(debounceTime(500), filter(value => value !== this.paramsGetPosition.search)).subscribe((value) => {
+      this.searchPosition(value);
+    });
+    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
+      this.searchDepartment(value);
+    });
+    this.onSearchPersonnel.pipe(debounceTime(500), filter(value => value !== this.paramsGetPersonnel.search)).subscribe((value) => {
+      this.searchPersonnel(value);
+    });
     this.getListMeetingRoom();
+    this.getListDepartment();
+    this.getListPosition();
+    this.getListPersonnel();
   }
 
   initData() {
@@ -115,10 +193,17 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       RangeTime: [this.meetingSchedule?.EstStartTime && this.meetingSchedule?.EstEndTime ? [new Date(this.meetingSchedule?.EstStartTime), new Date(this.meetingSchedule?.EstEndTime)] : [], [Validators.required]],
       EstDuration: [this.meetingSchedule?.EstDuration ? this.meetingSchedule?.EstDuration : '', [Validators.required]],
       IdRoom: [this.meetingSchedule?.IdRoom || '', [Validators.required]],
+      MeetingScheduleDtls: [this.meetingSchedule?.MeetingScheduleDtls || [], [Validators.required]],
       Content: [this.meetingSchedule?.Content || '']
     });
-    this.meetingSchedule?.EstStartTime && (this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'));
-    this.meetingSchedule?.EstEndTime && (this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'));
+    if (this.meetingSchedule?.EstStartTime) {
+      this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
+      this.paramsGetPersonnel.from = dayjs(this.meetingSchedule.EstStartTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
+    }
+    if (this.meetingSchedule?.EstEndTime) {
+      this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
+      this.paramsGetPersonnel.to = dayjs(this.meetingSchedule.EstEndTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
+    }
   }
 
   rangeTimeChange(result: Date[]) {
@@ -199,6 +284,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   async handlerUpdate(event: Event) {
     event.stopPropagation();
+    this.isDirty = true;
     if (!this.meetingScheduleForm.valid) {
       Object.values(this.meetingScheduleForm.controls).forEach(control => {
         if (control.invalid) {
@@ -237,6 +323,150 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     }
 
     this.saveSuccess.emit(this.meetingScheduleForm.value);
+  }
+
+  searchDepartment(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetDepartment.search : (this.paramsGetDepartment.search = text);
+    this.listDepartment = [];
+    this.getListDepartment();
+  }
+
+  handlerSelectDepartment(event: string) {
+    this.paramsGetPosition.idDepartment = event;
+    this.paramsGetPersonnel.idPosition = undefined;
+    this.getListPosition();
+    this.listPersonnel = [];
+    this.getListPersonnel();
+  }
+
+  handlerSearchDepartment(event: string) {
+    this.paramsGetDepartment.page = 1;
+    this.onSearchDepartment.next(event);
+  }
+
+  handlerScrollBottomDepartment() {
+    if (this.loadingDepartment || !this.totalDepartment || this.totalDepartment <= this.listDepartment.length) {
+      return;
+    }
+    this.paramsGetDepartment.page += 1;
+    this.getListDepartment();
+  }
+
+  async getListDepartment() {
+    if (this.loadingDepartment && !this.firstCallDepartment) {
+      return;
+    }
+    this.firstCallDepartment = false;
+    try {
+      this.loadingDepartment = true;
+      const result = await this.departmentService.getListDepartment(this.paramsGetDepartment);
+      this.totalDepartment = result.Total;
+      this.listDepartment.push(...result.Value);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingDepartment = false;
+      this.loading = false;
+    }
+  }
+
+  searchPosition(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetPosition.search : (this.paramsGetPosition.search = text);
+    this.listPosition = [];
+    this.getListPosition();
+  }
+
+  handlerSearchPosition(event: string) {
+    this.paramsGetPosition.page = 1;
+    this.onSearchPosition.next(event);
+  }
+
+  async getListPosition() {
+    if (this.loadingPosition && !this.firstCallPosition) {
+      return;
+    }
+    this.firstCallPosition = false;
+    try {
+      this.loadingPosition = true;
+      const result = await this.positionService.getListPosition(this.paramsGetPosition);
+      this.totalPosition = result.Total;
+      this.listPosition = result.Value;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingPosition = false;
+    }
+  }
+
+  handlerScrollBottomPosition() {
+    if (this.loadingPosition || !this.totalPosition || this.totalPosition <= this.listPosition.length) {
+      return;
+    }
+    this.paramsGetPosition.page += 1;
+    this.getListPosition();
+  }
+
+  handlerSelectPosition() {
+    this.listPersonnel = [];
+    this.getListPersonnel();
+  }
+
+  handlerSearchPersonnel(event: string) {
+    this.paramsGetPersonnel.page = 1;
+    this.onSearchPersonnel.next(event);
+  }
+
+  handlerScrollBottomPersonnel(event: any) {
+    if (event.target.scrollTop < (event.target.scrollHeight - event.target.offsetHeight - 30) || this.loadingPersonnel || !this.totalPersonnel || this.totalPersonnel <= this.listPersonnel.length) {
+      return;
+    }
+    this.paramsGetPersonnel.page += 1;
+    this.getListPersonnel();
+  }
+
+  searchPersonnel(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetPersonnel.search : (this.paramsGetPersonnel.search = text);
+    this.listPersonnel = [];
+    this.getListPersonnel();
+  }
+
+  async getListPersonnel() {
+    if (this.loadingPersonnel && !this.firstCallPersonnel) {
+      return;
+    }
+    this.firstCallPersonnel = false;
+    try {
+      this.loadingPersonnel = true;
+      const result = await this.personnelService.getListPersonnelFreeTime(this.paramsGetPersonnel);
+      this.totalPersonnel = result.Total;
+      this.listPersonnel.push(...result.Value?.map(item => {
+        const id = item.Id;
+        return {
+          ...item,
+          IdAccount: item.Id,
+          Id: this.listPersonnelJoin.find(item => item.IdAccount === id)?.Id || id
+        }
+      }));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingPersonnel = false;
+    }
+  }
+
+  handlerKeyUp(event) {
+    if (this.paramsGetPersonnel.search === event.target.value) {
+      return;
+    }
+    this.paramsGetPersonnel.page = 1;
+    if (event.key === 'Enter') {
+      this.searchPersonnel(event.target.value);
+      return;
+    }
+    this.onSearchPersonnel.next(event.target.value);
   }
 
 }

@@ -1,0 +1,114 @@
+<div class="w-100 h-100 d-flex flex-column">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center">
+      <div class="bm-font-head-3s bm-mr-24px">Danh mục</div>
+      <button nz-button
+        nzType="primary"
+        (click)="handlerAddDictionary($event)">
+        <i nz-icon
+          nzType="plus"
+          nzTheme="outline"></i>Thêm danh mục</button>
+      <button nz-button
+        *ngIf="showDelete"
+        class="bm-ml-12px"
+        nzType="primary"
+        nzDanger
+        (click)="handlerDeleteListDictionary($event)">Xoá danh mục</button>
+    </div>
+  </div>
+  <div class="h-100 w-100 bm-mt-12px">
+    <div class="h-100"
+      *ngIf="listDictionary && listDictionary.length">
+      <nz-table #dictionaryTable
+        [nzScroll]="{ y: 'calc(100vh - 175px)' }"
+        [nzData]="listDictionary"
+        [nzLoading]="loading"
+        [nzShowPagination]="false"
+        [total]="total"
+        [nzPageSize]="10000"
+        [nzShowTotal]="totalTemplate"
+        [nzSize]="'middle'"
+        [nzBordered]="true"
+        (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+        (nzQueryParams)="handlerQueryParamsChange($event)">
+        <thead>
+          <tr>
+            <th [(nzChecked)]="checked"
+              [nzWidth]="'2%'"
+              (nzCheckedChange)="onAllChecked($event)"></th>
+            <th *ngFor="let column of columnConfig"
+              [nzAlign]="'left'"
+              class="bm-font-head-4s">
+              {{ column }}
+            </th>
+            <th [nzWidth]="'4%'">#</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of dictionaryTable.data">
+            <td [nzChecked]="setOfCheckedId.has(item.Id)"
+              (nzCheckedChange)="onItemChecked(item.Id, $event)"></td>
+            <td class="bm-color-009cdb bm-cursor-pointer"
+              (click)="handlerEditDictionary($event, item)">{{item.Name}}</td>
+            <td>{{item.Code}}</td>
+            <td>
+              <div class="bm-overflow-hidden text-truncate">
+                <span nz-tooltip
+                  [nzTooltipTitle]="descriptionTemplate"
+                  [nzTooltipTitleContext]="{ $implicit: item.Description }">
+                  {{item.Description || '&mdash;'}}
+                </span>
+              </div>
+              <ng-template #descriptionTemplate
+                let-description>
+                <span class="bm-max-h-100px bm-overflow-auto">{{ description }}</span>
+              </ng-template>
+            </td>
+            <td>
+              <nz-switch [(ngModel)]="item.Active"
+                [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
+                (ngModelChange)="handlerActiveChange($event, item)"></nz-switch>
+            </td>
+            <td><span nz-tooltip
+                [nzTooltipTitle]="viewChildTemplate"
+                (click)="handlerViewChildDictionary($event, item)"
+                class="bm-color-009cdb bm-cursor-pointer">
+                <span nz-icon
+                  nzType="eye"
+                  nzTheme="outline"></span>
+              </span>
+              <ng-template #viewChildTemplate>
+                <div class="bm-max-h-100px bm-overflow-auto">Xem danh mục con</div>
+              </ng-template>
+              <span nz-tooltip
+                [nzTooltipTitle]="deleteDictionaryTemplate"
+                class="bm-ml-12px bm-cursor-pointer">
+                <span nz-icon
+                  class="bm-color-ff5454"
+                  nz-popconfirm
+                  nzPopconfirmTitle="Bạn có chắc chắn muốn xoá danh mục?"
+                  nzPopconfirmPlacement="bottom"
+                  (nzOnConfirm)="handlerDeleteDictionary(item.Id)"
+                  nzType="delete"
+                  nzTheme="outline"></span>
+              </span>
+              <ng-template #deleteDictionaryTemplate>
+                <span class="bm-max-h-100px bm-overflow-auto">Xoá danh mục</span>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+    </div>
+    <div class="h-100 w-100 d-flex align-items-center justify-content-center"
+      *ngIf="!listDictionary || !listDictionary.length">
+      <span *ngIf="!loading">{{'Chưa có danh mục nào trong danh sách'}}</span>
+      <nz-spin *ngIf="loading"
+        nzTip="Đang tải..."
+        nzSimple></nz-spin>
+    </div>
+  </div>
+</div>
+
+<ng-template #totalTemplate
+  let-total>Tổng cộng {{ total }} bản ghi</ng-template>
