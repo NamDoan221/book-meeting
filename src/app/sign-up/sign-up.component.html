@@ -5,16 +5,6 @@
     <form nz-form
       [formGroup]="signUpForm">
       <nz-form-item class="bm-mb-0">
-        <nz-form-control nzErrorTip="Tài khoản không thể để trống!">
-          <nz-input-group [nzPrefix]="prefixUser">
-            <input type="text"
-              nz-input
-              formControlName="username"
-              placeholder="Tài khoản">
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item class="bm-mt-16px bm-mb-0">
         <nz-form-control nzErrorTip="Họ tên không thể để trống!">
           <nz-input-group [nzPrefix]="prefixFullName">
             <input type="text"
@@ -55,12 +45,20 @@
       </nz-form-item>
       <nz-form-item class="bm-mt-16px bm-mb-0">
         <nz-form-control [nzErrorTip]="emailErrorTpl">
-          <nz-input-group [nzPrefix]="prefixEmail">
-            <input [type]="'text'"
-              nz-input
-              formControlName="email"
-              placeholder="Email">
-          </nz-input-group>
+          <div class="position-relative">
+            <nz-input-group [nzPrefix]="prefixEmail">
+              <input [type]="'text'"
+                nz-input
+                formControlName="email"
+                placeholder="Email"
+                (ngModelChange)="handlerCheckAccountExist('email')">
+            </nz-input-group>
+            <span nz-icon
+              *ngIf="emailValid"
+              class="bm-color-6de01b position-absolute bm-top-10px bm-right-6px bm-z-index-10"
+              nzType="check-circle"
+              nzTheme="outline"></span>
+          </div>
         </nz-form-control>
         <ng-template #emailErrorTpl
           let-control>
@@ -80,12 +78,20 @@
       </nz-form-item>
       <nz-form-item class="bm-mt-16px bm-mb-0">
         <nz-form-control [nzErrorTip]="phoneErrorTip">
-          <nz-input-group [nzPrefix]="prefixPhone">
-            <input type="text"
-              nz-input
-              formControlName="phone"
-              placeholder="Số điện thoại">
-          </nz-input-group>
+          <div class="position-relative">
+            <nz-input-group [nzPrefix]="prefixPhone">
+              <input type="text"
+                nz-input
+                formControlName="phone"
+                placeholder="Số điện thoại"
+                (ngModelChange)="handlerCheckAccountExist('phone')">
+            </nz-input-group>
+            <span nz-icon
+              *ngIf="phoneValid"
+              class="bm-color-6de01b position-absolute bm-top-10px bm-right-6px bm-z-index-10"
+              nzType="check-circle"
+              nzTheme="outline"></span>
+          </div>
           <ng-template #phoneErrorTip
             let-control>
             <span class="font-size-11"

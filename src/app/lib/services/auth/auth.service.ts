@@ -102,6 +102,19 @@ export class AuthService extends BaseService {
     });
   }
 
+  public checkExistAccount(body: { phone: string, email: string }): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.post(`${this.domain}/Auth/check-exist-account`, body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
   public changeAvatar(id: string, url: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Account/${id}/change-avatar`, undefined, new HttpParams({ fromObject: { url: url } })).subscribe(result => {

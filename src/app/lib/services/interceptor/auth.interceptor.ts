@@ -42,6 +42,7 @@ export class AuthInterceptor implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
       const refreshToken = this.authService.decodeToken().RefreshToken;
+      console.log(refreshToken);
       return this.authService.refreshToken({ refreshToken: refreshToken }).pipe(
         switchMap((res: any) => {
           this.authService.setToken(JSON.stringify(res));
@@ -81,4 +82,4 @@ export class AuthInterceptor implements HttpInterceptor {
 }
 
 export const AuthInterceptorProviders = { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true };
-export const DEFAULT_REFRESH_URL_BLACKLIST = ['login', 'refresh-tokens', 'register'];
+export const DEFAULT_REFRESH_URL_BLACKLIST = ['login', 'refresh-tokens', 'register', 'check-exist-account'];

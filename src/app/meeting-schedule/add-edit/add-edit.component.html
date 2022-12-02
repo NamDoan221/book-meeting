@@ -105,10 +105,38 @@
           </ng-template>
         </nz-form-control>
       </nz-form-item>
+      <ng-container *ngFor="let item of meetingPositionType">
+        <nz-form-item class="bm-mt-16px bm-mb-0">
+          <nz-form-control [nzErrorTip]="item.Name + ' không thể để trống!'">
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="item.Code">
+              {{item.Name}}
+            </nz-form-label>
+            <nz-select [nzShowSearch]="true"
+              [nzServerSearch]="true"
+              [formControlName]="item.Code"
+              [nzPlaceHolder]="'Chọn nhân viên'"
+              [nzNotFoundContent]="notFoundContentTemplate"
+              (nzOnSearch)="handlerSearchPersonnel($event)"
+              (nzScrollToBottom)="handlerScrollBottomPersonnel()">
+              <nz-option *ngFor="let item of listPersonnel"
+                [nzValue]="item.Id"
+                [nzLabel]="item.FullName + ' (' + item.PositionName + ' - ' + item.DepartmentName + ')'">
+              </nz-option>
+            </nz-select>
+            <ng-template #notFoundContentTemplate>
+              <div class="d-flex align-items-center justify-content-center">
+                <span *ngIf="!loadingPersonnel">{{paramsGetPersonnel.search ? 'Không có kết quả' : 'Chưa có nhân viên nào trong danh sách'}}</span>
+                <nz-spin *ngIf="loadingPersonnel"
+                  nzSimple></nz-spin>
+              </div>
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+      </ng-container>
       <nz-form-item class="bm-mt-16px bm-mb-0">
         <nz-form-control>
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'MeetingScheduleDtls'">
+          <nz-form-label [nzNoColon]="true">
             Người tham gia
           </nz-form-label>
           <div class="bm-h-316px w-100 bm-mr-12px d-flex flex-column">
@@ -179,11 +207,12 @@
               </div>
               <div class="w-100 h-100 position-relative">
                 <div class="w-100 h-100 position-absolute bm-overflow-auto"
-                  (scroll)="handlerScrollBottomPersonnel($event)">
+                  (scroll)="handlerScrollPersonnel($event)">
                   <div *ngFor="let personnel of listPersonnel"
                     class="d-flex flex-column bm-pl-12px bm-py-6px bm-border-bottom-general">
                     <label nz-checkbox
                       [nzDisabled]="disableChangePersonnelJoin"
+                      [ngModelOptions]="{standalone: true}"
                       [ngModel]="personnel.IdAccount | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelJoin"
                       (ngModelChange)="handlerAddPersonnelToMeetingSchedule($event, personnel)">{{personnel.FullName}}</label>
                     <span class="bm-ml-24px">Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { differenceInCalendarDays } from 'date-fns';
 import * as dayjs from 'dayjs';
 import { DisabledTimeFn } from 'ng-zorro-antd/date-picker';
@@ -9,6 +9,8 @@ import { debounceTime, filter } from 'rxjs/operators';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
 import { DepartmentService } from 'src/app/lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from 'src/app/lib/services/department/interfaces/department.interface';
+import { DictionaryService } from 'src/app/lib/services/dictionary/dictionary.service';
+import { IDataItemGetByTypeDictionary } from 'src/app/lib/services/dictionary/interfaces/dictionary.interface';
 import { IMeetingRoom, IParamsGetListMeetingRoomFreeTime } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
 import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
 import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
@@ -60,6 +62,8 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   paramsGetPosition: IParamsGetListPosition;
   loadingPosition: boolean;
   firstCallPosition: boolean;
+
+  meetingPositionType: IDataItemGetByTypeDictionary[];
 
   range(start: number, end: number): number[] {
     const result: number[] = [];
@@ -114,6 +118,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     private departmentService: DepartmentService,
     private positionService: PositionService,
     private personnelService: PersonnelService,
+    private dictionaryService: DictionaryService
   ) {
     this.loading = false;
     this.isDirty = false;
@@ -184,6 +189,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.getListDepartment();
     this.getListPosition();
     this.getListPersonnel();
+    this.getMeetingPositionType();
   }
 
   initData() {
@@ -193,7 +199,6 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       RangeTime: [this.meetingSchedule?.EstStartTime && this.meetingSchedule?.EstEndTime ? [new Date(this.meetingSchedule?.EstStartTime), new Date(this.meetingSchedule?.EstEndTime)] : [], [Validators.required]],
       EstDuration: [this.meetingSchedule?.EstDuration ? this.meetingSchedule?.EstDuration : '', [Validators.required]],
       IdRoom: [this.meetingSchedule?.IdRoom || '', [Validators.required]],
-      MeetingScheduleDtls: [this.meetingSchedule?.MeetingScheduleDtls || [], [Validators.required]],
       Content: [this.meetingSchedule?.Content || '']
     });
     if (this.meetingSchedule?.EstStartTime) {
@@ -216,7 +221,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     }, 250);
     const duration = dayjs(result[1]).utc().diff(dayjs(result[0]).utc(), 'minute', false);
     this.meetingScheduleForm.controls.EstDuration.setValue(duration);
-    this.refreshMeetingRoomWhenChangeTime(result);
+    this.refreshMeetingRoomAndPersonnelWhenChangeTime(result);
   }
 
   durationTimeChange(event: number) {
@@ -230,19 +235,23 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     if (this.meetingScheduleForm.controls.RangeTime.value.length) {
       const rangeTime = [dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).utc().toDate(), dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).add(event, 'minute').utc().toDate()];
       this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
-      this.refreshMeetingRoomWhenChangeTime(rangeTime);
+      this.refreshMeetingRoomAndPersonnelWhenChangeTime(rangeTime);
       return;
     }
     const rangeTime = [dayjs().add(15, 'minute').utc().toDate(), dayjs().add(15 + event, 'minute').utc().toDate()];
     this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
-    this.refreshMeetingRoomWhenChangeTime(rangeTime);
+    this.refreshMeetingRoomAndPersonnelWhenChangeTime(rangeTime);
   }
 
-  refreshMeetingRoomWhenChangeTime(result: Date[]) {
+  refreshMeetingRoomAndPersonnelWhenChangeTime(result: Date[]) {
     this.paramsGetMeetingRoom.from = dayjs(result[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
     this.paramsGetMeetingRoom.to = dayjs(result[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
     this.listMeetingRoom = [];
     this.getListMeetingRoom();
+    this.paramsGetPersonnel.from = dayjs(result[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.paramsGetPersonnel.to = dayjs(result[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.listPersonnel = [];
+    this.getListPersonnel();
   }
 
   handlerSearchMeetingRoom(event: string) {
@@ -301,6 +310,11 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       EstEndTime: dayjs(this.meetingScheduleForm.value.RangeTime[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
       IdCreator: this.meetingSchedule?.IdCreator ?? this.authService.decodeToken().Id
     }
+    this.meetingPositionType.forEach(item => {
+      const data = { idAccount: this.meetingScheduleForm.value[item.Code], idAttendanceType: item.Id };
+      body.MeetingScheduleDtls && body.MeetingScheduleDtls.length ? body.MeetingScheduleDtls.push(data) : body.MeetingScheduleDtls = [data];
+      delete body[item.Code];
+    });
     if (this.modeEdit) {
       body.Id = this.meetingSchedule.Id;
     }
@@ -311,7 +325,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
         const positionName = this.authService.decodeToken().PositionName;
         const departmentName = this.authService.decodeToken().DepartmentName;
         const roomName = this.listMeetingRoom.find(item => item.Id === body.IdRoom)?.Name;
-        this.saveSuccess.emit({ ...body, Id: result.result ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
+        this.saveSuccess.emit({ ...body, Id: result.Id ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
@@ -418,7 +432,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.onSearchPersonnel.next(event);
   }
 
-  handlerScrollBottomPersonnel(event: any) {
+  handlerScrollPersonnel(event: any) {
     if (event.target.scrollTop < (event.target.scrollHeight - event.target.offsetHeight - 30) || this.loadingPersonnel || !this.totalPersonnel || this.totalPersonnel <= this.listPersonnel.length) {
       return;
     }
@@ -469,4 +483,26 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.onSearchPersonnel.next(event.target.value);
   }
 
+  async getMeetingPositionType() {
+    try {
+      const result = await this.dictionaryService.getListDataByTypeDictionary('POSITION_MEETING_SCHEDULE');
+      this.meetingPositionType = result;
+      this.meetingPositionType.forEach(item => {
+        const itemFound = this.meetingSchedule?.MeetingScheduleDtls?.find(element => element.idAttendanceType === item.Id);
+        this.meetingScheduleForm.addControl(item.Code, new FormControl(itemFound?.idAccount ?? '', [Validators.required]));
+      });
+      console.log(this.meetingScheduleForm);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  handlerScrollBottomPersonnel() {
+    if (this.loadingPersonnel || !this.totalPersonnel || this.totalPersonnel <= this.listPersonnel.length) {
+      return;
+    }
+    this.paramsGetPersonnel.page += 1;
+    this.getListPersonnel();
+  }
 }

@@ -31,7 +31,10 @@ export interface IMeetingSchedule {
   CreateDate?: string;
   CreatorAvatar?: string;
   StatusCode?: string;
-  MeetingScheduleDtls?: string[];
+  MeetingScheduleDtls?: {
+    idAccount: string;
+    idAttendanceType: string;
+  }[];
 }
 
 export interface IBodyAddPersonnelToMeetingSchedule {

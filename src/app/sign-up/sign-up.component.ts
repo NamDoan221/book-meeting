@@ -15,6 +15,8 @@ export class BmSignUpComponent {
   public passwordVisible: boolean;
   public passwordRetypeVisible: boolean;
   public loading: boolean;
+  public phoneValid: boolean;
+  public emailValid: boolean;
 
   constructor(
     private router: Router,
@@ -26,7 +28,6 @@ export class BmSignUpComponent {
     this.passwordVisible = false;
     this.passwordRetypeVisible = false;
     this.signUpForm = this.fb.group({
-      username: ['', [Validators.required]],
       fullName: ['', [Validators.required]],
       email: ['', [Validators.email]],
       address: [''],
@@ -41,6 +42,19 @@ export class BmSignUpComponent {
 
   handlerLogin() {
     this.router.navigate(['/login']);
+  }
+
+  async handlerCheckAccountExist(type: string) {
+    try {
+      const data = {
+        phone: this.signUpForm.value.phone,
+        email: this.signUpForm.value.email
+      };
+      const result = await this.auth.checkExistAccount(data);
+      type === 'email' ? this.emailValid = result.isEmail : this.phoneValid = result.isPhone;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async handlerSignUp(): Promise<any> {
