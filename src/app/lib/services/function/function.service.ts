@@ -1,5 +1,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { ConstantDefines } from '../../defines/constant.define';
 import { BaseService } from '../base.service';
 import { IParamsGetListFunction, IFunction } from './interfaces/function.interface';
 
@@ -13,9 +14,13 @@ export class FunctionService extends BaseService {
   }
 
   public getListFunction(params: IParamsGetListFunction): Promise<any> {
+    if (this.cacheService.getKey(ConstantDefines.MENU_KEY) && JSON.parse(this.cacheService.getKey(ConstantDefines.MENU_KEY))) {
+      return JSON.parse(this.cacheService.getKey(ConstantDefines.MENU_KEY));
+    }
     return new Promise((resolve, reject) => {
       this.get(`Function`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
+          this.cacheService.setKey(ConstantDefines.MENU_KEY, JSON.stringify(result));
           return resolve(result);
         },
         error: err => {

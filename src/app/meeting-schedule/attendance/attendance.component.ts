@@ -17,6 +17,7 @@ import * as uuid from 'uuid';
 })
 export class BmMeetingScheduleAttendanceComponent implements OnInit {
 
+  modeAttendance: boolean;
   loading: boolean;
   listPersonnelJoin: IPersonnel[];
   disableChangePersonnelJoin: boolean;
@@ -44,8 +45,8 @@ export class BmMeetingScheduleAttendanceComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     if (this.meetingSchedule &&
-      (dayjs(this.meetingSchedule.EstEndTime).utc().diff(dayjs().utc(), 'minute', false) > 0 && dayjs(this.meetingSchedule.EstStartTime).utc().diff(dayjs().utc(), 'minute', false) < 0) ||
-      dayjs(this.meetingSchedule.EstEndTime).utc().diff(dayjs().utc(), 'minute', false) < 0 ||
+      (dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) > 0 && dayjs(this.meetingSchedule.EstStartTime).diff(dayjs(), 'minute', false) < 0) ||
+      dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) < 0 ||
       this.meetingSchedule.StatusCode !== 'MS_DEFAULT') {
       this.disableChangePersonnelJoin = true;
     }
@@ -110,7 +111,7 @@ export class BmMeetingScheduleAttendanceComponent implements OnInit {
   async handlerUpdate(personnel: IPersonnel) {
     try {
       this.loading = true;
-      const result = await this.meetingScheduleService.addPersonnelToMeetingSchedule({ idMeetingSchedule: this.meetingSchedule.Id, idAccount: personnel.IdAccount });
+      const result = await this.meetingScheduleService.addPersonnelToMeetingSchedule({ IdMeetingSchedule: this.meetingSchedule.Id, IdAccount: personnel.IdAccount });
       if (result.success) {
         personnel.Id = result.result;
         this.nzMessageService.success('Thao tác thành công.');

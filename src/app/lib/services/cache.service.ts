@@ -7,7 +7,7 @@ import { ConstantDefines } from '../defines/constant.define';
 })
 export class CacheService {
   public setKey(key: string, data: string) {
-    localStorage.setItem(key, CryptoJS.AES.encrypt(data, ConstantDefines.KEY_CRYPTO).toString());
+    localStorage.setItem(key, CryptoJS.AES.encrypt(data, ConstantDefines.CRYPTO_KEY).toString());
   }
 
   public getKey(key: string) {
@@ -15,7 +15,7 @@ export class CacheService {
     if (!data) {
       return undefined;
     }
-    return CryptoJS.AES.decrypt(data, ConstantDefines.KEY_CRYPTO).toString(CryptoJS.enc.Utf8);
+    return CryptoJS.AES.decrypt(data, ConstantDefines.CRYPTO_KEY).toString(CryptoJS.enc.Utf8);
   }
 
   public clearAll() {

@@ -31,13 +31,15 @@ export interface IMeetingSchedule {
   CreateDate?: string;
   CreatorAvatar?: string;
   StatusCode?: string;
-  MeetingScheduleDtls?: {
-    idAccount: string;
-    idAttendanceType: string;
-  }[];
+  MeetingScheduleDtls?: IMeetingScheduleJoin[];
+}
+
+export interface IMeetingScheduleJoin {
+  IdAccount: string;
+  IdAttendanceType: string;
 }
 
 export interface IBodyAddPersonnelToMeetingSchedule {
-  idAccount: string;
-  idMeetingSchedule: string;
+  IdAccount: string;
+  IdMeetingSchedule: string;
 }

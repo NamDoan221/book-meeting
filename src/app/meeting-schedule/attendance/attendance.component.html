@@ -12,14 +12,9 @@
       </div>
       <div class="d-flex">
         <button nzType="primary"
-          *ngIf="!disableChangePersonnelJoin"
           nz-button>Điểm danh</button>
         <button class="bm-ml-12px"
-          *ngIf="!disableChangePersonnelJoin && !modeAdd"
-          nz-button
-          (click)="handlerChangeModeAdd($event)">Thêm người tham gia</button>
-        <button class="bm-ml-12px"
-          *ngIf="modeAdd"
+          *ngIf="modeAttendance"
           nz-button
           (click)="handlerBack($event)">Quay lại</button>
       </div>
@@ -86,12 +81,6 @@
                 </span>
                 <span>Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>
               </div>
-              <span nz-icon
-                class="bm-cursor-pointer bm-color-ff5454"
-                *ngIf="!disableChangePersonnelJoin"
-                nzType="close-circle"
-                (click)="handlerRemovePersonnelJoin($event, personnel)"
-                nzTheme="outline"></span>
             </div>
             <div class="h-100 w-100 d-flex align-items-center justify-content-center"
               *ngIf="!listPersonnelJoin || !listPersonnelJoin.length">

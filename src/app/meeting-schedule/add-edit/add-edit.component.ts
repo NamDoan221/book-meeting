@@ -28,7 +28,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   meetingScheduleForm: FormGroup;
   loading: boolean;
-  isDirty: boolean;
+  guestType: IDataItemGetByTypeDictionary;
 
   totalMeetingRoom: number;
   listMeetingRoom: IMeetingRoom[];
@@ -41,7 +41,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   rangeChange: boolean;
   durationChange: boolean;
 
-  listPersonnelJoin: IPersonnel[];
+  listPersonnelGuest: IPersonnel[];
   totalPersonnel: number;
   listPersonnel: IPersonnel[];
   onSearchPersonnel: Subject<string> = new Subject();
@@ -106,6 +106,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   @Input() meetingSchedule: IMeetingSchedule;
   @Input() modeEdit: boolean;
+  @Input() disable: boolean;
 
   @Output() saveSuccess = new EventEmitter<IMeetingSchedule>();
 
@@ -121,15 +122,13 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     private dictionaryService: DictionaryService
   ) {
     this.loading = false;
-    this.isDirty = false;
-
     this.listMeetingRoom = [];
     this.paramsGetMeetingRoom = {
       page: 1,
       pageSize: 20,
       search: '',
-      from: dayjs().utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-      to: dayjs().add(5, 'day').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      from: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
+      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss'),
       active: true
     }
     this.loadingMeetingRoom = true;
@@ -137,13 +136,13 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.rangeChange = false;
     this.durationChange = false;
 
-    this.listPersonnelJoin = [];
+    this.listPersonnelGuest = [];
     this.listPersonnel = [];
     this.paramsGetPersonnel = {
       page: 1,
       pageSize: 20,
-      from: dayjs().utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-      to: dayjs().add(5, 'day').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      from: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
+      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss'),
       search: ''
     }
     this.loadingPersonnel = true;
@@ -202,12 +201,12 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       Content: [this.meetingSchedule?.Content || '']
     });
     if (this.meetingSchedule?.EstStartTime) {
-      this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
-      this.paramsGetPersonnel.from = dayjs(this.meetingSchedule.EstStartTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
+      this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).format('YYYY-MM-DDTHH:mm:ss')
+      this.paramsGetPersonnel.from = dayjs(this.meetingSchedule.EstStartTime).format('YYYY-MM-DDTHH:mm:ss')
     }
     if (this.meetingSchedule?.EstEndTime) {
-      this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
-      this.paramsGetPersonnel.to = dayjs(this.meetingSchedule.EstEndTime).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
+      this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss')
+      this.paramsGetPersonnel.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss')
     }
   }
 
@@ -219,7 +218,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     setTimeout(() => {
       this.rangeChange = false;
     }, 250);
-    const duration = dayjs(result[1]).utc().diff(dayjs(result[0]).utc(), 'minute', false);
+    const duration = dayjs(result[1]).diff(dayjs(result[0]), 'minute', false);
     this.meetingScheduleForm.controls.EstDuration.setValue(duration);
     this.refreshMeetingRoomAndPersonnelWhenChangeTime(result);
   }
@@ -233,23 +232,23 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       this.durationChange = false;
     }, 250);
     if (this.meetingScheduleForm.controls.RangeTime.value.length) {
-      const rangeTime = [dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).utc().toDate(), dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).add(event, 'minute').utc().toDate()];
+      const rangeTime = [dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).toDate(), dayjs(this.meetingScheduleForm.controls.RangeTime.value[0]).add(event, 'minute').toDate()];
       this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
       this.refreshMeetingRoomAndPersonnelWhenChangeTime(rangeTime);
       return;
     }
-    const rangeTime = [dayjs().add(15, 'minute').utc().toDate(), dayjs().add(15 + event, 'minute').utc().toDate()];
+    const rangeTime = [dayjs().add(15, 'minute').toDate(), dayjs().add(15 + event, 'minute').toDate()];
     this.meetingScheduleForm.controls.RangeTime.setValue(rangeTime);
     this.refreshMeetingRoomAndPersonnelWhenChangeTime(rangeTime);
   }
 
   refreshMeetingRoomAndPersonnelWhenChangeTime(result: Date[]) {
-    this.paramsGetMeetingRoom.from = dayjs(result[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
-    this.paramsGetMeetingRoom.to = dayjs(result[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.paramsGetMeetingRoom.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss');
+    this.paramsGetMeetingRoom.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss');
     this.listMeetingRoom = [];
     this.getListMeetingRoom();
-    this.paramsGetPersonnel.from = dayjs(result[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
-    this.paramsGetPersonnel.to = dayjs(result[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.paramsGetPersonnel.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss');
+    this.paramsGetPersonnel.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss');
     this.listPersonnel = [];
     this.getListPersonnel();
   }
@@ -293,7 +292,6 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   async handlerUpdate(event: Event) {
     event.stopPropagation();
-    this.isDirty = true;
     if (!this.meetingScheduleForm.valid) {
       Object.values(this.meetingScheduleForm.controls).forEach(control => {
         if (control.invalid) {
@@ -304,17 +302,24 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       return;
     }
     this.loading = true;
+    const estStartTime = dayjs(this.meetingScheduleForm.value.RangeTime[0]).format('YYYY-MM-DDTHH:mm:ss');
+    const estEndTime = dayjs(this.meetingScheduleForm.value.RangeTime[1]).format('YYYY-MM-DDTHH:mm:ss');
+    delete this.meetingScheduleForm.value.RangeTime;
     const body: IMeetingSchedule = {
       ...this.meetingScheduleForm.value,
-      EstStartTime: dayjs(this.meetingScheduleForm.value.RangeTime[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-      EstEndTime: dayjs(this.meetingScheduleForm.value.RangeTime[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      EstStartTime: estStartTime,
+      EstEndTime: estEndTime,
       IdCreator: this.meetingSchedule?.IdCreator ?? this.authService.decodeToken().Id
     }
     this.meetingPositionType.forEach(item => {
-      const data = { idAccount: this.meetingScheduleForm.value[item.Code], idAttendanceType: item.Id };
+      const data = { IdAccount: this.meetingScheduleForm.value[item.Code], IdAttendanceType: item.Id };
       body.MeetingScheduleDtls && body.MeetingScheduleDtls.length ? body.MeetingScheduleDtls.push(data) : body.MeetingScheduleDtls = [data];
       delete body[item.Code];
     });
+    this.listPersonnelGuest.forEach(item => {
+      const data = { IdAccount: item.Id, IdAttendanceType: this.guestType.Id };
+      body.MeetingScheduleDtls && body.MeetingScheduleDtls.length ? body.MeetingScheduleDtls.push(data) : body.MeetingScheduleDtls = [data];
+    })
     if (this.modeEdit) {
       body.Id = this.meetingSchedule.Id;
     }
@@ -325,7 +330,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
         const positionName = this.authService.decodeToken().PositionName;
         const departmentName = this.authService.decodeToken().DepartmentName;
         const roomName = this.listMeetingRoom.find(item => item.Id === body.IdRoom)?.Name;
-        this.saveSuccess.emit({ ...body, Id: result.Id ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
+        this.saveSuccess.emit({ ...body, Id: result.result.Id ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
@@ -461,7 +466,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
         return {
           ...item,
           IdAccount: item.Id,
-          Id: this.listPersonnelJoin.find(item => item.IdAccount === id)?.Id || id
+          Id: this.listPersonnelGuest.find(item => item.IdAccount === id)?.Id || id
         }
       }));
     } catch (error) {
@@ -486,13 +491,25 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   async getMeetingPositionType() {
     try {
       const result = await this.dictionaryService.getListDataByTypeDictionary('POSITION_MEETING_SCHEDULE');
-      this.meetingPositionType = result;
-      this.meetingPositionType.forEach(item => {
-        const itemFound = this.meetingSchedule?.MeetingScheduleDtls?.find(element => element.idAttendanceType === item.Id);
-        this.meetingScheduleForm.addControl(item.Code, new FormControl(itemFound?.idAccount ?? '', [Validators.required]));
+      this.meetingPositionType = result.filter(item => {
+        if (item.Code === 'GUEST') {
+          this.guestType = item;
+          return false;
+        }
+        const itemFound = this.meetingSchedule?.MeetingScheduleDtls?.find(element => element.IdAttendanceType === item.Id);
+        this.meetingScheduleForm.addControl(item.Code, new FormControl(itemFound?.IdAccount ?? '', [Validators.required]));
+        return true;
       });
-      console.log(this.meetingScheduleForm);
-
+      if (this.guestType) {
+        const listGuest = [...(this.meetingSchedule?.MeetingScheduleDtls || [])].filter(item => item.IdAttendanceType === this.guestType.Id);
+        const listGuestMap: IPersonnel[] = listGuest.map(item => {
+          return {
+            Id: item.IdAccount,
+            IdAccount: item.IdAccount
+          }
+        })
+        this.listPersonnelGuest = listGuestMap;
+      };
     } catch (error) {
       console.log(error);
     }
@@ -504,5 +521,13 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     }
     this.paramsGetPersonnel.page += 1;
     this.getListPersonnel();
+  }
+
+  handlerAddPersonnelToMeetingSchedule(event: boolean, personnel: IPersonnel) {
+    if (event) {
+      this.listPersonnelGuest = [...this.listPersonnelGuest, personnel];
+      return;
+    }
+    this.listPersonnelGuest = this.listPersonnelGuest.filter(item => item.IdAccount !== personnel.IdAccount);
   }
 }

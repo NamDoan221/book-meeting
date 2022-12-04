@@ -233,15 +233,6 @@ export class BmDictionaryComponent implements OnInit {
 
     this.drawerRefGlobal.afterOpen.subscribe(() => {
       this.isOpenDraw = true;
-      this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
-        this.isOpenDraw = false;
-        this.drawerRefGlobal.close();
-        if (item) {
-          Object.assign(item, data);
-          return;
-        }
-        this.listDictionary = [data, ...this.listDictionary];
-      });
     });
 
     this.drawerRefGlobal.afterClose.subscribe(data => {

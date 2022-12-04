@@ -149,15 +149,15 @@
             </td>
             <td>{{item.EstStartTime | date: 'dd/MM/yyyy HH:mm'}}
               <span nz-tooltip
-                *ngIf="item.EstStartTime | CheckTimeStartMeetingSchedulePipe"
+                *ngIf="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration"
                 [nzTooltipTitle]="timeTemplate">
                 <span nz-icon
-                  class="bm-ml-4px {{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:false:false:true}}"
-                  [nzType]="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:false:true"></span>
+                  class="bm-ml-4px {{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:false:false:true}}"
+                  [nzType]="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:false:true"></span>
               </span>
               <ng-template #timeTemplate
                 let-content>
-                <span class="bm-max-h-100px bm-overflow-auto">{{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:true}}</span>
+                <span class="bm-max-h-100px bm-overflow-auto">{{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:true}}</span>
               </ng-template>
             </td>
             <td>{{item.EstDuration}} Phút</td>
@@ -170,7 +170,7 @@
                 <span nz-tooltip
                   [nzTooltipTitle]="contentTemplate"
                   [nzTooltipTitleContext]="{ $implicit: item.Content }">
-                  {{item.Content}}
+                  {{item.Content || '&mdash;'}}
                 </span>
               </div>
               <ng-template #contentTemplate
@@ -184,14 +184,14 @@
                 (click)="handlerAddPersonnel($event, item)"
                 class="bm-color-009cdb bm-cursor-pointer">
                 <span nz-icon
-                  nzType="user-add"
+                  nzType="info-circle"
                   nzTheme="outline"></span>
               </span>
               <ng-template #addPersonnelTemplate>
-                <div class="bm-max-h-100px bm-overflow-auto">Thêm người tham gia</div>
+                <div class="bm-max-h-100px bm-overflow-auto">Xem chi tiết cuộc họp</div>
               </ng-template>
               <span nz-tooltip
-                *ngIf="!(item.EstStartTime | CheckTimeStartMeetingSchedulePipe)"
+                *ngIf="item.EstStartTime | CheckCanAttendanceMeetingSchedulePipe:item.EstDuration"
                 [nzTooltipTitle]="attendanceTemplate"
                 (click)="handlerAttendance($event, item)"
                 class="bm-color-009cdb bm-cursor-pointer bm-ml-12px">

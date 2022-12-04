@@ -82,7 +82,7 @@ export class BmMeetingScheduleComponent implements OnInit {
       'Mô tả nội dung cuộc họp',
       'Trạng thái'
     ];
-    this.defaultFilterTime = [dayjs().startOf('month').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'), dayjs().endOf('month').utc().format('YYYY-MM-DDTHH:mm:ss[Z]')];
+    this.defaultFilterTime = [dayjs().startOf('month').format('YYYY-MM-DDTHH:mm:ss'), dayjs().endOf('month').format('YYYY-MM-DDTHH:mm:ss')];
     this.params = {
       page: 1,
       pageSize: 20,
@@ -203,7 +203,7 @@ export class BmMeetingScheduleComponent implements OnInit {
       case 5:
         return;
     }
-    this.defaultFilterTime = [dayjs().startOf(timeKey).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'), dayjs().endOf(timeKey).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')];
+    this.defaultFilterTime = [dayjs().startOf(timeKey).format('YYYY-MM-DDTHH:mm:ss'), dayjs().endOf(timeKey).format('YYYY-MM-DDTHH:mm:ss')];
     this.params.from = this.defaultFilterTime[0];
     this.params.to = this.defaultFilterTime[1];
     this.getListMeetingSchedule();
@@ -249,8 +249,8 @@ export class BmMeetingScheduleComponent implements OnInit {
     if (dayjs(this.params.from).isSame(dayjs(result[0])) && dayjs(this.params.to).isSame(dayjs(result[1]))) {
       return;
     }
-    this.params.from = dayjs(result[0]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
-    this.params.to = dayjs(result[1]).utc().format('YYYY-MM-DDTHH:mm:ss[Z]');
+    this.params.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss');
+    this.params.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss');
     this.getListMeetingSchedule();
   }
 
@@ -285,7 +285,8 @@ export class BmMeetingScheduleComponent implements OnInit {
       nzContent: BmMeetingScheduleAddEditComponent,
       nzContentParams: {
         meetingSchedule: schedule,
-        modeEdit: schedule ? true : false
+        modeEdit: schedule ? true : false,
+        disable: schedule ? dayjs(schedule.EstStartTime).diff(dayjs(), 'minute', false) < 0 : false
       }
     });
 
@@ -439,6 +440,13 @@ export class BmMeetingScheduleComponent implements OnInit {
           return;
         }
         this.listMeetingSchedule = [data, ...this.listMeetingSchedule];
+      });
+      this.drawerRefGlobal.getContentComponent().attendance.subscribe((data) => {
+        this.isOpenDrawAddPersonnel = false;
+        this.drawerRefGlobal.close();
+        setTimeout(() => {
+          this.handlerAttendance({ stopPropagation: () => { } } as Event, data);
+        }, 300);
       });
     });
 

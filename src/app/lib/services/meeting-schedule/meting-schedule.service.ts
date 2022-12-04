@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../base.service';
-import { IBodyAddPersonnelToMeetingSchedule, IMeetingSchedule, IParamsGetListMeetingSchedule } from './interfaces/metting-schedule.interface';
+import { IBodyAddPersonnelToMeetingSchedule, IMeetingSchedule, IMeetingScheduleJoin, IParamsGetListMeetingSchedule } from './interfaces/metting-schedule.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -108,6 +108,19 @@ export class MeetingScheduleService extends BaseService {
   public addPersonnelToMeetingSchedule(body: IBodyAddPersonnelToMeetingSchedule): Promise<any> {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Mschedule/detail`, body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  public addListPersonnelToMeetingSchedule(body: IMeetingScheduleJoin[], idMeetingSchedule: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.post(`${this.domain}/Mschedule/detail-multiple`, body, new HttpParams({ fromObject: { IdMeetingSchedule: idMeetingSchedule } })).subscribe({
         next: result => {
           return resolve(result);
         },

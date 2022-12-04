@@ -74,8 +74,8 @@ export class BmMeetingAttendanceContentComponent implements OnInit {
       page: 1,
       pageSize: 20,
       status: 'MS_DEFAULT',
-      from: dayjs().subtract(5, 'minute').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
-      to: dayjs().add(10, 'month').utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+      from: dayjs().subtract(5, 'minute').format('YYYY-MM-DDTHH:mm:ss'),
+      to: dayjs().add(10, 'month').format('YYYY-MM-DDTHH:mm:ss'),
       search: '',
       idCreator: this.authService.decodeToken().Id
     };

@@ -1,5 +1,6 @@
 <form nz-form
   class="w-100"
+  [ngClass]="{'bm-disable bm-pointer-events-none': disable}"
   [formGroup]="meetingScheduleForm">
   <div class="h-100 w-100 d-flex flex-column justify-content-between">
     <div>
@@ -106,38 +107,16 @@
         </nz-form-control>
       </nz-form-item>
       <ng-container *ngFor="let item of meetingPositionType">
-        <nz-form-item class="bm-mt-16px bm-mb-0">
-          <nz-form-control [nzErrorTip]="item.Name + ' không thể để trống!'">
-            <nz-form-label [nzNoColon]="true"
-              [nzFor]="item.Code">
-              {{item.Name}}
-            </nz-form-label>
-            <nz-select [nzShowSearch]="true"
-              [nzServerSearch]="true"
-              [formControlName]="item.Code"
-              [nzPlaceHolder]="'Chọn nhân viên'"
-              [nzNotFoundContent]="notFoundContentTemplate"
-              (nzOnSearch)="handlerSearchPersonnel($event)"
-              (nzScrollToBottom)="handlerScrollBottomPersonnel()">
-              <nz-option *ngFor="let item of listPersonnel"
-                [nzValue]="item.Id"
-                [nzLabel]="item.FullName + ' (' + item.PositionName + ' - ' + item.DepartmentName + ')'">
-              </nz-option>
-            </nz-select>
-            <ng-template #notFoundContentTemplate>
-              <div class="d-flex align-items-center justify-content-center">
-                <span *ngIf="!loadingPersonnel">{{paramsGetPersonnel.search ? 'Không có kết quả' : 'Chưa có nhân viên nào trong danh sách'}}</span>
-                <nz-spin *ngIf="loadingPersonnel"
-                  nzSimple></nz-spin>
-              </div>
-            </ng-template>
-          </nz-form-control>
-        </nz-form-item>
+        <bm-meeting-schedule-dynamic_field [formGroup]="meetingScheduleForm"
+          [meetingSchedule]="meetingSchedule"
+          [item]="item">
+        </bm-meeting-schedule-dynamic_field>
       </ng-container>
-      <nz-form-item class="bm-mt-16px bm-mb-0">
+      <nz-form-item class="bm-mt-16px bm-mb-0"
+        *ngIf="guestType">
         <nz-form-control>
           <nz-form-label [nzNoColon]="true">
-            Người tham gia
+            Khách mời
           </nz-form-label>
           <div class="bm-h-316px w-100 bm-mr-12px d-flex flex-column">
             <div class="h-100 w-100 bm-border-general d-flex flex-column">
@@ -149,7 +128,7 @@
                       [nzAllowClear]="true"
                       [nzServerSearch]="true"
                       [nzPlaceHolder]="'Chọn phòng ban'"
-                      [ngModel]="paramsGetPersonnel.idDepartment"
+                      [(ngModel)]="paramsGetPersonnel.idDepartment"
                       [ngModelOptions]="{standalone: true}"
                       [nzNotFoundContent]="notFoundDepartmentTemplate"
                       (ngModelChange)="handlerSelectDepartment($event)"
@@ -174,7 +153,7 @@
                       [nzAllowClear]="true"
                       [nzServerSearch]="true"
                       [nzPlaceHolder]="'Chọn chức vụ'"
-                      [ngModel]="paramsGetPersonnel.idPosition"
+                      [(ngModel)]="paramsGetPersonnel.idPosition"
                       [ngModelOptions]="{standalone: true}"
                       [nzNotFoundContent]="notFoundPositionTemplate"
                       (ngModelChange)="handlerSelectPosition()"
@@ -213,7 +192,7 @@
                     <label nz-checkbox
                       [nzDisabled]="disableChangePersonnelJoin"
                       [ngModelOptions]="{standalone: true}"
-                      [ngModel]="personnel.IdAccount | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelJoin"
+                      [ngModel]="personnel.IdAccount | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelGuest"
                       (ngModelChange)="handlerAddPersonnelToMeetingSchedule($event, personnel)">{{personnel.FullName}}</label>
                     <span class="bm-ml-24px">Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>
                   </div>
@@ -228,8 +207,6 @@
               </div>
             </div>
           </div>
-          <div class="font-size-11 bm-color-ff4d4f"
-            *ngIf="isDirty && !listPersonnelJoin.length">Người tham gia không thể để trống!</div>
         </nz-form-control>
       </nz-form-item>
       <nz-form-item class="bm-mb-0 bm-mt-16px">

@@ -41,7 +41,9 @@ import {
   EnvironmentOutline,
   BankOutline,
   SmileOutline,
-  ScanOutline
+  ScanOutline,
+  PauseCircleOutline,
+  InfoCircleOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -84,7 +86,9 @@ const icons = [
   EnvironmentOutline,
   BankOutline,
   SmileOutline,
-  ScanOutline
+  ScanOutline,
+  PauseCircleOutline,
+  InfoCircleOutline
 ];
 @NgModule({
   imports: [NzIconModule],

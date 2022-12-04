@@ -8,22 +8,23 @@ export interface IParamsGetListPersonnel {
 }
 
 export interface IPersonnel {
-  Id: string;
-  Domain: string;
-  Username: string;
-  FullName: string;
-  Address: string;
-  Phone: string;
-  AvatarUrl: string;
-  Email: string;
-  Gender: number;
-  Dob: string;
-  IdPosition: string;
-  PositionName: string;
-  Active: boolean;
-  IdAccount: string;
-  AttendanceTime: string;
+  Id?: string;
+  Domain?: string;
+  Username?: string;
+  FullName?: string;
+  Address?: string;
+  Phone?: string;
+  AvatarUrl?: string;
+  Email?: string;
+  Gender?: number;
+  Dob?: string;
+  IdPosition?: string;
+  PositionName?: string;
+  Active?: boolean;
+  IdAccount?: string;
+  AttendanceTime?: string;
   SpecificHasFace?: boolean;
+  IdAttendanceType?: string;
 }
 
 export interface IParamsGetListPersonnelFreeTime {

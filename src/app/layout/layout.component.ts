@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../lib/services/auth/auth.service';
@@ -25,7 +25,8 @@ export class BmLayoutComponent implements OnInit {
     private auth: AuthService,
     private cacheService: CacheService,
     private functionService: FunctionService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private zone: NgZone
   ) {
     this.isCollapsed = false;
     this.menuData = []
@@ -74,14 +75,17 @@ export class BmLayoutComponent implements OnInit {
       try {
         const result = await this.auth.logout();
         this.cacheService.clearAll();
-        this.router.navigate(['/login']);
+        this.zone.run(() => {
+          this.router.navigate(['/login']);
+        });
       } catch (error) {
         console.log(error);
       }
       return;
     }
     this.currentPath = url;
-    this.router.navigate([url]);
+    this.zone.run(() => {
+      this.router.navigate([url]);
+    });
   }
-
 }
