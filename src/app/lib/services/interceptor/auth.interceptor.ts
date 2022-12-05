@@ -42,21 +42,15 @@ export class AuthInterceptor implements HttpInterceptor {
       this.isRefreshing = true;
       this.refreshTokenSubject.next(null);
       const refreshToken = this.authService.decodeToken().RefreshToken;
-      console.log(refreshToken);
       return this.authService.refreshToken({ refreshToken: refreshToken }).pipe(
         switchMap((res: any) => {
           this.authService.setToken(JSON.stringify(res));
-          // localStorage.setItem('access_token', res.access_token);
-          // this.authService.verifyToken(res.access_token).subscribe((resVer: any) => {
-          //   localStorage.setItem('username', resVer.sub);
           this.isRefreshing = false;
           this.refreshTokenSubject.next(res.JwtToken);
-          // })
           return next.handle(this.addTokenHeader(request));
         }),
         catchError((err) => {
           this.isRefreshing = false;
-          console.log(err);
           this.cacheService.clearAll();
           this.router.navigate(['login']);
           return throwError(() => err);

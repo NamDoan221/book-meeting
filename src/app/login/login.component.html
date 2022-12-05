@@ -44,6 +44,12 @@
               </nz-input-group>
             </nz-form-control>
           </nz-form-item>
+          <div class="bm-mt-16px">
+            <label nz-checkbox
+              [ngModel]="!!rememberAccount"
+              [ngModelOptions]="{standalone: true}"
+              (ngModelChange)="handlerUpdateRemember($event)">Nhớ mật khẩu</label>
+          </div>
           <nz-form-item class="bm-mt-16px bm-mb-0">
             <nz-form-control>
               <div class="d-flex align-items-center justify-content-between">

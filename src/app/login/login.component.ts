@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IBodyLogin } from '../lib/services/auth/interfaces/auth.interfaces';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'bm-login',
@@ -15,12 +16,14 @@ export class BmLoginComponent implements OnInit {
   passwordVisible: boolean;
   loading: boolean;
   loadingGoogle: boolean;
+  rememberAccount: string;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private auth: AuthService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private svCookie: CookieService
   ) {
     this.loading = false;
     this.loadingGoogle = false;
@@ -29,6 +32,7 @@ export class BmLoginComponent implements OnInit {
       username: [null, [Validators.required]],
       password: [null, [Validators.required]]
     });
+    this.rememberAccount = this.svCookie.get('RememberMe');
   }
 
   ngOnInit(): void {
@@ -83,6 +87,20 @@ export class BmLoginComponent implements OnInit {
     } finally {
       this.loadingGoogle = false;
     }
+  }
+
+  handlerUpdateRemember(event: boolean) {
+    this.rememberAccount = `${event}`;
+    if (event) {
+      this.svCookie.set('RememberMe', 'true', {
+        expires: 30,
+        secure: true,
+        domain: 'face',
+        sameSite: 'None',
+      });
+      return;
+    }
+    this.svCookie.delete('RememberMe');
   }
 
   handlerSignUp(): any {

@@ -7,6 +7,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { RouterModule, Routes } from '@angular/router';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 const routes: Routes = [
   {
@@ -24,7 +25,8 @@ const routes: Routes = [
     IconsProviderModule,
     NzInputModule,
     NzButtonModule,
-    NzFormModule
+    NzFormModule,
+    NzCheckboxModule
   ],
   declarations: [BmLoginComponent]
 })

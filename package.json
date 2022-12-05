@@ -31,6 +31,7 @@
     "lodash": "^4.17.21",
     "ng-zorro-antd": "~13.3.2",
     "ngx-bootstrap": "~6.2.0",
+    "ngx-cookie-service": "^15.0.0",
     "ngx-perfect-scrollbar": "^10.1.1",
     "node-sass": "^7.0.1",
     "rxjs": "~6.6.0",
