@@ -304,6 +304,10 @@ export class BmMeetingScheduleComponent implements OnInit {
           this.handlerAddPersonnel({ stopPropagation: () => { } } as Event, data);
         }, 500);
       });
+      this.drawerRefGlobal.getContentComponent().close.subscribe(() => {
+        this.isOpenDrawAddEdit = false;
+        this.drawerRefGlobal.close();
+      });
     });
 
     this.drawerRefGlobal.afterClose.subscribe(data => {

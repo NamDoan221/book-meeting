@@ -15,6 +15,7 @@ import { PersonnelService } from 'src/app/lib/services/personnel/personnel.servi
 import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
 import { PositionService } from 'src/app/lib/services/position/position.service';
 import { cloneDeep } from 'lodash';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'bm-meeting-schedule-add_personnel',
@@ -29,12 +30,14 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   disableChangePersonnelJoin: boolean;
   modeAdd: boolean;
   guestType: IDataItemGetByTypeDictionary;
+  listPersonnelOther: IPersonnel[];
 
   totalPersonnel: number;
   listPersonnel: IPersonnel[];
   onSearchPersonnel: Subject<string> = new Subject();
   paramsGetPersonnel: IParamsGetListPersonnelFreeTime;
   loadingPersonnel: boolean;
+  canLoadMorePersonal: boolean;
   firstCallPersonnel: boolean;
 
   paramsGetDetail: { search: string, active: boolean };
@@ -61,6 +64,8 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
 
   personnelJoinForm: FormGroup;
 
+  keyFetch: string;
+
   @Input() meetingSchedule: IMeetingSchedule;
   @Input() modeEdit: boolean;
 
@@ -79,6 +84,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     this.modeAdd = false;
     this.listPersonnelGuest = [];
     this.loading = false;
+    this.listPersonnelOther = [];
 
     this.listPersonnel = [];
     this.paramsGetPersonnel = {
@@ -91,6 +97,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     this.loadingPersonnel = true;
     this.firstCallPersonnel = true;
     this.disableChangePersonnelJoin = false;
+    this.canLoadMorePersonal = true;
 
     this.paramsGetDetail = {
       search: '',
@@ -123,8 +130,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     this.personnelJoinForm = this.fb.group({});
     if (this.meetingSchedule &&
       (dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) > 0 && dayjs(this.meetingSchedule.EstStartTime).diff(dayjs(), 'minute', false) < 0) ||
-      dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) < 0 ||
-      this.meetingSchedule.StatusCode !== 'MS_DEFAULT') {
+      dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) < 0 || this.meetingSchedule.StatusCode !== 'MS_DEFAULT') {
       this.disableChangePersonnelJoin = true;
     }
     this.onSearchPersonnel.pipe(debounceTime(500), filter(value => value !== this.paramsGetPersonnel.search)).subscribe((value) => {
@@ -143,10 +149,10 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     this.getListPosition();
     await this.getDetailMeetingSchedule();
     this.getListPersonnel();
-    this.getMeetingPositionType();
   }
 
-  async getMeetingPositionType() {
+  async getMeetingPositionType(dataDetail: IPersonnel[]) {
+    this.listPersonnelOther = [];
     try {
       const result = await this.dictionaryService.getListDataByTypeDictionary('POSITION_MEETING_SCHEDULE');
       this.meetingPositionType = result.filter(item => {
@@ -154,14 +160,16 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
           this.guestType = item;
           return false;
         }
-        const itemFound = this.listPersonnelGuest?.find(element => element.IdAttendanceType === item.Id);
+        const itemFound = dataDetail.find(element => element.IdAttendanceType === item.Id);
+        this.listPersonnelOther.push(itemFound);
         this.personnelJoinForm.addControl(item.Code, new FormControl(itemFound?.IdAccount ?? '', [Validators.required]));
         return true;
       });
       if (this.guestType) {
-        const listGuest = [...(this.listPersonnelGuest || [])].filter(item => item.IdAttendanceType === this.guestType.Id);
+        const listGuest = [...dataDetail].filter(item => item.IdAttendanceType === this.guestType.Id);
         const listGuestMap: IPersonnel[] = listGuest.map(item => {
           return {
+            ...item,
             Id: item.IdAccount,
             IdAccount: item.IdAccount
           }
@@ -185,8 +193,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     this.loadingDetail = true;
     try {
       const result = await this.meetingScheduleService.getDetailMeetingSchedule(this.meetingSchedule.Id, this.paramsGetDetail);
-      this.listPersonnelGuest = result.Value;
-      this.listPersonnelGuestClone = cloneDeep(this.listPersonnelGuest);
+      await this.getMeetingPositionType(result.Value);
     } catch (error) {
       console.log(error);
     } finally {
@@ -225,6 +232,18 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   handlerBack(event: Event) {
     event.stopPropagation();
     this.modeAdd = false;
+    let data = {};
+    this.listPersonnelOther.forEach(item => {
+      const positionType = this.meetingPositionType.find(element => element.Id === item.IdAttendanceType);
+      if (!positionType) {
+        return;
+      }
+      data = {
+        ...data,
+        [positionType.Code]: item.IdAccount
+      }
+    });
+    this.personnelJoinForm.setValue(data);
   }
 
   handlerSearchPersonnel(event: string) {
@@ -233,7 +252,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   }
 
   handlerScrollBottomPersonnel(event: any) {
-    if (event.target.scrollTop < (event.target.scrollHeight - event.target.offsetHeight - 30) || this.loadingPersonnel || !this.totalPersonnel || this.totalPersonnel <= this.listPersonnel.length) {
+    if (event.target.scrollTop < (event.target.scrollHeight - event.target.offsetHeight - 3) || this.loadingPersonnel || !this.totalPersonnel || !this.canLoadMorePersonal) {
       return;
     }
     this.paramsGetPersonnel.page += 1;
@@ -255,15 +274,22 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     try {
       this.loadingPersonnel = true;
       const result = await this.personnelService.getListPersonnelFreeTime(this.paramsGetPersonnel);
+      if (!result.Value.length) {
+        this.canLoadMorePersonal = false;
+      }
       this.totalPersonnel = result.Total;
-      this.listPersonnel.push(...result.Value?.map(item => {
+      const guestData = [];
+      result.Value.forEach(item => {
         const id = item.Id;
-        return {
-          ...item,
-          IdAccount: item.Id,
-          Id: this.listPersonnelGuest.find(item => item.IdAccount === id)?.Id || id
+        const itemFound = this.listPersonnelOther?.find(element => element?.IdAccount === id);
+        if (!itemFound) {
+          guestData.push({
+            ...item,
+            IdAccount: id
+          });
         }
-      }));
+      });
+      this.listPersonnel = [...this.listPersonnel, ...guestData];
     } catch (error) {
       console.log(error);
     } finally {
@@ -274,9 +300,11 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   handlerAddGuestToMeetingSchedule(event: boolean, personnel: IPersonnel) {
     if (event) {
       this.listPersonnelGuestClone = [...this.listPersonnelGuestClone, personnel];
+      this.keyFetch = uuid();
       return;
     }
     this.listPersonnelGuestClone = this.listPersonnelGuestClone.filter(item => item.IdAccount !== personnel.IdAccount);
+    this.keyFetch = uuid();
   }
 
   handlerRemovePersonnelJoin(event: Event, personnel: IPersonnel) {

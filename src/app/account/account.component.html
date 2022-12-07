@@ -94,6 +94,30 @@
         </form>
       </div>
     </div>
+    <div class="w-100 bm-bg-ffffff bm-mt-20px bm-p-20px bm-border-radius-4px">
+      <div class="bm-font-head-3s bm-mb-12px">Tài khoản kết nối google calendar</div>
+      <div *ngIf="!tempAccount.IsConnectedGG"
+        class="bm-p-20px d-flex align-items-center justify-content-center">
+        <button nz-button
+          nzType="primary"
+          (click)="handlerConnect()">Kết nối</button>
+      </div>
+      <div *ngIf="tempAccount.IsConnectedGG"
+        class="bm-p-20px d-flex align-items-center justify-content-center">
+        <div class="d-flex flex-column">
+          <div class="d-flex align-items-center">
+            <img [src]="tempAccount.GGAvatarUrl"
+              class="bm-h-40px bm-w-40px account-img">
+            <span class="bm-ml-8px">{{tempAccount.Email}}</span>
+          </div>
+          <button nz-button
+            class="bm-mt-12px"
+            nzDanger
+            nzType="primary"
+            (click)="handlerDeleteConnect()">Xoá kết nối</button>
+        </div>
+      </div>
+    </div>
     <div class="bm-bg-ffffff bm-p-20px bm-border-radius-4px bm-mt-20px">
       <div class="bm-font-head-3s bm-mb-12px">Bảo mật</div>
       <div *ngIf="!modeUpdatePass"

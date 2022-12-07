@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import * as dayjs from 'dayjs';
 import { Subject } from 'rxjs';
@@ -12,24 +12,28 @@ import { PersonnelService } from 'src/app/lib/services/personnel/personnel.servi
   selector: 'bm-meeting-schedule-dynamic_field',
   templateUrl: './dynamic-field.component.html'
 })
-export class BmMeetingScheduleDynamicFieldComponent implements OnInit {
+export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges {
 
   totalPersonnel: number;
   listPersonnel: IPersonnel[];
+  listPersonnelOrigin: IPersonnel[];
   onSearchPersonnel: Subject<string> = new Subject();
   paramsGetPersonnel: IParamsGetListPersonnelFreeTime;
   loadingPersonnel: boolean;
   firstCallPersonnel: boolean;
+  canLoadMore: boolean;
 
   @Input() meetingSchedule: IMeetingSchedule;
   @Input() item: IDataItemGetByTypeDictionary;
   @Input() formGroup: FormGroup;
   @Input() ignoreMargin: boolean;
+  @Input() ignorePersonal: IPersonnel[];
+  @Input() keyFetch: string;
 
   constructor(
     private personnelService: PersonnelService
   ) {
-
+    this.canLoadMore = true;
     this.listPersonnel = [];
     this.paramsGetPersonnel = {
       page: 1,
@@ -40,6 +44,12 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit {
     }
     this.loadingPersonnel = true;
     this.firstCallPersonnel = true;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.keyFetch || changes.ignorePersonal) {
+      this.updateListPersonnel(this.listPersonnelOrigin);
+    }
   }
 
   ngOnInit(): void {
@@ -59,18 +69,17 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit {
     }
   }
 
-
   handlerSearchPersonnel(event: string) {
     this.paramsGetPersonnel.page = 1;
     this.onSearchPersonnel.next(event);
   }
 
-  handlerScrollPersonnel(event: any) {
-    if (event.target.scrollTop < (event.target.scrollHeight - event.target.offsetHeight - 30) || this.loadingPersonnel || !this.totalPersonnel || this.totalPersonnel <= this.listPersonnel.length) {
+  handlerScrollBottomPersonnel() {
+    if (this.loadingPersonnel || !this.totalPersonnel || !this.canLoadMore) {
       return;
     }
     this.paramsGetPersonnel.page += 1;
-    this.getListPersonnel();
+    this.getListPersonnel(true);
   }
 
   searchPersonnel(value: string) {
@@ -80,7 +89,7 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit {
     this.getListPersonnel();
   }
 
-  async getListPersonnel() {
+  async getListPersonnel(isLoadMore: boolean = false) {
     if (this.loadingPersonnel && !this.firstCallPersonnel) {
       return;
     }
@@ -89,12 +98,24 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit {
       this.loadingPersonnel = true;
       const result = await this.personnelService.getListPersonnelFreeTime(this.paramsGetPersonnel);
       this.totalPersonnel = result.Total;
-      this.listPersonnel = result.Value;
+      if (!result.Value.length || result.Value.length < this.paramsGetPersonnel.pageSize) {
+        this.canLoadMore = false;
+      }
+      this.listPersonnelOrigin = [...result.Value];
+      this.updateListPersonnel(result.Value, isLoadMore);
     } catch (error) {
       console.log(error);
     } finally {
       this.loadingPersonnel = false;
     }
+  }
+
+  updateListPersonnel(data: IPersonnel[] = [], isLoadMore: boolean = false) {
+    if (isLoadMore) {
+      this.listPersonnel = [...this.listPersonnel.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element.IdAccount === item.Id))), ...data.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element.IdAccount === item.Id)))];
+      return;
+    }
+    this.listPersonnel = [...data.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element.IdAccount === item.Id)))];
   }
 
   handlerKeyUp(event) {
@@ -107,13 +128,5 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit {
       return;
     }
     this.onSearchPersonnel.next(event.target.value);
-  }
-
-  handlerScrollBottomPersonnel() {
-    if (this.loadingPersonnel || !this.totalPersonnel || this.totalPersonnel <= this.listPersonnel.length) {
-      return;
-    }
-    this.paramsGetPersonnel.page += 1;
-    this.getListPersonnel();
   }
 }

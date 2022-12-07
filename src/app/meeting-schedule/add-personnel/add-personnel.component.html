@@ -87,7 +87,9 @@
           <bm-meeting-schedule-dynamic_field [formGroup]="personnelJoinForm"
             [ignoreMargin]="true"
             [meetingSchedule]="meetingSchedule"
-            [item]="item">
+            [item]="item"
+            [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuestClone:listPersonnelOther:keyFetch"
+            [keyFetch]="keyFetch">
           </bm-meeting-schedule-dynamic_field>
         </ng-container>
       </div>
@@ -183,7 +185,7 @@
             </div>
           </div>
           <div class="h-100 w-50 d-flex flex-column">
-            <div class="bm-mb-4px bm-font-head-5">Danh sách nhân viên tham gia</div>
+            <div class="bm-mb-4px bm-font-head-5">Danh sách khách mời</div>
             <div class="w-100 h-100 position-relative">
               <div class="h-100 w-100 bm-border-general d-flex flex-column">
                 <div class="bm-p-12px bm-border-bottom-general">

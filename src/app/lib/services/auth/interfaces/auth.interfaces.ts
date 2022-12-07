@@ -6,24 +6,26 @@ export interface IPassWord {
 }
 
 export interface IToken {
-  Domain: string;
-  Username: string;
-  FullName: string;
-  Address: string;
-  AvatarUrl: string;
-  Email: string;
-  Gender: number;
-  Dob: string;
-  JwtToken: string;
-  RefreshToken: string;
-  CreateDate: string;
-  UpdateDate: string;
-  Active: boolean;
-  Phone: string;
-  Id: string;
-  PositionName: string;
-  DepartmentName: string;
-  Roles: IRole[];
+  Domain?: string;
+  Username?: string;
+  FullName?: string;
+  Address?: string;
+  AvatarUrl?: string;
+  Email?: string;
+  Gender?: number;
+  Dob?: string;
+  JwtToken?: string;
+  RefreshToken?: string;
+  CreateDate?: string;
+  UpdateDate?: string;
+  Active?: boolean;
+  Phone?: string;
+  Id?: string;
+  PositionName?: string;
+  DepartmentName?: string;
+  Roles?: IRole[];
+  IsConnectedGG?: boolean;
+  GGAvatarUrl?: string;
 }
 
 export interface IBodyLogin {
@@ -47,4 +49,9 @@ export interface IBodyChangeInfo {
   Email: string;
   FullName: string;
   Phone: string;
+}
+
+export interface IParamsConnectGoogle {
+  idUser?: string;
+  callbackUri?: string;
 }

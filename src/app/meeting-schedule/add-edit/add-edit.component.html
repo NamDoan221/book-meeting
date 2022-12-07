@@ -223,6 +223,20 @@
           </nz-input-group>
         </nz-form-control>
       </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'IsSyncGGCalendar'">
+            Đồng bộ lịch lên google calendar
+          </nz-form-label>
+          <nz-input-group>
+            <nz-switch formControlName="IsSyncGGCalendar"></nz-switch>
+            <span *ngIf="!isConnectGoogle"
+              class="bm-ml-8px">Bạn chưa kết nối với tài khoản google. <span class="bm-color-009cdb bm-cursor-pointer"
+                (click)="handlerConnect($event)">Kết nối ngay tại đây.</span></span>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
     </div>
     <div class="d-flex justify-content-end bm-mt-20px">
       <button nz-button

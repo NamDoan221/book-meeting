@@ -6,7 +6,7 @@ import { IToken } from '../lib/services/auth/interfaces/auth.interfaces';
 import { CacheService } from '../lib/services/cache.service';
 import { FunctionService } from '../lib/services/function/function.service';
 import { IFunction } from '../lib/services/function/interfaces/function.interface';
-import { IRole } from '../lib/services/role/interfaces/role.interface';
+import { GlobalEventService } from '../lib/services/global-event.service';
 import { menuDefault } from './defines/layout.define';
 
 @Component({
@@ -25,7 +25,7 @@ export class BmLayoutComponent implements OnInit {
     private auth: AuthService,
     private cacheService: CacheService,
     private functionService: FunctionService,
-    private nzMessageService: NzMessageService,
+    private globalEventService: GlobalEventService,
     private zone: NgZone
   ) {
     this.isCollapsed = false;
@@ -33,6 +33,7 @@ export class BmLayoutComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.globalEventService.UrlReplaceBehaviorSubject.subscribe(url => this.currentPath = url);
     this.accountFromCache = this.auth.decodeToken();
     this.buildMenu();
     this.currentPath = this.router.url;

@@ -76,8 +76,8 @@ export class BmLoginComponent implements OnInit {
     }
     this.loadingGoogle = true;
     try {
-      const result = await this.auth.loginGoogle();
-      console.log(result);
+      // const result = await this.auth.loginGoogle();
+      // console.log(result);
 
       // this.nzMessageService.success('Đăng nhập thành công!');
       // this.router.navigate(['/chat']);

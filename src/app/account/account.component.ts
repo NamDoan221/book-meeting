@@ -1,9 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute, Params, Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzUploadFile } from 'ng-zorro-antd/upload';
 import { AuthService } from '../lib/services/auth/auth.service';
-
+import { IParamsConnectGoogle, IToken } from '../lib/services/auth/interfaces/auth.interfaces';
+import jwt_decode from "jwt-decode";
 @Component({
   selector: 'bm-account',
   templateUrl: './account.component.html',
@@ -15,7 +17,7 @@ export class BmAccountComponent implements OnInit {
   passwordForm: FormGroup;
   loading: boolean;
   loadingChangePass: boolean;
-  tempAccount: any;
+  tempAccount: IToken;
   currentPasswordVisible: boolean;
   newPasswordVisible: boolean;
   reNewPasswordVisible: boolean;
@@ -27,15 +29,17 @@ export class BmAccountComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private nzMessageService: NzMessageService
+    private nzMessageService: NzMessageService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
   ) {
     this.modeUpdatePass = false;
     this.currentPasswordVisible = false;
     this.newPasswordVisible = false;
     this.reNewPasswordVisible = false;
     this.tempAccount = {
-      avatar: '',
-      name: ''
+      AvatarUrl: '',
+      FullName: ''
     }
     this.passwordForm = this.fb.group({
       oldPassword: ['', [Validators.required]],
@@ -52,6 +56,19 @@ export class BmAccountComponent implements OnInit {
       Phone: [{ value: accountFromCache.Phone || '', disabled: true }, [Validators.required, Validators.pattern('^(0|84)([0-9]{9})$')]] //^(0|(\+?84))([0-9]{9})$
     });
     this.tempAccount = { ...accountFromCache };
+    this.activatedRoute.queryParams.subscribe((res: Params) => {
+      if (res['success']) {
+        const dataGoogle = jwt_decode(res['success']);
+        this.tempAccount.Email = dataGoogle['Email'];
+        this.tempAccount.GGAvatarUrl = dataGoogle['GGAvatarUrl'];
+        this.tempAccount.IsConnectedGG = true;
+        this.authService.setToken(JSON.stringify(this.tempAccount));
+        this.nzMessageService.success('Kết nối thành công');
+      }
+      if (res['error']) {
+        this.nzMessageService.error('Kết nối thất bại');
+      }
+    });
   }
 
   confirmationValidator = (control: FormControl): { [s: string]: boolean } => {
@@ -141,7 +158,6 @@ export class BmAccountComponent implements OnInit {
 
   handlerCancel() {
     this.accountForm.setValue({
-      Username: this.tempAccount.Username ?? '',
       Email: this.tempAccount.Email ?? '',
       FullName: this.tempAccount.FullName ?? '',
       Phone: this.tempAccount.Phone ?? ''
@@ -183,4 +199,20 @@ export class BmAccountComponent implements OnInit {
     this.modeUpdatePass = false;
   }
 
+  async handlerConnect() {
+    const params: IParamsConnectGoogle = {
+      idUser: this.tempAccount.Id,
+      callbackUri: `${window.origin}${this.router.url}`
+    }
+    try {
+      const result = await this.authService.connectGoogle(params);
+      window.open(result, '_blank');
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  handlerDeleteConnect() {
+    console.log('handlerDeleteConnect');
+  }
 }

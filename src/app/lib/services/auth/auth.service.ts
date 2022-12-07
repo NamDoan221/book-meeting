@@ -1,12 +1,11 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot } from '@angular/router';
 import jwt_decode from "jwt-decode";
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { DOMAIN_SITE } from '../../defines/base-url.define';
 import { ConstantDefines } from '../../defines/constant.define';
 import { BaseService } from '../base.service';
-import { IBodyChangeInfo, IBodyLogin, IBodyRegisterAccount, IPassWord, IToken } from './interfaces/auth.interfaces';
+import { IBodyChangeInfo, IBodyLogin, IBodyRegisterAccount, IParamsConnectGoogle, IPassWord, IToken } from './interfaces/auth.interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -62,9 +61,9 @@ export class AuthService extends BaseService {
     });
   }
 
-  public loginGoogle(): Promise<any> {
+  public connectGoogle(params: IParamsConnectGoogle): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.get(`${this.domain}/Auth/google-callback`).subscribe({
+      this.post(`${this.domain}/Auth/authenticate-gg`, undefined, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
           return resolve(result);
         },

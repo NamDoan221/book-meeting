@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { differenceInCalendarDays } from 'date-fns';
 import * as dayjs from 'dayjs';
 import { DisabledTimeFn } from 'ng-zorro-antd/date-picker';
@@ -11,6 +12,7 @@ import { DepartmentService } from 'src/app/lib/services/department/department.se
 import { IDepartment, IParamsGetListDepartment } from 'src/app/lib/services/department/interfaces/department.interface';
 import { DictionaryService } from 'src/app/lib/services/dictionary/dictionary.service';
 import { IDataItemGetByTypeDictionary } from 'src/app/lib/services/dictionary/interfaces/dictionary.interface';
+import { GlobalEventService } from 'src/app/lib/services/global-event.service';
 import { IMeetingRoom, IParamsGetListMeetingRoomFreeTime } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
 import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
 import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
@@ -26,6 +28,7 @@ import { PositionService } from 'src/app/lib/services/position/position.service'
 })
 export class BmMeetingScheduleAddEditComponent implements OnInit {
 
+  isConnectGoogle: boolean;
   meetingScheduleForm: FormGroup;
   loading: boolean;
   guestType: IDataItemGetByTypeDictionary;
@@ -109,6 +112,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   @Input() disable: boolean;
 
   @Output() saveSuccess = new EventEmitter<IMeetingSchedule>();
+  @Output() close = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -119,7 +123,9 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     private departmentService: DepartmentService,
     private positionService: PositionService,
     private personnelService: PersonnelService,
-    private dictionaryService: DictionaryService
+    private dictionaryService: DictionaryService,
+    private router: Router,
+    private globalEventService: GlobalEventService
   ) {
     this.loading = false;
     this.listMeetingRoom = [];
@@ -192,13 +198,15 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   }
 
   initData() {
+    this.isConnectGoogle = this.authService.decodeToken().IsConnectedGG;
     this.meetingScheduleForm = this.fb.group({
       Title: [this.meetingSchedule?.Title || '', [Validators.required]],
       Code: [this.meetingSchedule?.Code || '', [Validators.required, Validators.pattern('^([0-9A-Z])+(\_?([0-9A-Z]))+$')]],
       RangeTime: [this.meetingSchedule?.EstStartTime && this.meetingSchedule?.EstEndTime ? [new Date(this.meetingSchedule?.EstStartTime), new Date(this.meetingSchedule?.EstEndTime)] : [], [Validators.required]],
       EstDuration: [this.meetingSchedule?.EstDuration ? this.meetingSchedule?.EstDuration : '', [Validators.required]],
       IdRoom: [this.meetingSchedule?.IdRoom || '', [Validators.required]],
-      Content: [this.meetingSchedule?.Content || '']
+      Content: [this.meetingSchedule?.Content || ''],
+      IsSyncGGCalendar: [{ value: this.meetingSchedule?.IsSyncGGCalendar || false, disabled: this.isConnectGoogle ? false : true }]
     });
     if (this.meetingSchedule?.EstStartTime) {
       this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).format('YYYY-MM-DDTHH:mm:ss')
@@ -208,6 +216,13 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss')
       this.paramsGetPersonnel.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss')
     }
+  }
+
+  handlerConnect(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/account']);
+    this.globalEventService.UrlReplaceBehaviorSubject.next('/account');
+    this.close.emit();
   }
 
   rangeTimeChange(result: Date[]) {
@@ -330,7 +345,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
         const positionName = this.authService.decodeToken().PositionName;
         const departmentName = this.authService.decodeToken().DepartmentName;
         const roomName = this.listMeetingRoom.find(item => item.Id === body.IdRoom)?.Name;
-        this.saveSuccess.emit({ ...body, Id: result.result.Id ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định" });
+        this.saveSuccess.emit({ ...body, Id: result.result.Id ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định", StatusCode: this.meetingSchedule?.StatusCode || "MS_DEFAULT" });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
