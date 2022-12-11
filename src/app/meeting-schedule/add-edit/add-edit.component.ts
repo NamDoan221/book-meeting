@@ -15,12 +15,14 @@ import { IDataItemGetByTypeDictionary } from 'src/app/lib/services/dictionary/in
 import { GlobalEventService } from 'src/app/lib/services/global-event.service';
 import { IMeetingRoom, IParamsGetListMeetingRoomFreeTime } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
 import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
-import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
-import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
+import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
+import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meeting-schedule.service';
 import { IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
 import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
 import { PositionService } from 'src/app/lib/services/position/position.service';
+import * as uuid from 'uuid';
+import { cloneDeep } from 'lodash';
 
 @Component({
   selector: 'bm-meeting-schedule-add_edit',
@@ -67,6 +69,9 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   firstCallPosition: boolean;
 
   meetingPositionType: IDataItemGetByTypeDictionary[];
+  keyFetch: string;
+  listPersonnelOther: IPersonnel[];
+  listPersonnelClone: IPersonnel[];
 
   range(start: number, end: number): number[] {
     const result: number[] = [];
@@ -173,7 +178,9 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       page: 1,
       pageSize: 20,
       search: ''
-    }
+    };
+    this.keyFetch = uuid();
+    this.listPersonnelOther = [];
   }
 
   ngOnInit(): void {
@@ -345,18 +352,17 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
         const positionName = this.authService.decodeToken().PositionName;
         const departmentName = this.authService.decodeToken().DepartmentName;
         const roomName = this.listMeetingRoom.find(item => item.Id === body.IdRoom)?.Name;
-        this.saveSuccess.emit({ ...body, Id: result.result.Id ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định", StatusCode: this.meetingSchedule?.StatusCode || "MS_DEFAULT" });
+        this.saveSuccess.emit({ ...body, Id: result.result.Id ?? this.meetingSchedule?.Id, CreatorName: creatorName, RoomName: roomName, PositionName: positionName, DepartmentName: departmentName, StatusName: this.meetingSchedule?.StatusName || "Mặc định", StatusCode: this.meetingSchedule?.StatusCode || "MS_DEFAULT", CreatorAvatar: this.meetingSchedule?.CreatorAvatar || this.authService.decodeToken().AvatarUrl });
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
       this.nzMessageService.error(result.message || 'Thao tác không thành công.');
     } catch (error) {
+      console.log(error);
       this.nzMessageService.error('Thao tác không thành công.');
     } finally {
       this.loading = false;
     }
-
-    this.saveSuccess.emit(this.meetingScheduleForm.value);
   }
 
   searchDepartment(value: string) {
@@ -484,6 +490,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
           Id: this.listPersonnelGuest.find(item => item.IdAccount === id)?.Id || id
         }
       }));
+      this.listPersonnelClone = cloneDeep(this.listPersonnel);
     } catch (error) {
       console.log(error);
     } finally {
@@ -544,5 +551,11 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       return;
     }
     this.listPersonnelGuest = this.listPersonnelGuest.filter(item => item.IdAccount !== personnel.IdAccount);
+  }
+
+  handlerSelectedChange(event: string, item: IDataItemGetByTypeDictionary) {
+    this.listPersonnelOther = this.listPersonnelOther.filter(person => person.IdAttendanceType !== item.Id);
+    this.listPersonnelOther.push({ IdAccount: event, IdAttendanceType: item.Id, });
+    this.listPersonnel = [...this.listPersonnelClone].filter(item => !this.listPersonnelOther.find(element => element.IdAccount === item.IdAccount));
   }
 }

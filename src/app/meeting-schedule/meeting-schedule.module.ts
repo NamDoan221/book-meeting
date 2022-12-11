@@ -30,6 +30,8 @@ import { BmMeetingScheduleDynamicFieldComponent } from './dynamic-field/dynamic-
 import { CheckCanAttendanceMeetingSchedulePipeModule } from './pipes/check-can-attendance.pipe';
 import { GetIgnorePersonnelPipeModule } from './pipes/get-ignore-personnel.pipe';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { CheckPersonnelGuestMeetingSchedulePipeModule } from './pipes/check-personel-guest.pipe';
+import { BmLibDropDownModule } from '../lib/dropdown/dropdown.module';
 
 export const routes: Routes = [
   {
@@ -66,7 +68,9 @@ export const routes: Routes = [
     NzSegmentedModule,
     NzCheckboxModule,
     CheckCanAttendanceMeetingSchedulePipeModule,
-    GetIgnorePersonnelPipeModule
+    GetIgnorePersonnelPipeModule,
+    CheckPersonnelGuestMeetingSchedulePipeModule,
+    BmLibDropDownModule
   ],
   declarations: [
     BmMeetingScheduleComponent,

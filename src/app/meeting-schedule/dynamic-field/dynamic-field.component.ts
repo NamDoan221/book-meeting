@@ -1,10 +1,10 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import * as dayjs from 'dayjs';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { IDataItemGetByTypeDictionary } from 'src/app/lib/services/dictionary/interfaces/dictionary.interface';
-import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
+import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
 import { IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
 
@@ -30,6 +30,8 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
   @Input() ignorePersonal: IPersonnel[];
   @Input() keyFetch: string;
 
+  @Output() selectedChange = new EventEmitter<string>();
+
   constructor(
     private personnelService: PersonnelService
   ) {
@@ -44,6 +46,7 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
     }
     this.loadingPersonnel = true;
     this.firstCallPersonnel = true;
+    this.listPersonnelOrigin = [];
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -101,7 +104,7 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
       if (!result.Value.length || result.Value.length < this.paramsGetPersonnel.pageSize) {
         this.canLoadMore = false;
       }
-      this.listPersonnelOrigin = [...result.Value];
+      this.listPersonnelOrigin = [...this.listPersonnelOrigin, ...result.Value];
       this.updateListPersonnel(result.Value, isLoadMore);
     } catch (error) {
       console.log(error);
@@ -112,10 +115,10 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
 
   updateListPersonnel(data: IPersonnel[] = [], isLoadMore: boolean = false) {
     if (isLoadMore) {
-      this.listPersonnel = [...this.listPersonnel.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element.IdAccount === item.Id))), ...data.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element.IdAccount === item.Id)))];
+      this.listPersonnel = [...this.listPersonnel.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element?.IdAccount === item.Id))), ...data.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element?.IdAccount === item.Id)))];
       return;
     }
-    this.listPersonnel = [...data.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element.IdAccount === item.Id)))];
+    this.listPersonnel = [...data.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element?.IdAccount === item.Id)))];
   }
 
   handlerKeyUp(event) {
@@ -128,5 +131,9 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
       return;
     }
     this.onSearchPersonnel.next(event.target.value);
+  }
+
+  handlerChangeSelected(event: string) {
+    this.selectedChange.emit(event);
   }
 }

@@ -1,0 +1,26 @@
+<div [formGroup]="formGroup">
+  <nz-form-item class="bm-mb-0">
+    <nz-form-control [nzErrorTip]="'Phòng họp không thể để trống!'">
+      <nz-select [nzShowSearch]="true"
+        [nzServerSearch]="true"
+        [formControlName]="formControlName"
+        [nzPlaceHolder]="'Chọn phòng họp'"
+        [nzNotFoundContent]="notFoundContentTemplate"
+        (nzOnSearch)="handlerSearchMeetingRoom($event)"
+        (nzScrollToBottom)="handlerScrollBottomMeetingRoom()"
+        (ngModelChange)="handlerChangeSelected($event)">
+        <nz-option *ngFor="let item of listMeetingRoom"
+          [nzValue]="item.Id"
+          [nzLabel]="item.Name">
+        </nz-option>
+      </nz-select>
+      <ng-template #notFoundContentTemplate>
+        <div class="d-flex align-items-center justify-content-center">
+          <span *ngIf="!loadingMeetingRoom">{{paramsGetMeetingRoom.search ? 'Không có kết quả' : 'Chưa có phòng họp nào trong danh sách'}}</span>
+          <nz-spin *ngIf="loadingMeetingRoom"
+            nzSimple></nz-spin>
+        </div>
+      </ng-template>
+    </nz-form-control>
+  </nz-form-item>
+</div>

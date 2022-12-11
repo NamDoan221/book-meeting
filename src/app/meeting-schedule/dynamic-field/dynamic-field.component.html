@@ -12,7 +12,8 @@
         [nzPlaceHolder]="'Chọn nhân viên'"
         [nzNotFoundContent]="notFoundContentTemplate"
         (nzOnSearch)="handlerSearchPersonnel($event)"
-        (nzScrollToBottom)="handlerScrollBottomPersonnel()">
+        (nzScrollToBottom)="handlerScrollBottomPersonnel()"
+        (ngModelChange)="handlerChangeSelected($event)">
         <nz-option *ngFor="let item of listPersonnel"
           [nzValue]="item.Id"
           [nzLabel]="item.FullName + ' (' + item.PositionName + ' - ' + item.DepartmentName + ')'">

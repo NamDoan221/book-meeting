@@ -1,27 +1,27 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as dayjs from 'dayjs';
 import { NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { Subject } from 'rxjs';
+import { interval, Subject, Subscription } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { AuthService } from '../lib/services/auth/auth.service';
 import { DepartmentService } from '../lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from '../lib/services/department/interfaces/department.interface';
-import { IMeetingSchedule, IParamsGetListMeetingSchedule } from '../lib/services/meeting-schedule/interfaces/metting-schedule.interface';
-import { MeetingScheduleService } from '../lib/services/meeting-schedule/meting-schedule.service';
+import { IMeetingSchedule, IParamsGetListMeetingSchedule } from '../lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
+import { MeetingScheduleService } from '../lib/services/meeting-schedule/meeting-schedule.service';
 import { IParamsGetListPersonnel, IPersonnel } from '../lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from '../lib/services/personnel/personnel.service';
 import { BmMeetingScheduleAddEditComponent } from './add-edit/add-edit.component';
 import { BmMeetingScheduleAddPersonnelComponent } from './add-personnel/add-personnel.component';
 import { BmMeetingScheduleAttendanceComponent } from './attendance/attendance.component';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'bm-meeting-schedule',
   templateUrl: './meeting-schedule.component.html',
   styleUrls: ['./meeting-schedule.component.scss']
 })
-export class BmMeetingScheduleComponent implements OnInit {
+export class BmMeetingScheduleComponent implements OnInit, OnDestroy {
 
   columnConfig: string[];
   isOpenDrawAddEdit: boolean;
@@ -57,6 +57,9 @@ export class BmMeetingScheduleComponent implements OnInit {
 
   dataView: { key: string, label: string }[];
   dataViewSelected: string;
+
+  keyFetch: string;
+  intervalSub: Subscription;
 
   constructor(
     private drawerService: NzDrawerService,
@@ -131,6 +134,8 @@ export class BmMeetingScheduleComponent implements OnInit {
     }];
     this.dataViewSelected = 'all';
     this.functionCallListMeetingSchedule = 'getListMeetingSchedule';
+    this.keyFetch = '';
+    this.intervalSub = interval(300000).subscribe(() => this.keyFetch = uuid());
   }
 
   ngOnInit(): void {
@@ -429,8 +434,7 @@ export class BmMeetingScheduleComponent implements OnInit {
       nzTitle: `Chi tiết lịch họp`,
       nzContent: BmMeetingScheduleAddPersonnelComponent,
       nzContentParams: {
-        meetingSchedule: schedule,
-        modeEdit: schedule ? true : false
+        meetingSchedule: schedule
       }
     });
 
@@ -451,6 +455,10 @@ export class BmMeetingScheduleComponent implements OnInit {
         setTimeout(() => {
           this.handlerAttendance({ stopPropagation: () => { } } as Event, data);
         }, 300);
+      });
+      this.drawerRefGlobal.getContentComponent().close.subscribe(() => {
+        this.isOpenDrawAddPersonnel = false;
+        this.drawerRefGlobal.close();
       });
     });
 
@@ -496,5 +504,9 @@ export class BmMeetingScheduleComponent implements OnInit {
       this.isOpenDrawAttendance = false;
       this.drawerRefGlobal.close();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.intervalSub.unsubscribe();
   }
 }

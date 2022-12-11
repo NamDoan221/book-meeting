@@ -4,9 +4,9 @@ import * as dayjs from 'dayjs';
 
 @Pipe({ name: 'CheckCanAttendanceMeetingSchedulePipe' })
 export class CheckCanAttendanceMeetingSchedulePipe implements PipeTransform {
-  transform(timeStart: string, duration: number) {
+  transform(timeStart: string, duration: number, keyFetch: string) {
     const compareTimeWithNow = dayjs(timeStart).diff(dayjs(), 'minute', false);
-    if (compareTimeWithNow > 0) {
+    if (compareTimeWithNow >= 0) {
       return true;
     }
     if (compareTimeWithNow < 0) {

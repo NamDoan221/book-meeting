@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, ElementRef, Inject, OnDestroy, PLATFORM_ID, ViewChild } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { MeetingScheduleService } from '../lib/services/meeting-schedule/meting-schedule.service';
+import { MeetingScheduleService } from '../lib/services/meeting-schedule/meeting-schedule.service';
 import * as uuid from 'uuid';
 declare var faceapi: any;
 

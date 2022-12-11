@@ -6,7 +6,7 @@ import { IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.
 @Pipe({ name: 'GetIgnorePersonnelPipe' })
 export class GetIgnorePersonnelPipe implements PipeTransform {
   transform(item: IDataItemGetByTypeDictionary, dataGuest: IPersonnel[] = [], dataOther: IPersonnel[] = [], keyFetch: string) {
-    const dataOtherNew = dataOther?.filter(element => element.IdAttendanceType !== item.Id);
+    const dataOtherNew = dataOther?.filter(element => element?.IdAttendanceType !== item.Id);
     return [...dataGuest, ...dataOtherNew];
   }
 }

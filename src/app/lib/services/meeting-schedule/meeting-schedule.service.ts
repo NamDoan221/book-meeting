@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../base.service';
-import { IBodyAddPersonnelToMeetingSchedule, IMeetingSchedule, IMeetingScheduleJoin, IParamsGetListMeetingSchedule } from './interfaces/metting-schedule.interface';
+import { IBodyAddPersonnelToMeetingSchedule, IMeetingSchedule, IMeetingScheduleJoin, IParamsGetListMeetingSchedule } from './interfaces/meeting-schedule.interface';
 
 @Injectable({
   providedIn: 'root',

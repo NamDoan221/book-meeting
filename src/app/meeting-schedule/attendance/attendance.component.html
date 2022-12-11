@@ -12,11 +12,15 @@
       </div>
       <div class="d-flex">
         <button nzType="primary"
-          nz-button>Điểm danh</button>
+          *ngIf="!modeAttendance"
+          nz-button>Bắt đầu</button>
+        <button *ngIf="modeAttendance"
+          nz-button
+          (click)="handlerBack($event)">Lưu</button>
         <button class="bm-ml-12px"
           *ngIf="modeAttendance"
           nz-button
-          (click)="handlerBack($event)">Quay lại</button>
+          (click)="handlerBack($event)">Huỷ bỏ</button>
       </div>
     </div>
     <div class="bm-mt-12px">

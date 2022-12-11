@@ -64,9 +64,11 @@ export class BmAccountComponent implements OnInit {
         this.tempAccount.IsConnectedGG = true;
         this.authService.setToken(JSON.stringify(this.tempAccount));
         this.nzMessageService.success('Kết nối thành công');
+        this.router.navigate['/account'];
       }
       if (res['error']) {
         this.nzMessageService.error('Kết nối thất bại');
+        this.router.navigate['/account'];
       }
     });
   }

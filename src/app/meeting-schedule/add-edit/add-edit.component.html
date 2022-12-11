@@ -109,7 +109,10 @@
       <ng-container *ngFor="let item of meetingPositionType">
         <bm-meeting-schedule-dynamic_field [formGroup]="meetingScheduleForm"
           [meetingSchedule]="meetingSchedule"
-          [item]="item">
+          [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuest:listPersonnelOther:keyFetch"
+          [item]="item"
+          [keyFetch]="keyFetch"
+          (selectedChange)="handlerSelectedChange($event, item)">
         </bm-meeting-schedule-dynamic_field>
       </ng-container>
       <nz-form-item class="bm-mt-16px bm-mb-0"

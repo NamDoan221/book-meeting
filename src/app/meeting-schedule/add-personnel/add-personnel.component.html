@@ -6,11 +6,28 @@
           class="bm-w-40px bm-h-40px bm-border-radius-50em"
           (error)="handlerErrorImage($event)" />
         <div class="bm-ml-8px">
-          <div class="d-flex align-items-center bm-font-head-4s bm-mb-4px">{{meetingSchedule.Title}}
-            <ng-container *ngIf="meetingSchedule.EstStartTime | CheckStatusMeetingSchedulePipe:meetingSchedule.EstEndTime:meetingSchedule.EstDuration:true as tagStatus">
+          <div class="d-flex align-items-center bm-font-head-4s bm-mb-4px">
+            <div>
+              <span *ngIf="!modeAdd">{{meetingSchedule.Title}}</span>
+              <div *ngIf="modeAdd"
+                [formGroup]="meetingScheduleForm">
+                <nz-form-item class="bm-mb-0">
+                  <nz-form-control nzErrorTip="Tên cuộc họp không thể để trống!">
+                    <nz-input-group>
+                      <input type="text"
+                        nz-input
+                        class="bm-border-radius-4px"
+                        formControlName="Title"
+                        placeholder="Nhập tên cuộc họp">
+                    </nz-input-group>
+                  </nz-form-control>
+                </nz-form-item>
+              </div>
+            </div>
+            <ng-container *ngIf="meetingSchedule.EstStartTime | CheckStatusMeetingSchedulePipe:meetingSchedule.EstEndTime:meetingSchedule.EstDuration:keyFetchStatus:true as tagStatus">
               <span nz-tooltip
                 [nzTooltipTitle]="contentTemplate"
-                [nzTooltipTitleContext]="{ $implicit: meetingSchedule.EstStartTime | CheckStatusMeetingSchedulePipe:meetingSchedule.EstEndTime:meetingSchedule.EstDuration }">
+                [nzTooltipTitleContext]="{ $implicit: meetingSchedule.EstStartTime | CheckStatusMeetingSchedulePipe:meetingSchedule.EstEndTime:meetingSchedule.EstDuration:keyFetchStatus }">
                 <nz-tag class="bm-ml-8px"
                   [nzColor]="tagStatus === 1 ? 'warning' : tagStatus === 2 ? 'processing' : 'success'">{{tagStatus === 1 ? 'Sắp diễn ra' : tagStatus === 2 ? 'Đang diễn ra' : 'Đã kết thúc'}}</nz-tag>
               </span>
@@ -21,26 +38,42 @@
       </div>
       <div class="d-flex">
         <button nzType="primary"
-          *ngIf="(meetingSchedule.EstStartTime | CheckCanAttendanceMeetingSchedulePipe:meetingSchedule.EstDuration) && !modeAdd"
+          *ngIf="(meetingSchedule.EstStartTime | CheckCanAttendanceMeetingSchedulePipe:meetingSchedule.EstDuration:keyFetchStatus) && !modeAdd"
           nz-button
           (click)="handlerAttendance($event)">Điểm danh</button>
         <button nzType="primary"
           *ngIf="modeAdd"
           nz-button
+          [disable]="loading"
+          [isPending]="loading"
           (click)="handlerSaveScheduleMeetingGuest($event)">Lưu</button>
         <button class="bm-ml-12px"
           *ngIf="!disableChangePersonnelJoin && !modeAdd"
           nz-button
-          (click)="handlerChangeModeAdd($event)">Sửa danh sách người tham gia</button>
+          (click)="handlerChangeModeAdd($event)">Sửa</button>
         <button class="bm-ml-12px"
           *ngIf="modeAdd"
           nz-button
+          [disable]="loading"
           (click)="handlerBack($event)">Quay lại</button>
       </div>
     </div>
     <div class="bm-mt-12px">
       <div class="bm-font-head-5">
-        {{meetingSchedule.Content}}
+        <div *ngIf="modeAdd"
+          [formGroup]="meetingScheduleForm">
+          <nz-form-item class="bm-mb-0">
+            <nz-form-control>
+              <nz-input-group>
+                <textarea nz-input
+                  formControlName="Content"
+                  placeholder="Nhập mô tả"
+                  [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
+              </nz-input-group>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+        <span *ngIf="!modeAdd">{{meetingSchedule.Content}}</span>
       </div>
       <div class="bm-mt-12px bm-pt-12px d-flex align-items-center bm-border-top-general">
         <div class="bm-mr-24px">
@@ -54,7 +87,7 @@
           </span>
           <span class="bm-font-head-5s">{{meetingSchedule.CreatorName}} ({{meetingSchedule.PositionName}})</span>
         </div>
-        <div class="bm-mr-24px">
+        <div class="bm-mr-24px d-flex align-items-center">
           <span nz-tooltip
             [nzTooltipTitle]="contentTemplate"
             [nzTooltipTitleContext]="{ $implicit: 'Địa điểm' }">
@@ -63,7 +96,15 @@
               nzType="environment"
               nzTheme="outline"></span>
           </span>
-          <span class="bm-font-head-5s">{{meetingSchedule.RoomName}}</span>
+          <span *ngIf="!modeAdd"
+            class="bm-font-head-5s">{{meetingSchedule.RoomName}}</span>
+          <bm-lib-dropdown *ngIf="modeAdd"
+            class="bm-w-200px"
+            [formGroup]="meetingScheduleForm"
+            [meetingSchedule]="meetingSchedule"
+            [formControlName]="'IdRoom'"
+            (selectedChange)="handlerRoomChange($event)">
+          </bm-lib-dropdown>
         </div>
         <div>
           <span nz-tooltip
@@ -77,10 +118,28 @@
           <span class="bm-font-head-5s">{{meetingSchedule.DepartmentName}}</span>
         </div>
       </div>
+      <div class="bm-mt-12px bm-pt-12px d-flex align-items-center bm-border-top-general"
+        [formGroup]="meetingScheduleForm">
+        <nz-form-item class="bm-mb-0">
+          <nz-form-control>
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'IsSyncGGCalendar'">
+              Đồng bộ lịch lên google calendar
+            </nz-form-label>
+            <nz-input-group>
+              <nz-switch formControlName="IsSyncGGCalendar"
+                [nzDisabled]="!isConnectGoogle || !modeAdd"></nz-switch>
+              <span *ngIf="!isConnectGoogle"
+                class="bm-ml-8px">Bạn chưa kết nối với tài khoản google. <span class="bm-color-009cdb bm-cursor-pointer"
+                  (click)="handlerConnect($event)">Kết nối ngay tại đây.</span></span>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
     </div>
   </div>
-  <div class="h-100 w-100 position-relative bm-mt-12px">
-    <div class="w-100 h-100 position-absolute bm-p-12px bm-border-general bm-border-radius-4px d-flex flex-column">
+  <div class="h-100 w-100 position-relative bm-mt-12px bm-min-height-234px">
+    <div class="w-100 h-100 position-absolute bm-p-12px bm-border-general bm-border-radius-4px d-flex flex-column bm-overflow-auto">
       <div class="grid-box"
         [ngClass]="{'bm-disable bm-pointer-events-none': !modeAdd}">
         <ng-container *ngFor="let item of meetingPositionType">
@@ -89,11 +148,12 @@
             [meetingSchedule]="meetingSchedule"
             [item]="item"
             [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuestClone:listPersonnelOther:keyFetch"
-            [keyFetch]="keyFetch">
+            [keyFetch]="keyFetch"
+            (selectedChange)="handlerSelectedChange($event, item)">
           </bm-meeting-schedule-dynamic_field>
         </ng-container>
       </div>
-      <div class="w-100 h-100 position-relative"
+      <div class="w-100 h-100 position-relative bm-min-height-379px"
         [class.bm-mt-16px]="meetingPositionType && meetingPositionType.length">
         <div class="d-flex w-100 h-100 position-absolute">
           <div *ngIf="modeAdd"
@@ -165,7 +225,7 @@
               <div class="w-100 h-100 position-relative">
                 <div class="w-100 h-100 position-absolute bm-overflow-auto"
                   (scroll)="handlerScrollBottomPersonnel($event)">
-                  <div *ngFor="let personnel of listPersonnel"
+                  <div *ngFor="let personnel of (listPersonnel | CheckPersonnelGuestMeetingSchedulePipe:listPersonnelGuest)"
                     class="d-flex flex-column bm-pl-12px bm-py-6px bm-border-bottom-general">
                     <label nz-checkbox
                       [nzDisabled]="disableChangePersonnelJoin"
@@ -202,7 +262,7 @@
                 </div>
                 <div class="w-100 h-100 position-relative">
                   <div class="w-100 h-100 position-absolute bm-overflow-auto">
-                    <div *ngFor="let personnel of listPersonnelGuest; index as i"
+                    <div *ngFor="let personnel of (listPersonnelGuest | CheckPersonnelGuestMeetingSchedulePipe:listPersonnelGuestSearch:paramsGetDetail.search:true); index as i"
                       class="bm-px-12px bm-py-6px bm-border-bottom-general d-flex align-items-center justify-content-between">
                       <div class="d-flex flex-column">
                         <span>{{personnel.FullName}}

@@ -5,8 +5,8 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
-import { IMeetingSchedule, IParamsGetListMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
-import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
+import { IMeetingSchedule, IParamsGetListMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
+import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meeting-schedule.service';
 
 @Component({
   selector: 'bm-meeting-schedule-content',

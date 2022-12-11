@@ -138,8 +138,15 @@
         <tbody>
           <tr *ngFor="let item of meetingScheduleTable.data; index as i">
             <td>
-              <div class="bm-color-009cdb bm-cursor-pointer bm-overflow-hidden text-truncate"
+              <!-- <div class="bm-color-009cdb bm-cursor-pointer bm-overflow-hidden text-truncate"
                 (click)="handlerEditMeetingSchedule($event, item)">
+                <span nz-tooltip
+                  [nzTooltipTitle]="contentTemplate"
+                  [nzTooltipTitleContext]="{ $implicit: item.Title }">
+                  {{item.Title}}
+                </span>
+              </div> -->
+              <div class="bm-overflow-hidden text-truncate">
                 <span nz-tooltip
                   [nzTooltipTitle]="contentTemplate"
                   [nzTooltipTitleContext]="{ $implicit: item.Title }">
@@ -149,15 +156,15 @@
             </td>
             <td>{{item.EstStartTime | date: 'dd/MM/yyyy HH:mm'}}
               <span nz-tooltip
-                *ngIf="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration"
+                *ngIf="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:keyFetch"
                 [nzTooltipTitle]="timeTemplate">
                 <span nz-icon
-                  class="bm-ml-4px {{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:false:false:true}}"
-                  [nzType]="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:false:true"></span>
+                  class="bm-ml-4px {{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:keyFetch:false:false:true}}"
+                  [nzType]="item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:keyFetch:false:true"></span>
               </span>
               <ng-template #timeTemplate
                 let-content>
-                <span class="bm-max-h-100px bm-overflow-auto">{{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:true}}</span>
+                <span class="bm-max-h-100px bm-overflow-auto">{{item.EstStartTime | CheckTimeStartMeetingSchedulePipe:item.EstDuration:keyFetch:true}}</span>
               </ng-template>
             </td>
             <td>{{item.EstDuration}} Phút</td>
@@ -191,7 +198,7 @@
                 <div class="bm-max-h-100px bm-overflow-auto">Xem chi tiết cuộc họp</div>
               </ng-template>
               <span nz-tooltip
-                *ngIf="item.EstStartTime | CheckCanAttendanceMeetingSchedulePipe:item.EstDuration"
+                *ngIf="item.EstStartTime | CheckCanAttendanceMeetingSchedulePipe:item.EstDuration:keyFetch"
                 [nzTooltipTitle]="attendanceTemplate"
                 (click)="handlerAttendance($event, item)"
                 class="bm-color-009cdb bm-cursor-pointer bm-ml-12px">

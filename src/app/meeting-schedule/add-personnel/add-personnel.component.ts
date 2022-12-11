@@ -1,39 +1,46 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as dayjs from 'dayjs';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { Subject } from 'rxjs';
+import { interval, Subject, Subscription } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { DepartmentService } from 'src/app/lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from 'src/app/lib/services/department/interfaces/department.interface';
 import { DictionaryService } from 'src/app/lib/services/dictionary/dictionary.service';
 import { IDataItemGetByTypeDictionary } from 'src/app/lib/services/dictionary/interfaces/dictionary.interface';
-import { IMeetingSchedule, IMeetingScheduleJoin } from 'src/app/lib/services/meeting-schedule/interfaces/metting-schedule.interface';
-import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meting-schedule.service';
+import { IMeetingSchedule, IMeetingScheduleJoin } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
+import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meeting-schedule.service';
 import { IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
 import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
 import { PositionService } from 'src/app/lib/services/position/position.service';
 import { cloneDeep } from 'lodash';
 import * as uuid from 'uuid';
+import { AuthService } from 'src/app/lib/services/auth/auth.service';
+import { Router } from '@angular/router';
+import { GlobalEventService } from 'src/app/lib/services/global-event.service';
 
 @Component({
   selector: 'bm-meeting-schedule-add_personnel',
   templateUrl: './add-personnel.component.html',
   styleUrls: ['./add-personnel.component.scss']
 })
-export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
+export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy {
 
+  allPersonnelJoin: IPersonnel[];
   loading: boolean;
   listPersonnelGuest: IPersonnel[];
+  listPersonnelGuestSearch: IPersonnel[];
   listPersonnelGuestClone: IPersonnel[];
   disableChangePersonnelJoin: boolean;
   modeAdd: boolean;
   guestType: IDataItemGetByTypeDictionary;
   listPersonnelOther: IPersonnel[];
+  listPersonnelOtherClone: IPersonnel[];
 
   totalPersonnel: number;
   listPersonnel: IPersonnel[];
+  listPersonnelClone: IPersonnel[];
   onSearchPersonnel: Subject<string> = new Subject();
   paramsGetPersonnel: IParamsGetListPersonnelFreeTime;
   loadingPersonnel: boolean;
@@ -44,7 +51,6 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   loadingDetail: boolean;
   firstCallDetail: boolean;
   onSearchDetail: Subject<string> = new Subject();
-
 
   totalDepartment: number;
   listDepartment: IDepartment[];
@@ -65,12 +71,19 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   personnelJoinForm: FormGroup;
 
   keyFetch: string;
+  keyFetchStatus: string;
+  intervalSub: Subscription;
+
+  meetingScheduleForm: FormGroup;
+  isConnectGoogle: boolean;
+
+  roomName: string;
 
   @Input() meetingSchedule: IMeetingSchedule;
-  @Input() modeEdit: boolean;
 
   @Output() saveSuccess = new EventEmitter<IMeetingSchedule>();
   @Output() attendance = new EventEmitter<IMeetingSchedule>();
+  @Output() close = new EventEmitter<void>();
 
   constructor(
     private personnelService: PersonnelService,
@@ -79,14 +92,19 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     private departmentService: DepartmentService,
     private positionService: PositionService,
     private dictionaryService: DictionaryService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private globalEventService: GlobalEventService
   ) {
     this.modeAdd = false;
     this.listPersonnelGuest = [];
+    this.listPersonnelGuestSearch = [];
     this.loading = false;
     this.listPersonnelOther = [];
 
     this.listPersonnel = [];
+    this.listPersonnelClone = [];
     this.paramsGetPersonnel = {
       page: 1,
       pageSize: 20,
@@ -124,9 +142,27 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
       pageSize: 20,
       search: ''
     }
+    this.keyFetchStatus = '';
+    this.intervalSub = interval(300000).subscribe(() => this.keyFetchStatus = uuid());
   }
 
   async ngOnInit(): Promise<void> {
+    if (this.meetingSchedule?.EstStartTime) {
+      // this.paramsGetMeetingRoom.from = dayjs(this.meetingSchedule.EstStartTime).format('YYYY-MM-DDTHH:mm:ss')
+      this.paramsGetPersonnel.from = dayjs(this.meetingSchedule.EstStartTime).format('YYYY-MM-DDTHH:mm:ss')
+    }
+    if (this.meetingSchedule?.EstEndTime) {
+      // this.paramsGetMeetingRoom.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss')
+      this.paramsGetPersonnel.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss')
+    }
+    this.roomName = this.meetingSchedule.RoomName;
+    this.isConnectGoogle = this.authService.decodeToken().IsConnectedGG;
+    this.meetingScheduleForm = this.fb.group({
+      Title: [this.meetingSchedule?.Title || '', [Validators.required]],
+      IdRoom: [this.meetingSchedule?.IdRoom || '', [Validators.required]],
+      Content: [this.meetingSchedule?.Content || ''],
+      IsSyncGGCalendar: [{ value: this.meetingSchedule?.IsSyncGGCalendar || false, disabled: this.isConnectGoogle ? false : true }]
+    });
     this.personnelJoinForm = this.fb.group({});
     if (this.meetingSchedule &&
       (dayjs(this.meetingSchedule.EstEndTime).diff(dayjs(), 'minute', false) > 0 && dayjs(this.meetingSchedule.EstStartTime).diff(dayjs(), 'minute', false) < 0) ||
@@ -165,12 +201,12 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
         this.personnelJoinForm.addControl(item.Code, new FormControl(itemFound?.IdAccount ?? '', [Validators.required]));
         return true;
       });
+      this.listPersonnelOtherClone = cloneDeep(this.listPersonnelOther);
       if (this.guestType) {
         const listGuest = [...dataDetail].filter(item => item.IdAttendanceType === this.guestType.Id);
         const listGuestMap: IPersonnel[] = listGuest.map(item => {
           return {
             ...item,
-            Id: item.IdAccount,
             IdAccount: item.IdAccount
           }
         })
@@ -185,14 +221,19 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
   searchDetail(value: string) {
     const text = value.trim();
     !text ? delete this.paramsGetDetail.search : (this.paramsGetDetail.search = text);
-    this.listPersonnelGuest = [];
-    this.getDetailMeetingSchedule();
+    this.listPersonnelGuestSearch = [];
+    this.getDetailMeetingSchedule(true);
   }
 
-  async getDetailMeetingSchedule() {
+  async getDetailMeetingSchedule(isSearch: boolean = false) {
     this.loadingDetail = true;
     try {
       const result = await this.meetingScheduleService.getDetailMeetingSchedule(this.meetingSchedule.Id, this.paramsGetDetail);
+      if (isSearch) {
+        this.listPersonnelGuestSearch = result.Value;
+        return;
+      }
+      this.allPersonnelJoin = cloneDeep(result.Value);
       await this.getMeetingPositionType(result.Value);
     } catch (error) {
       console.log(error);
@@ -233,7 +274,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     event.stopPropagation();
     this.modeAdd = false;
     let data = {};
-    this.listPersonnelOther.forEach(item => {
+    this.listPersonnelOtherClone.forEach(item => {
       const positionType = this.meetingPositionType.find(element => element.Id === item.IdAttendanceType);
       if (!positionType) {
         return;
@@ -244,6 +285,12 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
       }
     });
     this.personnelJoinForm.setValue(data);
+    this.meetingScheduleForm.setValue({
+      Title: this.meetingSchedule?.Title || '',
+      IdRoom: this.meetingSchedule?.IdRoom || '',
+      Content: this.meetingSchedule?.Content || '',
+      IsSyncGGCalendar: this.meetingSchedule?.IsSyncGGCalendar || false
+    })
   }
 
   handlerSearchPersonnel(event: string) {
@@ -263,6 +310,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     const text = value.trim();
     !text ? delete this.paramsGetPersonnel.search : (this.paramsGetPersonnel.search = text);
     this.listPersonnel = [];
+    this.listPersonnelClone = [];
     this.getListPersonnel();
   }
 
@@ -278,6 +326,13 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
         this.canLoadMorePersonal = false;
       }
       this.totalPersonnel = result.Total;
+      this.listPersonnelClone = [...this.listPersonnelClone, ...result.Value].map(item => {
+        const id = item.Id;
+        return {
+          ...item,
+          IdAccount: id
+        }
+      });
       const guestData = [];
       result.Value.forEach(item => {
         const id = item.Id;
@@ -314,17 +369,17 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     this.listPersonnelGuestClone = cloneDeep(this.listPersonnelGuest)
   }
 
-  async handlerDelete(id: string) {
+  async handlerDelete(id: string, showMessage: boolean = true) {
     try {
       this.loading = true;
       const result = await this.meetingScheduleService.deletePersonnelInMeetingSchedule(id);
       if (result.success) {
-        this.nzMessageService.success('Thao tác thành công.');
+        showMessage && this.nzMessageService.success('Thao tác thành công.');
         return;
       }
-      this.nzMessageService.error(result.message || 'Thao tác không thành công.');
+      showMessage && this.nzMessageService.error(result.message || 'Thao tác không thành công.');
     } catch (error) {
-      this.nzMessageService.error('Thao tác không thành công.');
+      showMessage && this.nzMessageService.error('Thao tác không thành công.');
     } finally {
       this.loading = false;
     }
@@ -429,8 +484,8 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     this.attendance.emit(this.meetingSchedule);
   }
 
-  async handlerSaveScheduleMeetingGuest(event: Event) {
-    event.stopPropagation();
+  validate() {
+    let valid = true;
     if (!this.personnelJoinForm.valid) {
       Object.values(this.personnelJoinForm.controls).forEach(control => {
         if (control.invalid) {
@@ -438,23 +493,54 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
           control.updateValueAndValidity({ onlySelf: true });
         }
       });
+      valid = false;
+    }
+    if (!this.meetingScheduleForm.valid) {
+      Object.values(this.meetingScheduleForm.controls).forEach(control => {
+        if (control.invalid) {
+          control.markAsDirty();
+          control.updateValueAndValidity({ onlySelf: true });
+        }
+      });
+      valid = false;
+    }
+    return valid;
+  }
+
+  async handlerSaveScheduleMeetingGuest(event: Event) {
+    event.stopPropagation();
+    if (!this.validate()) {
       return;
     }
     const body: IMeetingScheduleJoin[] = [];
     this.meetingPositionType.forEach(item => {
+      if (item.Code === 'GUEST') {
+        return;
+      }
       const data = { IdAccount: this.personnelJoinForm.value[item.Code], IdAttendanceType: item.Id };
       body.push(data);
     });
     this.listPersonnelGuestClone.forEach(item => {
       const data = { IdAccount: item.Id, IdAttendanceType: this.guestType.Id };
       body.push(data);
-    })
+    });
+    const dataPromise = [];
+    this.allPersonnelJoin.forEach(item => {
+      dataPromise.push(this.handlerDelete(item.Id, false));
+    });
+    dataPromise.push(this.meetingScheduleService.updateMeetingSchedule({ Id: this.meetingSchedule.Id, ...this.meetingScheduleForm.value }));
+    await Promise.all(dataPromise);
+    this.meetingSchedule = {
+      ...this.meetingSchedule,
+      ...this.meetingScheduleForm.value,
+      RoomName: this.roomName
+    }
     try {
       this.loading = true;
       const result = await this.meetingScheduleService.addListPersonnelToMeetingSchedule(body, this.meetingSchedule.Id);
       if (result.success) {
+        this.getDetailMeetingSchedule();
         this.modeAdd = false;
-        this.listPersonnelGuest = cloneDeep(this.listPersonnelGuestClone);
         this.nzMessageService.success('Thao tác thành công.');
         return;
       }
@@ -464,6 +550,26 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit {
     } finally {
       this.loading = false;
     }
+  }
 
+  handlerSelectedChange(event: string, item: IDataItemGetByTypeDictionary) {
+    this.listPersonnelOther = this.listPersonnelOther.filter(person => person.IdAttendanceType !== item.Id);
+    this.listPersonnelOther.push({ IdAccount: event, IdAttendanceType: item.Id, });
+    this.listPersonnel = [...this.listPersonnelClone].filter(item => !this.listPersonnelOther.find(element => element.IdAccount === item.IdAccount));
+  }
+
+  handlerConnect(event: Event) {
+    event.stopPropagation();
+    this.router.navigate(['/account']);
+    this.globalEventService.UrlReplaceBehaviorSubject.next('/account');
+    this.close.emit();
+  }
+
+  handlerRoomChange(event: string) {
+    this.roomName = event;
+  }
+
+  ngOnDestroy(): void {
+    this.intervalSub.unsubscribe();
   }
 }

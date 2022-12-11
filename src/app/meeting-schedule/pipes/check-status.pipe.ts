@@ -4,13 +4,13 @@ import * as dayjs from 'dayjs';
 
 @Pipe({ name: 'CheckStatusMeetingSchedulePipe' })
 export class CheckStatusMeetingSchedulePipe implements PipeTransform {
-  transform(timeStart: string, timeEnd: string, duration: number, tag: boolean = false) {
+  transform(timeStart: string, timeEnd: string, duration: number, keyFetch: string, tag: boolean = false) {
     const compareTimeStartWithNow = dayjs(timeStart).diff(dayjs(), 'minute', false);
     const compareTimeEndWithNow = dayjs(timeEnd).diff(dayjs(), 'minute', false);
-    if (compareTimeStartWithNow > 0 && compareTimeStartWithNow > duration) {
+    if (compareTimeStartWithNow > 0) {
       return tag ? 1 : `Sự kiện này sẽ diễn ra lúc ${dayjs(timeStart).format('HH:mm DD/MM/YYYY')} và kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
     }
-    if (compareTimeStartWithNow < 0 && -compareTimeStartWithNow <= duration) {
+    if (compareTimeStartWithNow <= 0 && -compareTimeStartWithNow <= duration) {
       return tag ? 2 : `Sự kiện này đã diễn ra ${this.buildText(timeStart, dayjs(), compareTimeStartWithNow)} trước và sẽ kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
     }
     if (compareTimeEndWithNow < 0) {
