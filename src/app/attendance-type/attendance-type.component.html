@@ -1,5 +1,5 @@
 <div class="w-100 h-100 d-flex flex-column">
-  <div class="d-flex align-items-center justify-content-between">
+  <div class="d-flex align-items-center justify-content-between bm-bg-ffffff bm-p-12px">
     <div class="d-flex align-items-center">
       <div class="bm-font-head-3s bm-mr-24px">Kiểu người tham gia cuộc họp</div>
       <button nz-button
@@ -29,7 +29,7 @@
         nzType="search"></i>
     </ng-template>
   </div>
-  <div class="h-100 w-100 bm-mt-12px">
+  <div class="h-100 w-100">
     <nz-tabset class="h-100"
       nzCentered
       [(nzSelectedIndex)]="selectedTab"
@@ -62,7 +62,7 @@
                   <span nz-tooltip
                     [nzTooltipTitle]="'Sửa'"
                     (click)="handlerEditAttendanceType($event, item)"
-                    class="bm-color-009cdb bm-cursor-pointer bm-mr-12px">
+                    class="bm-color-009cdb bm-cursor-pointer bm-mr-12px bm-pt-4px">
                     <span nz-icon
                       class="bm-font-size-20px"
                       nzType="edit"

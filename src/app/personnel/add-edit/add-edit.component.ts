@@ -5,6 +5,8 @@ import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { ConstantDefines } from 'src/app/lib/defines/constant.define';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
+import { DepartmentService } from 'src/app/lib/services/department/department.service';
+import { IDepartment, IParamsGetListDepartment } from 'src/app/lib/services/department/interfaces/department.interface';
 import { IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
 import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
@@ -37,6 +39,13 @@ export class BmPersonnelAddEditComponent implements OnInit {
   total: number;
   pageIndexGroup: number;
 
+  totalDepartment: number;
+  listDepartment: IDepartment[];
+  onSearchDepartment: Subject<string> = new Subject();
+  paramsGetDepartment: IParamsGetListDepartment;
+  firstCallDepartment: boolean;
+  loadingDepartment: boolean;
+
   @Input() personnel: IPersonnel;
   @Input() modeEdit: boolean;
 
@@ -47,7 +56,8 @@ export class BmPersonnelAddEditComponent implements OnInit {
     private personnelService: PersonnelService,
     private positionService: PositionService,
     private nzMessageService: NzMessageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private departmentService: DepartmentService
   ) {
     this.total = 2;
     this.pageSize = 20;
@@ -70,6 +80,17 @@ export class BmPersonnelAddEditComponent implements OnInit {
     }
     this.loadingPosition = true;
     this.firstCallPosition = true;
+
+    this.totalDepartment = 0;
+    this.listDepartment = [];
+    this.paramsGetDepartment = {
+      page: 1,
+      pageSize: 20,
+      active: true,
+      search: ''
+    };
+    this.loadingDepartment = true;
+    this.firstCallDepartment = true;
   }
 
   ngOnInit(): void {
@@ -87,6 +108,10 @@ export class BmPersonnelAddEditComponent implements OnInit {
       this.searchPosition(value);
     });
     this.getListPosition();
+    this.onSearchDepartment.pipe(debounceTime(500), filter(value => value !== this.paramsGetDepartment.search)).subscribe((value) => {
+      this.searchDepartment(value);
+    });
+    this.getListDepartment();
   }
 
   handlerSearchPosition(event: string) {
@@ -183,4 +208,48 @@ export class BmPersonnelAddEditComponent implements OnInit {
     }
   }
 
+  searchDepartment(value: string) {
+    const text = value.trim();
+    !text ? delete this.paramsGetDepartment.search : (this.paramsGetDepartment.search = text);
+    this.listDepartment = [];
+    this.getListDepartment();
+  }
+
+  handlerSelectDepartment(event: string) {
+    this.paramsGetPosition.idDepartment = event;
+    this.listPosition = [];
+    this.personnelForm.get('IdPosition').reset();
+    this.getListPosition();
+  }
+
+  handlerSearchDepartment(event: string) {
+    this.paramsGetDepartment.page = 1;
+    this.onSearchDepartment.next(event);
+  }
+
+  handlerScrollBottomDepartment() {
+    if (this.loadingDepartment || !this.totalDepartment || this.totalDepartment <= this.listDepartment.length) {
+      return;
+    }
+    this.paramsGetDepartment.page += 1;
+    this.getListDepartment();
+  }
+
+  async getListDepartment() {
+    if (this.loadingDepartment && !this.firstCallDepartment) {
+      return;
+    }
+    this.firstCallDepartment = false;
+    try {
+      this.loadingDepartment = true;
+      const result = await this.departmentService.getListDepartment(this.paramsGetDepartment);
+      this.totalDepartment = result.Total;
+      this.listDepartment.push(...result.Value);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.loadingDepartment = false;
+      this.loading = false;
+    }
+  }
 }

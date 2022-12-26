@@ -8,7 +8,6 @@
             class="h-100 w-100 account-img"
             [nzSrc]="tempAccount.AvatarUrl || 'https://t3.ftcdn.net/jpg/02/09/37/00/360_F_209370065_JLXhrc5inEmGl52SyvSPeVB23hB6IjrR.jpg'"
             alt="">
-          <!-- [nzSrc]="tempAccount.avatar" -->
         </div>
         <div class="bm-ml-20px d-flex flex-column justify-content-center">
           <div class="bm-mb-8px d-flex flex-column">
@@ -106,7 +105,7 @@
         class="bm-p-20px d-flex align-items-center justify-content-center">
         <div class="d-flex flex-column">
           <div class="d-flex align-items-center">
-            <img [src]="tempAccount.GGAvatarUrl"
+            <img [src]="tempAccount.GGAvatarUrl || 'https://t3.ftcdn.net/jpg/02/09/37/00/360_F_209370065_JLXhrc5inEmGl52SyvSPeVB23hB6IjrR.jpg'"
               class="bm-h-40px bm-w-40px account-img">
             <span class="bm-ml-8px">{{tempAccount.Email}}</span>
           </div>
