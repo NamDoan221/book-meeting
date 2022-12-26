@@ -16,6 +16,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzI18nService, NZ_I18N, vi_VN } from 'ng-zorro-antd/i18n';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzResultModule } from 'ng-zorro-antd/result';
+import { DragulaModule } from 'ng2-dragula';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app.routing';
 import { IconsProviderModule } from './lib/icon-ant/icons-provider.module';
@@ -55,7 +56,8 @@ export function HttpLoaderFactory(http: HttpClient): any {
     }),
     NzResultModule,
     NzButtonModule,
-    NzMessageModule
+    NzMessageModule,
+    DragulaModule.forRoot()
   ],
   providers: [
     { provide: NZ_I18N, useValue: vi_VN },

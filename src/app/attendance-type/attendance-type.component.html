@@ -1,0 +1,92 @@
+<div class="w-100 h-100 d-flex flex-column">
+  <div class="d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center">
+      <div class="bm-font-head-3s bm-mr-24px">Kiểu người tham gia cuộc họp</div>
+      <button nz-button
+        nzType="primary"
+        (click)="handlerAddAttendanceType($event)">
+        <i nz-icon
+          nzType="plus"
+          nzTheme="outline"></i>Thêm kiểu người tham gia cuộc họp
+      </button>
+      <button nz-button
+        *ngIf="showDelete"
+        class="bm-ml-12px"
+        nzType="primary"
+        nzDanger
+        (click)="handlerDeleteAttendanceType($event)">Xoá
+      </button>
+    </div>
+    <nz-input-group class="bm-max-w-503px"
+      [nzSuffix]="suffixIconSearch">
+      <input type="text"
+        nz-input
+        placeholder="Tìm theo tên kiểu người tham gia cuộc họp"
+        (keyup)="handlerKeyUp($event)" />
+    </nz-input-group>
+    <ng-template #suffixIconSearch>
+      <i nz-icon
+        nzType="search"></i>
+    </ng-template>
+  </div>
+  <div class="h-100 w-100 bm-mt-12px">
+    <nz-tabset class="h-100"
+      nzCentered
+      [(nzSelectedIndex)]="selectedTab"
+      (nzSelectChange)="handlerTabChange($event)">
+      <nz-tab *ngFor="let tab of tabs"
+        [nzDisabled]="loading"
+        [nzTitle]="tab.title">
+        <ng-template nz-tab>
+          <div class="h-100 mo-lib-overflow-y-auto"
+            *ngIf="listAttendanceType && listAttendanceType.length"
+            [dragula]="'index'"
+            [(dragulaModel)]="listAttendanceType">
+            <div *ngFor="let item of listAttendanceType"
+              class="bm-border-general bm-bg-ffffff bm-border-radius-4px bm-mt-12px bm-p-12px bm-max-w-800px bm-mx-auto bm-cursor-pointer">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <div>Tên kiểu người tham gia: <span class="bm-font-head-4s">{{item.Name}}</span>
+                    <span nz-tooltip
+                      *ngIf="item.IsRequired"
+                      [nzTooltipTitle]="'Bắt buộc điền thông tin'"
+                      class="bm-color-ff5454 bm-cursor-pointer bm-ml-4px">
+                      <span nz-icon
+                        nzType="info-circle"
+                        nzTheme="outline"></span>
+                    </span>
+                  </div>
+                  <div>Mô tả: {{item.Description}}</div>
+                </div>
+                <div class="d-flex">
+                  <span nz-tooltip
+                    [nzTooltipTitle]="'Sửa'"
+                    (click)="handlerEditAttendanceType($event, item)"
+                    class="bm-color-009cdb bm-cursor-pointer bm-mr-12px">
+                    <span nz-icon
+                      class="bm-font-size-20px"
+                      nzType="edit"
+                      nzTheme="outline"></span>
+                  </span>
+                  <nz-switch [(ngModel)]="item.Active"
+                    [nzLoading]="item.Id && (keyToggleLoading === item.Id)"
+                    (ngModelChange)="handlerActiveChange($event, item)"></nz-switch>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="h-100 w-100 d-flex align-items-center justify-content-center"
+            *ngIf="!listAttendanceType || !listAttendanceType.length">
+            <span *ngIf="!loading">{{params.search ? 'Không có kết quả' : 'Chưa có kiểu người tham gia cuộc họp nào trong danh sách'}}</span>
+            <nz-spin *ngIf="loading"
+              nzTip="Đang tải..."
+              nzSimple></nz-spin>
+          </div>
+        </ng-template>
+      </nz-tab>
+    </nz-tabset>
+  </div>
+</div>
+
+<ng-template #totalTemplate
+  let-total>Tổng cộng {{ total }} bản ghi</ng-template>

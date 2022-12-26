@@ -10,7 +10,6 @@ export interface IParamsGetListPersonnel {
 export interface IPersonnel {
   Id?: string;
   Domain?: string;
-  Username?: string;
   FullName?: string;
   Address?: string;
   Phone?: string;

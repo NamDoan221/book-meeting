@@ -1,0 +1,89 @@
+<form nz-form
+  class="w-100"
+  [formGroup]="attendanceTypeForm">
+  <div class="h-100 w-100 d-flex flex-column justify-content-between">
+    <div>
+      <nz-form-item class="bm-mb-0">
+        <nz-form-control nzErrorTip="Tên kiểu người tham gia không thể để trống!">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Name'">
+            Tên kiểu người tham gia
+          </nz-form-label>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="Name"
+              placeholder="Nhập tên kiểu người tham gia">
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control [nzErrorTip]="codeErrorTip">
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Code'">
+            Mã kiểu người tham gia
+          </nz-form-label>
+          <nz-input-group>
+            <input type="text"
+              nz-input
+              class="bm-border-radius-4px"
+              formControlName="Code"
+              placeholder="Nhập mã kiểu người tham gia">
+          </nz-input-group>
+        </nz-form-control>
+        <ng-template #codeErrorTip
+          let-control>
+          <span class="font-size-11"
+            *ngIf="control.hasError('required')">Mã kiểu người tham gia không được để trống!</span>
+          <span class="font-size-11"
+            *ngIf="control.hasError('pattern')">
+            Mã kiểu người tham gia không đúng định dạng!
+          </span>
+        </ng-template>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'IsRequired'">
+            Bắt buộc
+          </nz-form-label>
+          <nz-input-group>
+            <nz-switch formControlName="IsRequired"></nz-switch>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Description'">
+            Mô tả
+          </nz-form-label>
+          <nz-input-group>
+            <textarea nz-input
+              formControlName="Description"
+              placeholder="Nhập mô tả"
+              [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Active'">
+            Trạng thái
+          </nz-form-label>
+          <nz-input-group>
+            <nz-switch formControlName="Active"></nz-switch>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+    </div>
+    <div class="d-flex justify-content-end bm-mt-20px">
+      <button nz-button
+        nzType="primary"
+        [nzLoading]="loading"
+        (click)="handlerSave($event)">{{modeEdit ? 'Cập nhật' : 'Lưu'}}</button>
+    </div>
+  </div>
+</form>

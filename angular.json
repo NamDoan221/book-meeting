@@ -21,7 +21,8 @@
               "ngx-virtual-scroller",
               "socket.io-client",
               "lodash",
-              "crypto-js"
+              "crypto-js",
+              "dragula"
             ],
             "outputPath": "dist/book-meeting",
             "index": "src/index.html",

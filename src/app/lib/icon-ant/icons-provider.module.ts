@@ -43,7 +43,8 @@ import {
   SmileOutline,
   ScanOutline,
   PauseCircleOutline,
-  InfoCircleOutline
+  InfoCircleOutline,
+  RedoOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons = [
@@ -88,7 +89,8 @@ const icons = [
   SmileOutline,
   ScanOutline,
   PauseCircleOutline,
-  InfoCircleOutline
+  InfoCircleOutline,
+  RedoOutline
 ];
 @NgModule({
   imports: [NzIconModule],

@@ -144,6 +144,19 @@ export class MeetingScheduleService extends BaseService {
     });
   }
 
+  public deleteMultiplePersonnelInMeetingSchedule(ids: string[]): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.put(`${this.domain}/Mschedule/detail-multiple`, ids).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
   public updateStatusAttendance(id: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Mschedule/${id}/detail-status`, {}, new HttpParams({ fromObject: { code: 'MSD_PRESENT' } })).subscribe({

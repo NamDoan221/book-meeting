@@ -85,6 +85,11 @@ export const menuDefault = (): IFunction[] => {
         IsMenu: false,
       },
       {
+        Name: 'Kiểu người tham gia cuộc họp',
+        Url: '/attendance-type',
+        IsMenu: false,
+      },
+      {
         Name: 'Đăng xuất',
         Url: '/logout',
         IsMenu: false,

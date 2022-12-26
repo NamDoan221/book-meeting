@@ -13,14 +13,14 @@ export class FunctionService extends BaseService {
     super();
   }
 
-  public getListFunction(params: IParamsGetListFunction): Promise<any> {
-    if (this.cacheService.getKey(ConstantDefines.MENU_KEY) && JSON.parse(this.cacheService.getKey(ConstantDefines.MENU_KEY))) {
+  public getListFunction(params: IParamsGetListFunction, ignoreCache: boolean = false): Promise<any> {
+    if (!ignoreCache && this.cacheService.getKey(ConstantDefines.MENU_KEY) && JSON.parse(this.cacheService.getKey(ConstantDefines.MENU_KEY))) {
       return JSON.parse(this.cacheService.getKey(ConstantDefines.MENU_KEY));
     }
     return new Promise((resolve, reject) => {
       this.get(`Function`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          this.cacheService.setKey(ConstantDefines.MENU_KEY, JSON.stringify(result));
+          !ignoreCache && this.cacheService.setKey(ConstantDefines.MENU_KEY, JSON.stringify(result));
           return resolve(result);
         },
         error: err => {

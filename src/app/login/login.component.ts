@@ -23,7 +23,7 @@ export class BmLoginComponent implements OnInit {
     private router: Router,
     private auth: AuthService,
     private nzMessageService: NzMessageService,
-    private svCookie: CookieService
+    private cookieService: CookieService
   ) {
     this.loading = false;
     this.loadingGoogle = false;
@@ -32,7 +32,7 @@ export class BmLoginComponent implements OnInit {
       username: [null, [Validators.required]],
       password: [null, [Validators.required]]
     });
-    this.rememberAccount = this.svCookie.get('RememberMe');
+    this.rememberAccount = this.cookieService.get('RememberMe');
   }
 
   ngOnInit(): void {
@@ -92,15 +92,10 @@ export class BmLoginComponent implements OnInit {
   handlerUpdateRemember(event: boolean) {
     this.rememberAccount = `${event}`;
     if (event) {
-      this.svCookie.set('RememberMe', 'true', {
-        expires: 30,
-        secure: true,
-        domain: 'face',
-        sameSite: 'None',
-      });
+      this.cookieService.set('RememberMe', 'true', { expires: 30, secure: true, sameSite: 'None' });
       return;
     }
-    this.svCookie.delete('RememberMe');
+    this.cookieService.delete('RememberMe');
   }
 
   handlerSignUp(): any {

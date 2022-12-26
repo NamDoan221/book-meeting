@@ -142,7 +142,7 @@
     <div class="w-100 h-100 position-absolute bm-p-12px bm-border-general bm-border-radius-4px d-flex flex-column bm-overflow-auto">
       <div class="grid-box"
         [ngClass]="{'bm-disable bm-pointer-events-none': !modeAdd}">
-        <ng-container *ngFor="let item of meetingPositionType">
+        <ng-container *ngFor="let item of attendanceType">
           <bm-meeting-schedule-dynamic_field [formGroup]="personnelJoinForm"
             [ignoreMargin]="true"
             [meetingSchedule]="meetingSchedule"
@@ -154,7 +154,7 @@
         </ng-container>
       </div>
       <div class="w-100 h-100 position-relative bm-min-height-379px"
-        [class.bm-mt-16px]="meetingPositionType && meetingPositionType.length">
+        [class.bm-mt-16px]="attendanceType && attendanceType.length">
         <div class="d-flex w-100 h-100 position-absolute">
           <div *ngIf="modeAdd"
             class="h-100 w-50 bm-mr-12px d-flex flex-column">

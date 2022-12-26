@@ -3,7 +3,7 @@ import { FormGroup } from '@angular/forms';
 import * as dayjs from 'dayjs';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
-import { IDataItemGetByTypeDictionary } from 'src/app/lib/services/dictionary/interfaces/dictionary.interface';
+import { IAttendanceType } from 'src/app/lib/services/attendance-type/interfaces/attendance-type.interface';
 import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
 import { IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
@@ -24,7 +24,7 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
   canLoadMore: boolean;
 
   @Input() meetingSchedule: IMeetingSchedule;
-  @Input() item: IDataItemGetByTypeDictionary;
+  @Input() item: IAttendanceType;
   @Input() formGroup: FormGroup;
   @Input() ignoreMargin: boolean;
   @Input() ignorePersonal: IPersonnel[];

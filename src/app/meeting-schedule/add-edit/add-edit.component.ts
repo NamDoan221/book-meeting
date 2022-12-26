@@ -3,14 +3,16 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 import { differenceInCalendarDays } from 'date-fns';
 import * as dayjs from 'dayjs';
+import { cloneDeep } from 'lodash';
 import { DisabledTimeFn } from 'ng-zorro-antd/date-picker';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
+import { AttendanceTypeService } from 'src/app/lib/services/attendance-type/attendance-type.service';
+import { IAttendanceType } from 'src/app/lib/services/attendance-type/interfaces/attendance-type.interface';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
 import { DepartmentService } from 'src/app/lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from 'src/app/lib/services/department/interfaces/department.interface';
-import { DictionaryService } from 'src/app/lib/services/dictionary/dictionary.service';
 import { IDataItemGetByTypeDictionary } from 'src/app/lib/services/dictionary/interfaces/dictionary.interface';
 import { GlobalEventService } from 'src/app/lib/services/global-event.service';
 import { IMeetingRoom, IParamsGetListMeetingRoomFreeTime } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
@@ -22,7 +24,6 @@ import { PersonnelService } from 'src/app/lib/services/personnel/personnel.servi
 import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
 import { PositionService } from 'src/app/lib/services/position/position.service';
 import * as uuid from 'uuid';
-import { cloneDeep } from 'lodash';
 
 @Component({
   selector: 'bm-meeting-schedule-add_edit',
@@ -33,7 +34,6 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   isConnectGoogle: boolean;
   meetingScheduleForm: FormGroup;
   loading: boolean;
-  guestType: IDataItemGetByTypeDictionary;
 
   totalMeetingRoom: number;
   listMeetingRoom: IMeetingRoom[];
@@ -68,7 +68,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   loadingPosition: boolean;
   firstCallPosition: boolean;
 
-  meetingPositionType: IDataItemGetByTypeDictionary[];
+  attendanceType: IAttendanceType[];
   keyFetch: string;
   listPersonnelOther: IPersonnel[];
   listPersonnelClone: IPersonnel[];
@@ -128,9 +128,9 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     private departmentService: DepartmentService,
     private positionService: PositionService,
     private personnelService: PersonnelService,
-    private dictionaryService: DictionaryService,
     private router: Router,
-    private globalEventService: GlobalEventService
+    private globalEventService: GlobalEventService,
+    private attendanceTypeService: AttendanceTypeService
   ) {
     this.loading = false;
     this.listMeetingRoom = [];
@@ -201,7 +201,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.getListDepartment();
     this.getListPosition();
     this.getListPersonnel();
-    this.getMeetingPositionType();
+    this.getAttendanceType();
   }
 
   initData() {
@@ -333,13 +333,13 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       EstEndTime: estEndTime,
       IdCreator: this.meetingSchedule?.IdCreator ?? this.authService.decodeToken().Id
     }
-    this.meetingPositionType.forEach(item => {
+    this.attendanceType.forEach(item => {
       const data = { IdAccount: this.meetingScheduleForm.value[item.Code], IdAttendanceType: item.Id };
       body.MeetingScheduleDtls && body.MeetingScheduleDtls.length ? body.MeetingScheduleDtls.push(data) : body.MeetingScheduleDtls = [data];
       delete body[item.Code];
     });
     this.listPersonnelGuest.forEach(item => {
-      const data = { IdAccount: item.Id, IdAttendanceType: this.guestType.Id };
+      const data = { IdAccount: item.Id, IdAttendanceType: undefined };
       body.MeetingScheduleDtls && body.MeetingScheduleDtls.length ? body.MeetingScheduleDtls.push(data) : body.MeetingScheduleDtls = [data];
     })
     if (this.modeEdit) {
@@ -510,28 +510,22 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.onSearchPersonnel.next(event.target.value);
   }
 
-  async getMeetingPositionType() {
+  async getAttendanceType() {
     try {
-      const result = await this.dictionaryService.getListDataByTypeDictionary('POSITION_MEETING_SCHEDULE');
-      this.meetingPositionType = result.filter(item => {
-        if (item.Code === 'GUEST') {
-          this.guestType = item;
-          return false;
-        }
+      const result = await this.attendanceTypeService.getListAttendanceTypeActive({ page: 1, pageSize: 100 });
+      this.attendanceType = result.Value.sort((a, b) => a.Index - b.Index);
+      this.attendanceType.forEach(item => {
         const itemFound = this.meetingSchedule?.MeetingScheduleDtls?.find(element => element.IdAttendanceType === item.Id);
-        this.meetingScheduleForm.addControl(item.Code, new FormControl(itemFound?.IdAccount ?? '', [Validators.required]));
-        return true;
+        this.meetingScheduleForm.addControl(item.Code, new FormControl(itemFound?.IdAccount ?? '', item.IsRequired ? [Validators.required] : []));
       });
-      if (this.guestType) {
-        const listGuest = [...(this.meetingSchedule?.MeetingScheduleDtls || [])].filter(item => item.IdAttendanceType === this.guestType.Id);
-        const listGuestMap: IPersonnel[] = listGuest.map(item => {
-          return {
-            Id: item.IdAccount,
-            IdAccount: item.IdAccount
-          }
-        })
-        this.listPersonnelGuest = listGuestMap;
-      };
+      const listGuest = [...(this.meetingSchedule?.MeetingScheduleDtls || [])].filter(item => !item.IdAttendanceType);
+      const listGuestMap: IPersonnel[] = listGuest.map(item => {
+        return {
+          Id: item.IdAccount,
+          IdAccount: item.IdAccount
+        }
+      })
+      this.listPersonnelGuest = listGuestMap;
     } catch (error) {
       console.log(error);
     }

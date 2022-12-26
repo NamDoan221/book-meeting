@@ -30,7 +30,8 @@
           *ngIf="!menu.Url"
           nzOpen
           [nzTitle]="menu.Name"
-          [nzIcon]="menu.Icon">
+          [nzIcon]="menu.Icon"
+          (click)="handlerChangeOpen($event)">
           <ul *ngIf="menu?.FunctionChilds?.length">
             <ng-container *ngFor="let item of menu.FunctionChilds">
               <li nz-menu-item

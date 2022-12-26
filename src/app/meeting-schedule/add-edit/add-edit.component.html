@@ -106,7 +106,7 @@
           </ng-template>
         </nz-form-control>
       </nz-form-item>
-      <ng-container *ngFor="let item of meetingPositionType">
+      <ng-container *ngFor="let item of attendanceType">
         <bm-meeting-schedule-dynamic_field [formGroup]="meetingScheduleForm"
           [meetingSchedule]="meetingSchedule"
           [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuest:listPersonnelOther:keyFetch"
@@ -115,8 +115,7 @@
           (selectedChange)="handlerSelectedChange($event, item)">
         </bm-meeting-schedule-dynamic_field>
       </ng-container>
-      <nz-form-item class="bm-mt-16px bm-mb-0"
-        *ngIf="guestType">
+      <nz-form-item class="bm-mt-16px bm-mb-0">
         <nz-form-control>
           <nz-form-label [nzNoColon]="true">
             Khách mời

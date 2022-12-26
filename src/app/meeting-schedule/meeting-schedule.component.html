@@ -138,14 +138,6 @@
         <tbody>
           <tr *ngFor="let item of meetingScheduleTable.data; index as i">
             <td>
-              <!-- <div class="bm-color-009cdb bm-cursor-pointer bm-overflow-hidden text-truncate"
-                (click)="handlerEditMeetingSchedule($event, item)">
-                <span nz-tooltip
-                  [nzTooltipTitle]="contentTemplate"
-                  [nzTooltipTitleContext]="{ $implicit: item.Title }">
-                  {{item.Title}}
-                </span>
-              </div> -->
               <div class="bm-overflow-hidden text-truncate">
                 <span nz-tooltip
                   [nzTooltipTitle]="contentTemplate"
@@ -169,9 +161,36 @@
             </td>
             <td>{{item.EstDuration}} Phút</td>
             <td>{{item.RoomName}}</td>
-            <td>{{item.CreatorName}} ({{item.PositionName}})</td>
+            <td>
+              <div class="bm-overflow-hidden text-truncate">
+                <span nz-tooltip
+                  [nzTooltipTitle]="creatorTemplate"
+                  [nzTooltipTitleContext]="{ $implicit: item }">
+                  {{item.CreatorName}} ({{item.PositionName}})
+                </span>
+              </div>
+              <ng-template #creatorTemplate
+                let-item>
+                <span class="bm-max-h-100px bm-overflow-auto">{{item.CreatorName}} ({{item.PositionName}})</span>
+              </ng-template>
+            </td>
             <td>{{item.DepartmentName}}</td>
             <td>{{item.CountAttendee}}</td>
+            <td>
+              {{!item.IsSyncGGCalendar ? 'Không đồng bộ' : !item.IdGGCalendar ? 'Đồng bộ thất bại' : 'Đồng bộ thành công'}}
+              <span nz-tooltip
+                *ngIf="item.IsSyncGGCalendar && !item.IdGGCalendar"
+                [nzTooltipTitle]="reSyncTemplate"
+                (click)="handlerReSyncGoogleCalendar($event, item)"
+                class="bm-color-009cdb bm-cursor-pointer bm-ml-4px">
+                <span nz-icon
+                  nzType="redo"
+                  nzTheme="outline"></span>
+              </span>
+              <ng-template #reSyncTemplate>
+                <div class="bm-max-h-100px bm-overflow-auto">Đồng bộ lại</div>
+              </ng-template>
+            </td>
             <td>
               <div class="bm-overflow-hidden text-truncate">
                 <span nz-tooltip

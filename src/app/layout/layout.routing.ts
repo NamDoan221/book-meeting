@@ -59,6 +59,11 @@ const routes: Routes = [
         path: 'dictionary',
         loadChildren: () =>
           import('../dictionary/dictionary.module').then((m) => m.BmDictionaryModule)
+      },
+      {
+        path: 'attendance-type',
+        loadChildren: () =>
+          import('../attendance-type/attendance-type.module').then((m) => m.BmAttendanceTypeModule)
       }
     ]
   }

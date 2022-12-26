@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
@@ -74,7 +74,6 @@ export class BmPersonnelAddEditComponent implements OnInit {
 
   ngOnInit(): void {
     this.personnelForm = this.fb.group({
-      Username: [this.personnel?.Username ?? '', [Validators.required]],
       FullName: [this.personnel?.FullName ?? '', [Validators.required]],
       AvatarUrl: [this.personnel?.AvatarUrl ?? ''],
       Dob: [this.personnel?.Dob ?? '', [Validators.required]],

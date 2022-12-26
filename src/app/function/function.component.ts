@@ -131,7 +131,7 @@ export class BmFunctionComponent implements OnInit {
     }
     this.loading = true;
     try {
-      const result = await this.functionService.getListFunction(this.params);
+      const result = await this.functionService.getListFunction(this.params, true);
       this.listFunction = result.Value;
       this.total = result.Total;
       this.refreshTable();

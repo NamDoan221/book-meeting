@@ -15,6 +15,7 @@ import { BmMeetingScheduleAddEditComponent } from './add-edit/add-edit.component
 import { BmMeetingScheduleAddPersonnelComponent } from './add-personnel/add-personnel.component';
 import { BmMeetingScheduleAttendanceComponent } from './attendance/attendance.component';
 import * as uuid from 'uuid';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Component({
   selector: 'bm-meeting-schedule',
@@ -61,12 +62,15 @@ export class BmMeetingScheduleComponent implements OnInit, OnDestroy {
   keyFetch: string;
   intervalSub: Subscription;
 
+  loadingReSyncGoogleCalendar: boolean;
+
   constructor(
     private drawerService: NzDrawerService,
     private departmentService: DepartmentService,
     private meetingScheduleService: MeetingScheduleService,
     private personnelService: PersonnelService,
-    private authService: AuthService
+    private authService: AuthService,
+    private nzMessageService: NzMessageService
   ) {
     this.loading = false;
     this.total = 0;
@@ -82,6 +86,7 @@ export class BmMeetingScheduleComponent implements OnInit, OnDestroy {
       'Người quản lý cuộc họp',
       'Phòng ban',
       'Số nhân viên được tham gia',
+      'Trạng thái đồng bộ google calendar',
       'Mô tả nội dung cuộc họp',
       'Trạng thái'
     ];
@@ -504,6 +509,27 @@ export class BmMeetingScheduleComponent implements OnInit, OnDestroy {
       this.isOpenDrawAttendance = false;
       this.drawerRefGlobal.close();
     });
+  }
+
+  async handlerReSyncGoogleCalendar(event: Event, item: IMeetingSchedule) {
+    event.stopPropagation();
+    if (this.loadingReSyncGoogleCalendar) {
+      return;
+    }
+    this.loadingReSyncGoogleCalendar = true;
+    try {
+      const result = await this.meetingScheduleService.updateMeetingSchedule(item);
+      if (result.success) {
+        this.nzMessageService.success('Thao tác thành công.');
+        return;
+      }
+      this.nzMessageService.error('Thao tác không thành công.');
+    } catch (error) {
+      console.log(error);
+      this.nzMessageService.error('Thao tác không thành công.');
+    } finally {
+      this.loadingReSyncGoogleCalendar = false;
+    }
   }
 
   ngOnDestroy(): void {

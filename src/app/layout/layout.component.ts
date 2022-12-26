@@ -1,6 +1,5 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NzMessageService } from 'ng-zorro-antd/message';
 import { AuthService } from '../lib/services/auth/auth.service';
 import { IToken } from '../lib/services/auth/interfaces/auth.interfaces';
 import { CacheService } from '../lib/services/cache.service';
@@ -26,15 +25,19 @@ export class BmLayoutComponent implements OnInit {
     private cacheService: CacheService,
     private functionService: FunctionService,
     private globalEventService: GlobalEventService,
-    private zone: NgZone
+    private zone: NgZone,
+    private cdr: ChangeDetectorRef
   ) {
     this.isCollapsed = false;
     this.menuData = []
   }
 
-  async ngOnInit(): Promise<void> {
-    this.globalEventService.UrlReplaceBehaviorSubject.subscribe(url => this.currentPath = url);
+  ngOnInit() {
     this.accountFromCache = this.auth.decodeToken();
+    this.globalEventService.UrlReplaceBehaviorSubject.subscribe(url => {
+      this.currentPath = url;
+      this.cdr.detectChanges();
+    });
     this.buildMenu();
     this.currentPath = this.router.url;
   }
@@ -88,5 +91,9 @@ export class BmLayoutComponent implements OnInit {
     this.zone.run(() => {
       this.router.navigate([url]);
     });
+  }
+
+  handlerChangeOpen(event: Event) {
+    this.cdr.detectChanges();
   }
 }

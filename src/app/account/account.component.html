@@ -110,11 +110,16 @@
               class="bm-h-40px bm-w-40px account-img">
             <span class="bm-ml-8px">{{tempAccount.Email}}</span>
           </div>
-          <button nz-button
-            class="bm-mt-12px"
-            nzDanger
-            nzType="primary"
-            (click)="handlerDeleteConnect()">Xoá kết nối</button>
+          <div class="bm-mt-12px d-flex">
+            <button nz-button
+              nzType="primary"
+              (click)="handlerConnect()">Tài khoản mới</button>
+            <button nz-button
+              class="bm-ml-8px"
+              nzDanger
+              nzType="primary"
+              (click)="handlerDeleteConnect()">Xoá kết nối</button>
+          </div>
         </div>
       </div>
     </div>
