@@ -53,8 +53,23 @@ export class BmAttendanceTypeComponent implements OnInit {
     this.tabs = TabsDefault();
     this.showDelete = false;
     this.checked = false;
-    this.dragulaService.dragend('index').subscribe(() => {
+    this.dragulaService.dragend('index').subscribe(async () => {
       console.log(this.listAttendanceType);
+      const body = [];
+      this.listAttendanceType.forEach((item, index) => {
+        body.push({ id: item.Id, index: index });
+      });
+      try {
+        const result = await this.attendanceTypeService.updateIndexAttendanceType(body);
+        if (result.success) {
+          this.nzMessageService.success('Thao tác thành công.');
+
+          return;
+        }
+        this.nzMessageService.error('Thao tác không thành công.');
+      } catch (error) {
+        console.log(error);
+      }
     });
   }
 
@@ -79,7 +94,7 @@ export class BmAttendanceTypeComponent implements OnInit {
     try {
       this.loading = true;
       const result = await this.attendanceTypeService.getListAttendanceType(this.params);
-      this.listAttendanceType = result.Value;
+      this.listAttendanceType = result.Value.sort((a, b) => a.Index - b.Index);
     } catch (error) {
       console.log(error);
     } finally {

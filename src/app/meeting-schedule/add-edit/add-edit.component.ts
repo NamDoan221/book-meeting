@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Data, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { differenceInCalendarDays } from 'date-fns';
 import * as dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
@@ -9,6 +9,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
+import { viewMsDuplicate } from 'src/app/lib/defines/function.define';
 import { AttendanceTypeService } from 'src/app/lib/services/attendance-type/attendance-type.service';
 import { IAttendanceType } from 'src/app/lib/services/attendance-type/interfaces/attendance-type.interface';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
@@ -90,16 +91,11 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       this.startTime = current;
       const currentCompareToday = differenceInCalendarDays(current, new Date()) > 0;
       const currentHours = current?.getHours();
-      const currentMinutes = current?.getMinutes();
       let numberDisableHours = 0;
       let numberDisableMinutes = 0;
-      console.log(currentCompareToday);
-
       if (!currentCompareToday) {
         const minutes = new Date().getMinutes() + 15;
         const hours = new Date().getHours();
-        console.log(currentHours, hours, minutes);
-
         if (currentHours < hours) {
           numberDisableHours = hours;
           numberDisableMinutes = 60;
@@ -113,28 +109,21 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
           }
         }
       }
-      // ...this.range(0, 24).splice(0, 8), ...this.range(0, 24).splice(19, 5)
       return {
-        nzDisabledHours: () => [...this.range(0, numberDisableHours)],
+        nzDisabledHours: () => [...this.range(0, 24).splice(0, 8), ...this.range(0, 24).splice(19, 5), ...this.range(0, numberDisableHours)],
         nzDisabledMinutes: () => this.range(0, numberDisableMinutes),
         nzDisabledSeconds: () => []
       };
     }
-
     const currentCompareToday = differenceInCalendarDays(current, new Date()) > 0;
     const currentHours = current?.getHours();
-    const currentMinutes = current?.getMinutes();
     let numberDisableHours = 0;
     let numberDisableMinutes = 0;
     let rangeHourExtend = [];
     let rangeMinutesExtend = [];
-    console.log(currentCompareToday);
-
     if (!currentCompareToday) {
       const minutes = new Date().getMinutes() + 15;
       const hours = new Date().getHours();
-      console.log(currentHours, hours, minutes, this.startTime?.getHours(), this.startTime?.getMinutes());
-
       if (currentHours < hours) {
         numberDisableHours = hours;
         numberDisableMinutes = 60;
@@ -160,7 +149,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       }
     }
     return {
-      nzDisabledHours: () => [...this.range(0, numberDisableHours), ...rangeHourExtend],
+      nzDisabledHours: () => [...this.range(0, 24).splice(0, 8), ...this.range(0, 24).splice(19, 5), ...this.range(0, numberDisableHours), ...rangeHourExtend],
       nzDisabledMinutes: () => [...this.range(0, numberDisableMinutes), ...rangeMinutesExtend],
       nzDisabledSeconds: () => []
     };
@@ -617,13 +606,8 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.listPersonnel = [...this.listPersonnelClone].filter(item => !this.listPersonnelOther.find(element => element.IdAccount === item.IdAccount));
   }
 
-  handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
+  async handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
     event.stopPropagation();
-    this.notificationService.remove();
-    this.notificationService.blank(
-      'Lịch họp trùng',
-      idMsDuplicate,
-      { nzDuration: 0, nzPlacement: 'top' }
-    );
+    viewMsDuplicate(this.notificationService, this.meetingScheduleService, idMsDuplicate);
   }
 }

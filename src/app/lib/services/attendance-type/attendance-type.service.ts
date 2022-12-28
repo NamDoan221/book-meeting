@@ -78,4 +78,17 @@ export class AttendanceTypeService extends BaseService {
       });
     });
   }
+
+  public updateIndexAttendanceType(body: { id: string, index: number }[]): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.put(`${this.domain}/AttendanceType/indexs`, body).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
 }

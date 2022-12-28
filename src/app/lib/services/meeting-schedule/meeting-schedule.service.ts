@@ -195,4 +195,17 @@ export class MeetingScheduleService extends BaseService {
       });
     });
   }
+
+  public getMeetingScheduleByIds(ids: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.get(`${this.domain}/Mschedule/by-ids`, new HttpParams({ fromObject: { listId: ids } })).subscribe({
+        next: result => {
+          return resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
 }

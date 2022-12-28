@@ -4,8 +4,10 @@ import * as dayjs from 'dayjs';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
+import { viewMsDuplicate } from 'src/app/lib/defines/function.define';
 import { IAttendanceType } from 'src/app/lib/services/attendance-type/interfaces/attendance-type.interface';
 import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
+import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meeting-schedule.service';
 import { IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
 import { PersonnelService } from 'src/app/lib/services/personnel/personnel.service';
 
@@ -35,7 +37,8 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
 
   constructor(
     private personnelService: PersonnelService,
-    private notificationService: NzNotificationService
+    private notificationService: NzNotificationService,
+    private meetingScheduleService: MeetingScheduleService
   ) {
     this.canLoadMore = true;
     this.listPersonnel = [];
@@ -157,11 +160,6 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
 
   handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
     event.stopPropagation();
-    this.notificationService.remove();
-    this.notificationService.blank(
-      'Lịch họp trùng',
-      idMsDuplicate,
-      { nzDuration: 0, nzPlacement: 'top' }
-    );
+    viewMsDuplicate(this.notificationService, this.meetingScheduleService, idMsDuplicate);
   }
 }

@@ -7,6 +7,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { interval, Subject, Subscription } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
+import { viewMsDuplicate } from 'src/app/lib/defines/function.define';
 import { AttendanceTypeService } from 'src/app/lib/services/attendance-type/attendance-type.service';
 import { IAttendanceType } from 'src/app/lib/services/attendance-type/interfaces/attendance-type.interface';
 import { AuthService } from 'src/app/lib/services/auth/auth.service';
@@ -566,12 +567,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
 
   handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
     event.stopPropagation();
-    this.notificationService.remove();
-    this.notificationService.blank(
-      'Lịch họp trùng',
-      idMsDuplicate,
-      { nzDuration: 0, nzPlacement: 'top' }
-    );
+    viewMsDuplicate(this.notificationService, this.meetingScheduleService, idMsDuplicate);
   }
 
   ngOnDestroy(): void {
