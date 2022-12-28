@@ -14,9 +14,26 @@
         (nzOnSearch)="handlerSearchPersonnel($event)"
         (nzScrollToBottom)="handlerScrollBottomPersonnel()"
         (ngModelChange)="handlerChangeSelected($event)">
-        <nz-option *ngFor="let item of listPersonnel"
-          [nzValue]="item.Id"
-          [nzLabel]="item.FullName + ' (' + item.PositionName + ' - ' + item.DepartmentName + ')'">
+        <nz-option *ngFor="let personnel of listPersonnel"
+          [nzValue]="personnel.Id"
+          [nzLabel]="personnel.FullName + ' (' + personnel.PositionName + ' - ' + personnel.DepartmentName + ')'"
+          [nzCustomContent]="true"
+          [nzDisabled]="personnel.CountMsDuplicate > 0">
+          <span class="bm-mr-8px">{{personnel.FullName + ' (' + personnel.PositionName + ' - ' + personnel.DepartmentName + ')'}}</span>
+          <span nz-tooltip
+            *ngIf="personnel.CountMsDuplicate > 0"
+            [nzTooltipTitle]="msDuplicate"
+            class="bm-color-ff5454">
+            <span nz-icon
+              nzType="exclamation-circle"
+              nzTheme="outline"></span>
+          </span>
+          <ng-template #msDuplicate>
+            <div class="bm-max-h-100px bm-overflow-auto bm-font-head-5">Người này đã có lịch họp trong khoảng thời gian bạn chọn.
+              <span class="bm-cursor-pointer bm-font-head-5 bm-color-009cdb"
+                (click)="handlerViewMsDuplicate($event, personnel.IdMsDuplicate)">Xem lịch trùng</span>
+            </div>
+          </ng-template>
         </nz-option>
       </nz-select>
       <ng-template #notFoundContentTemplate>

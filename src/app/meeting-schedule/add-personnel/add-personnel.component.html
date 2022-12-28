@@ -230,7 +230,22 @@
                     <label nz-checkbox
                       [nzDisabled]="disableChangePersonnelJoin"
                       [ngModel]="personnel.IdAccount | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelGuestClone"
-                      (ngModelChange)="handlerAddGuestToMeetingSchedule($event, personnel)">{{personnel.FullName}}</label>
+                      (ngModelChange)="handlerAddGuestToMeetingSchedule($event, personnel)">
+                      <span class="bm-mr-8px">{{personnel.FullName}}</span>
+                      <span nz-tooltip
+                        *ngIf="personnel.CountMsDuplicate > 0"
+                        [nzTooltipTitle]="msDuplicate"
+                        class="bm-color-ff5454">
+                        <span nz-icon
+                          nzType="exclamation-circle"
+                          nzTheme="outline"></span>
+                      </span>
+                      <ng-template #msDuplicate>
+                        <div class="bm-max-h-100px bm-overflow-auto bm-font-head-5">Người này đã có lịch họp trong khoảng thời gian bạn chọn.
+                          <span class="bm-cursor-pointer bm-font-head-5 bm-color-009cdb"
+                            (click)="handlerViewMsDuplicate($event, personnel.IdMsDuplicate)">Xem lịch trùng</span>
+                        </div>
+                      </ng-template></label>
                     <span class="bm-ml-24px">Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>
                   </div>
                   <div class="h-100 w-100 d-flex align-items-center justify-content-center"

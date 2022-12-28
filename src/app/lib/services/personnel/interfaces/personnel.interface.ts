@@ -24,6 +24,8 @@ export interface IPersonnel {
   AttendanceTime?: string;
   SpecificHasFace?: boolean;
   IdAttendanceType?: string;
+  IdMsDuplicate?: string;
+  CountMsDuplicate?: number;
 }
 
 export interface IParamsGetListPersonnelFreeTime {

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import * as dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { interval, Subject, Subscription } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { AttendanceTypeService } from 'src/app/lib/services/attendance-type/attendance-type.service';
@@ -94,7 +95,8 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
     private authService: AuthService,
     private router: Router,
     private globalEventService: GlobalEventService,
-    private attendanceTypeService: AttendanceTypeService
+    private attendanceTypeService: AttendanceTypeService,
+    private notificationService: NzNotificationService
   ) {
     this.modeAdd = false;
     this.listPersonnelGuest = [];
@@ -560,6 +562,16 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
 
   handlerRoomChange(event: string) {
     this.roomName = event;
+  }
+
+  handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
+    event.stopPropagation();
+    this.notificationService.remove();
+    this.notificationService.blank(
+      'Lịch họp trùng',
+      idMsDuplicate,
+      { nzDuration: 0, nzPlacement: 'top' }
+    );
   }
 
   ngOnDestroy(): void {

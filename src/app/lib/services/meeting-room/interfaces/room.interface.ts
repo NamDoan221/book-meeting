@@ -22,4 +22,6 @@ export interface IMeetingRoom {
   Name: string;
   AmountSlot: number;
   Description?: string;
+  IdMsDuplicate?: string;
+  CountMsDuplicate?: number;
 }

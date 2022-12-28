@@ -123,6 +123,8 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
               .getContext("2d")
               .drawImage(video, 0, 0, canvas_data.width, canvas_data.height);
             this.dataFace.push(canvas_data);
+            console.log(this.dataFace);
+
             if (this.dataFace.length > 250) {
               this.nzMessageService.success('Thu thập dữ liệu thành công.');
               this.completeDetectFace = true;

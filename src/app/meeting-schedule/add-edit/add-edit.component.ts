@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Data, Router } from '@angular/router';
 import { differenceInCalendarDays } from 'date-fns';
 import * as dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
-import { DisabledTimeFn } from 'ng-zorro-antd/date-picker';
+import { DisabledTimeFn, DisabledTimePartial } from 'ng-zorro-antd/date-picker';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { AttendanceTypeService } from 'src/app/lib/services/attendance-type/attendance-type.service';
@@ -24,6 +25,7 @@ import { PersonnelService } from 'src/app/lib/services/personnel/personnel.servi
 import { IParamsGetListPosition, IPosition } from 'src/app/lib/services/position/interfaces/position.interface';
 import { PositionService } from 'src/app/lib/services/position/position.service';
 import * as uuid from 'uuid';
+import { BmMeetingScheduleDynamicFieldComponent } from '../dynamic-field/dynamic-field.component';
 
 @Component({
   selector: 'bm-meeting-schedule-add_edit',
@@ -42,9 +44,9 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
   loadingMeetingRoom: boolean;
   firstCallMeetingRoom: boolean;
 
-  today = new Date();
   rangeChange: boolean;
   durationChange: boolean;
+  startTime: Date;
 
   listPersonnelGuest: IPersonnel[];
   totalPersonnel: number;
@@ -81,35 +83,87 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     return result;
   }
 
-  disabledDate = (current: Date): boolean => differenceInCalendarDays(current, this.today) < 0;
+  disabledDate = (current: Date): boolean => differenceInCalendarDays(current, new Date()) < 0;
 
-  disabledDateTime: DisabledTimeFn = (current: Date) => {
-    const currentCompareToday = differenceInCalendarDays(current, this.today) > 0;
+  disabledDateTime: DisabledTimeFn = (current: Date, type?: DisabledTimePartial) => {
+    if (type === 'start') {
+      this.startTime = current;
+      const currentCompareToday = differenceInCalendarDays(current, new Date()) > 0;
+      const currentHours = current?.getHours();
+      const currentMinutes = current?.getMinutes();
+      let numberDisableHours = 0;
+      let numberDisableMinutes = 0;
+      console.log(currentCompareToday);
+
+      if (!currentCompareToday) {
+        const minutes = new Date().getMinutes() + 15;
+        const hours = new Date().getHours();
+        console.log(currentHours, hours, minutes);
+
+        if (currentHours < hours) {
+          numberDisableHours = hours;
+          numberDisableMinutes = 60;
+        } else if (currentHours === hours) {
+          numberDisableHours = hours;
+          if (minutes <= 59) {
+            numberDisableMinutes = minutes;
+          } else {
+            numberDisableHours = hours + 1;
+            numberDisableMinutes = 0;
+          }
+        }
+      }
+      // ...this.range(0, 24).splice(0, 8), ...this.range(0, 24).splice(19, 5)
+      return {
+        nzDisabledHours: () => [...this.range(0, numberDisableHours)],
+        nzDisabledMinutes: () => this.range(0, numberDisableMinutes),
+        nzDisabledSeconds: () => []
+      };
+    }
+
+    const currentCompareToday = differenceInCalendarDays(current, new Date()) > 0;
     const currentHours = current?.getHours();
     const currentMinutes = current?.getMinutes();
     let numberDisableHours = 0;
     let numberDisableMinutes = 0;
+    let rangeHourExtend = [];
+    let rangeMinutesExtend = [];
+    console.log(currentCompareToday);
+
     if (!currentCompareToday) {
-      const minutes = this.today.getMinutes() + 15;
-      const hours = this.today.getHours();
-      if (currentHours && currentHours > hours) {
+      const minutes = new Date().getMinutes() + 15;
+      const hours = new Date().getHours();
+      console.log(currentHours, hours, minutes, this.startTime?.getHours(), this.startTime?.getMinutes());
+
+      if (currentHours < hours) {
         numberDisableHours = hours;
-        if (minutes > 59) {
+        numberDisableMinutes = 60;
+      } else if (currentHours === hours) {
+        numberDisableHours = hours;
+        if (minutes <= 59) {
+          numberDisableMinutes = minutes;
+        } else {
           numberDisableHours = hours + 1;
-          numberDisableMinutes = minutes - 59;
+          numberDisableMinutes = 0;
         }
-      } else if (minutes <= 59) {
-        numberDisableHours = hours;
-        numberDisableMinutes = minutes;
-      } else {
-        numberDisableHours = hours + 1;
+      }
+      if (this.startTime?.getHours() === currentHours) {
+        const startTimeMinutes = this.startTime?.getMinutes() + 5;
+        if (startTimeMinutes) {
+          if (startTimeMinutes < 59) {
+            rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes)
+          } else {
+            rangeHourExtend = [this.startTime?.getHours()];
+            rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes - 59)
+          }
+        }
       }
     }
     return {
-      nzDisabledHours: () => this.range(0, numberDisableHours),
-      nzDisabledMinutes: () => this.range(0, numberDisableMinutes),
+      nzDisabledHours: () => [...this.range(0, numberDisableHours), ...rangeHourExtend],
+      nzDisabledMinutes: () => [...this.range(0, numberDisableMinutes), ...rangeMinutesExtend],
       nzDisabledSeconds: () => []
-    }
+    };
   };
 
   @Input() meetingSchedule: IMeetingSchedule;
@@ -118,6 +172,8 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
 
   @Output() saveSuccess = new EventEmitter<IMeetingSchedule>();
   @Output() close = new EventEmitter<void>();
+
+  @ViewChildren('dynamicField') dynamicFieldRef: QueryList<BmMeetingScheduleDynamicFieldComponent>;
 
   constructor(
     private fb: FormBuilder,
@@ -130,16 +186,17 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     private personnelService: PersonnelService,
     private router: Router,
     private globalEventService: GlobalEventService,
-    private attendanceTypeService: AttendanceTypeService
+    private attendanceTypeService: AttendanceTypeService,
+    private notificationService: NzNotificationService
   ) {
     this.loading = false;
     this.listMeetingRoom = [];
     this.paramsGetMeetingRoom = {
       page: 1,
-      pageSize: 20,
+      pageSize: 100,
       search: '',
       from: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
-      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss'),
+      to: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
       active: true
     }
     this.loadingMeetingRoom = true;
@@ -151,9 +208,9 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.listPersonnel = [];
     this.paramsGetPersonnel = {
       page: 1,
-      pageSize: 20,
+      pageSize: 100,
       from: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
-      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss'),
+      to: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
       search: ''
     }
     this.loadingPersonnel = true;
@@ -163,7 +220,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.listDepartment = [];
     this.paramsGetDepartment = {
       page: 1,
-      pageSize: 20,
+      pageSize: 100,
       active: true,
       search: ''
     };
@@ -176,7 +233,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.firstCallPosition = true;
     this.paramsGetPosition = {
       page: 1,
-      pageSize: 20,
+      pageSize: 100,
       search: ''
     };
     this.keyFetch = uuid();
@@ -268,11 +325,14 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.paramsGetMeetingRoom.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss');
     this.paramsGetMeetingRoom.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss');
     this.listMeetingRoom = [];
+    this.paramsGetMeetingRoom.page = 1;
     this.getListMeetingRoom();
     this.paramsGetPersonnel.from = dayjs(result[0]).format('YYYY-MM-DDTHH:mm:ss');
     this.paramsGetPersonnel.to = dayjs(result[1]).format('YYYY-MM-DDTHH:mm:ss');
     this.listPersonnel = [];
+    this.paramsGetPersonnel.page = 1;
     this.getListPersonnel();
+    this.dynamicFieldRef.toArray().forEach(item => item.updateParamsGetPersonnel(result))
   }
 
   handlerSearchMeetingRoom(event: string) {
@@ -305,6 +365,10 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       const result = await this.meetingRoomService.getListMeetingRoomFreeTime(this.paramsGetMeetingRoom);
       this.totalMeetingRoom = result.Total;
       this.listMeetingRoom.push(...result.Value);
+      const roomSelected = result.Value.find(room => room.Id === this.meetingScheduleForm.get('IdRoom').value);
+      if (roomSelected?.CountMsDuplicate > 0) {
+        this.meetingScheduleForm.get('IdRoom').reset();
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -551,5 +615,15 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.listPersonnelOther = this.listPersonnelOther.filter(person => person.IdAttendanceType !== item.Id);
     this.listPersonnelOther.push({ IdAccount: event, IdAttendanceType: item.Id, });
     this.listPersonnel = [...this.listPersonnelClone].filter(item => !this.listPersonnelOther.find(element => element.IdAccount === item.IdAccount));
+  }
+
+  handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
+    event.stopPropagation();
+    this.notificationService.remove();
+    this.notificationService.blank(
+      'Lịch họp trùng',
+      idMsDuplicate,
+      { nzDuration: 0, nzPlacement: 'top' }
+    );
   }
 }

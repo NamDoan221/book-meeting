@@ -115,7 +115,7 @@ p {
   pointer-events: none;
   cursor: default;
   text-decoration: none;
-  opacity: 0.5;
+  opacity: 0.4;
 }
 
 .#{$prefixCss}readonly {
@@ -213,11 +213,6 @@ p {
 [class^="col"] {
   padding-left: 0;
   padding-right: 0;
-}
-
-.bm-disable {
-  opacity: 0.7;
-  pointer-events: none;
 }
 
 /* in-flight clone */

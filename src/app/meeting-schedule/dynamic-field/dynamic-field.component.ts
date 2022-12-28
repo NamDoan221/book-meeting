@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import * as dayjs from 'dayjs';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
 import { IAttendanceType } from 'src/app/lib/services/attendance-type/interfaces/attendance-type.interface';
@@ -33,15 +34,16 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
   @Output() selectedChange = new EventEmitter<string>();
 
   constructor(
-    private personnelService: PersonnelService
+    private personnelService: PersonnelService,
+    private notificationService: NzNotificationService
   ) {
     this.canLoadMore = true;
     this.listPersonnel = [];
     this.paramsGetPersonnel = {
       page: 1,
-      pageSize: 20,
+      pageSize: 100,
       from: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
-      to: dayjs().add(5, 'day').format('YYYY-MM-DDTHH:mm:ss'),
+      to: dayjs().format('YYYY-MM-DDTHH:mm:ss'),
       search: ''
     }
     this.loadingPersonnel = true;
@@ -61,6 +63,15 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
       this.searchPersonnel(value);
     });
     this.getListPersonnel();
+  }
+
+  async updateParamsGetPersonnel(rangeTime: Date[]) {
+    this.paramsGetPersonnel.from = dayjs(rangeTime[0]).format('YYYY-MM-DDTHH:mm:ss');
+    this.paramsGetPersonnel.to = dayjs(rangeTime[1]).format('YYYY-MM-DDTHH:mm:ss');
+    this.listPersonnelOrigin = [];
+    this.paramsGetPersonnel.page = 1;
+    await this.getListPersonnel();
+    this.resetDataSelected();
   }
 
   initData() {
@@ -113,6 +124,13 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
     }
   }
 
+  resetDataSelected() {
+    const personnelSelected = this.listPersonnel.find(personnel => personnel.Id === this.formGroup.get(this.item.Code).value);
+    if (personnelSelected?.CountMsDuplicate > 0) {
+      this.formGroup.get(this.item.Code).reset();
+    }
+  }
+
   updateListPersonnel(data: IPersonnel[] = [], isLoadMore: boolean = false) {
     if (isLoadMore) {
       this.listPersonnel = [...this.listPersonnel.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element?.IdAccount === item.Id))), ...data.filter(item => !(this.ignorePersonal && this.ignorePersonal.find(element => element?.IdAccount === item.Id)))];
@@ -135,5 +153,15 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
 
   handlerChangeSelected(event: string) {
     this.selectedChange.emit(event);
+  }
+
+  handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
+    event.stopPropagation();
+    this.notificationService.remove();
+    this.notificationService.blank(
+      'Lịch họp trùng',
+      idMsDuplicate,
+      { nzDuration: 0, nzPlacement: 'top' }
+    );
   }
 }

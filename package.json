@@ -29,7 +29,7 @@
     "face-api.js": "~0.22.2",
     "jwt-decode": "~3.1.2",
     "lodash": "~4.17.21",
-    "ng-zorro-antd": "~13.3.2",
+    "ng-zorro-antd": "~13.4.0",
     "ng2-dragula": "~2.1.1",
     "ngx-bootstrap": "~6.2.0",
     "ngx-cookie-service": "~13.2.1",

@@ -94,7 +94,24 @@
             (nzScrollToBottom)="handlerScrollBottomMeetingRoom()">
             <nz-option *ngFor="let item of listMeetingRoom"
               [nzValue]="item.Id"
-              [nzLabel]="item.Name">
+              [nzLabel]="item.Name"
+              [nzCustomContent]="true"
+              [nzDisabled]="item.CountMsDuplicate > 0">
+              <span class="bm-mr-8px">{{item.Name}}</span>
+              <span nz-tooltip
+                *ngIf="item.CountMsDuplicate > 0"
+                [nzTooltipTitle]="msDuplicate"
+                class="bm-color-ff5454">
+                <span nz-icon
+                  nzType="exclamation-circle"
+                  nzTheme="outline"></span>
+              </span>
+              <ng-template #msDuplicate>
+                <div class="bm-max-h-100px bm-overflow-auto bm-font-head-5">Phòng họp này đã có lịch họp trong khoảng thời gian bạn chọn.
+                  <span class="bm-cursor-pointer bm-font-head-5 bm-color-009cdb"
+                    (click)="handlerViewMsDuplicate($event, item.IdMsDuplicate)">Xem lịch trùng</span>
+                </div>
+              </ng-template>
             </nz-option>
           </nz-select>
           <ng-template #notFoundContentTemplate>
@@ -107,7 +124,8 @@
         </nz-form-control>
       </nz-form-item>
       <ng-container *ngFor="let item of attendanceType">
-        <bm-meeting-schedule-dynamic_field [formGroup]="meetingScheduleForm"
+        <bm-meeting-schedule-dynamic_field #dynamicField
+          [formGroup]="meetingScheduleForm"
           [meetingSchedule]="meetingSchedule"
           [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuest:listPersonnelOther:keyFetch"
           [item]="item"
@@ -195,7 +213,23 @@
                       [nzDisabled]="disableChangePersonnelJoin"
                       [ngModelOptions]="{standalone: true}"
                       [ngModel]="personnel.IdAccount | CheckPersonnelJoinMeetingSchedulePipe:listPersonnelGuest"
-                      (ngModelChange)="handlerAddPersonnelToMeetingSchedule($event, personnel)">{{personnel.FullName}}</label>
+                      (ngModelChange)="handlerAddPersonnelToMeetingSchedule($event, personnel)">
+                      <span class="bm-mr-8px">{{personnel.FullName}}</span>
+                      <span nz-tooltip
+                        *ngIf="personnel.CountMsDuplicate > 0"
+                        [nzTooltipTitle]="msDuplicate"
+                        class="bm-color-ff5454">
+                        <span nz-icon
+                          nzType="exclamation-circle"
+                          nzTheme="outline"></span>
+                      </span>
+                      <ng-template #msDuplicate>
+                        <div class="bm-max-h-100px bm-overflow-auto bm-font-head-5">Người này đã có lịch họp trong khoảng thời gian bạn chọn.
+                          <span class="bm-cursor-pointer bm-font-head-5 bm-color-009cdb"
+                            (click)="handlerViewMsDuplicate($event, personnel.IdMsDuplicate)">Xem lịch trùng</span>
+                        </div>
+                      </ng-template>
+                    </label>
                     <span class="bm-ml-24px">Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>
                   </div>
                   <div class="h-100 w-100 d-flex align-items-center justify-content-center"
