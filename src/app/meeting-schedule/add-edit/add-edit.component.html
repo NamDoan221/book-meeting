@@ -4,135 +4,174 @@
   [formGroup]="meetingScheduleForm">
   <div class="h-100 w-100 d-flex flex-column justify-content-between">
     <div>
-      <nz-form-item class="bm-mb-0">
-        <nz-form-control nzErrorTip="Tên cuộc họp không thể để trống!">
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'Title'">
-            Tên cuộc họp
-          </nz-form-label>
-          <nz-input-group>
-            <input type="text"
-              nz-input
-              class="bm-border-radius-4px"
-              formControlName="Title"
-              placeholder="Nhập tên cuộc họp">
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item class="bm-mb-0 bm-mt-16px">
-        <nz-form-control [nzErrorTip]="codeErrorTip">
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'Code'">
-            Mã lịch họp
-          </nz-form-label>
-          <nz-input-group>
-            <input type="text"
-              nz-input
-              class="bm-border-radius-4px"
-              formControlName="Code"
-              placeholder="Nhập mã lịch họp">
-          </nz-input-group>
-        </nz-form-control>
-        <ng-template #codeErrorTip
-          let-control>
-          <span class="font-size-11"
-            *ngIf="control.hasError('required')">Mã lịch họp không được để trống!</span>
-          <span class="font-size-11"
-            *ngIf="control.hasError('pattern')">
-            Mã lịch họp không đúng định dạng!
-          </span>
-        </ng-template>
-      </nz-form-item>
-      <nz-form-item class="bm-mt-16px bm-mb-0">
-        <nz-form-control [nzErrorTip]="'Thời gian không thể để trống!'">
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'RangeTime'">
-            Thời gian
-          </nz-form-label>
-          <nz-range-picker class="w-100"
-            [nzShowTime]="{ nzFormat: 'HH:mm' }"
-            [nzDisabledDate]="disabledDate"
-            [nzDisabledTime]="disabledDateTime"
-            nzFormat="dd/MM/yyyy HH:mm"
-            formControlName="RangeTime"
-            (ngModelChange)="rangeTimeChange($event)">
-          </nz-range-picker>
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item class="bm-mt-16px bm-mb-0">
-        <nz-form-control [nzErrorTip]="'Thời lượng dự kiến không thể để trống!'">
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'EstDuration'">
-            Thời lượng dự kiến
-          </nz-form-label>
-          <div class="d-flex">
-            <nz-input-number class="w-40"
-              formControlName="EstDuration"
-              nzPlaceHolder="Nhập thời lượng dự kiến"
-              [nzMin]="1"
-              [nzStep]="1"
-              (ngModelChange)="durationTimeChange($event)">
-            </nz-input-number>
-            <div class="d-flex align-items-center bm-h-32px bm-px-12px bm-border-top-general bm-border-right-general bm-border-bottom-general">
-              Phút
-            </div>
-          </div>
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item class="bm-mt-16px bm-mb-0">
-        <nz-form-control [nzErrorTip]="'Phòng họp không thể để trống!'">
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'IdRoom'">
-            Phòng họp
-          </nz-form-label>
-          <nz-select [nzShowSearch]="true"
-            [nzServerSearch]="true"
-            [formControlName]="'IdRoom'"
-            [nzPlaceHolder]="'Chọn phòng họp'"
-            [nzNotFoundContent]="notFoundContentTemplate"
-            (nzOnSearch)="handlerSearchMeetingRoom($event)"
-            (nzScrollToBottom)="handlerScrollBottomMeetingRoom()">
-            <nz-option *ngFor="let item of listMeetingRoom"
-              [nzValue]="item.Id"
-              [nzLabel]="item.Name"
-              [nzCustomContent]="true"
-              [nzDisabled]="item.CountMsDuplicate > 0">
-              <span class="bm-mr-8px">{{item.Name}}</span>
-              <span nz-tooltip
-                *ngIf="item.CountMsDuplicate > 0"
-                [nzTooltipTitle]="msDuplicate"
-                class="bm-color-ff5454">
-                <span nz-icon
-                  nzType="exclamation-circle"
-                  nzTheme="outline"></span>
-              </span>
-              <ng-template #msDuplicate>
-                <div class="bm-max-h-100px bm-overflow-auto bm-font-head-5">Phòng họp này đã có lịch họp trong khoảng thời gian bạn chọn.
-                  <span class="bm-cursor-pointer bm-font-head-5 bm-color-009cdb"
-                    (click)="handlerViewMsDuplicate($event, item.IdMsDuplicate)">Xem lịch trùng</span>
-                </div>
-              </ng-template>
-            </nz-option>
-          </nz-select>
-          <ng-template #notFoundContentTemplate>
-            <div class="d-flex align-items-center justify-content-center">
-              <span *ngIf="!loadingMeetingRoom">{{paramsGetMeetingRoom.search ? 'Không có kết quả' : 'Chưa có phòng họp nào trong danh sách'}}</span>
-              <nz-spin *ngIf="loadingMeetingRoom"
-                nzSimple></nz-spin>
-            </div>
+      <div class="bm-font-head-4s bm-pb-4px bm-mb-12px bm-border-bottom-general">Thông tin lịch họp</div>
+      <div class="d-flex">
+        <nz-form-item class="bm-mb-0 bm-pr-6px w-65">
+          <nz-form-control nzErrorTip="Tên cuộc họp không thể để trống!">
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'Title'">
+              Tên cuộc họp
+            </nz-form-label>
+            <nz-input-group>
+              <input type="text"
+                nz-input
+                class="bm-border-radius-4px"
+                formControlName="Title"
+                placeholder="Nhập tên cuộc họp">
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="bm-mb-0 bm-pl-6px w-35">
+          <nz-form-control [nzErrorTip]="codeErrorTip">
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'Code'">
+              Mã lịch họp
+            </nz-form-label>
+            <nz-input-group>
+              <input type="text"
+                nz-input
+                class="bm-border-radius-4px"
+                formControlName="Code"
+                placeholder="Nhập mã lịch họp">
+            </nz-input-group>
+          </nz-form-control>
+          <ng-template #codeErrorTip
+            let-control>
+            <span class="font-size-11"
+              *ngIf="control.hasError('required')">Mã lịch họp không được để trống!</span>
+            <span class="font-size-11"
+              *ngIf="control.hasError('pattern')">
+              Mã lịch họp không đúng định dạng!
+            </span>
           </ng-template>
+        </nz-form-item>
+      </div>
+      <div class="d-flex bm-mt-16px">
+        <nz-form-item class="bm-mb-0 bm-pr-6px w-65">
+          <nz-form-control [nzErrorTip]="'Thời gian không thể để trống!'">
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'RangeTime'">
+              Thời gian
+            </nz-form-label>
+            <nz-range-picker class="w-100"
+              [nzShowTime]="{ nzFormat: 'HH:mm' }"
+              [nzDisabledDate]="disabledDate"
+              [nzDisabledTime]="disabledDateTime"
+              nzFormat="dd/MM/yyyy HH:mm"
+              formControlName="RangeTime"
+              (ngModelChange)="rangeTimeChange($event)">
+            </nz-range-picker>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="bm-mb-0 bm-pl-6px w-35">
+          <nz-form-control [nzErrorTip]="'Thời lượng dự kiến không thể để trống!'">
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'EstDuration'">
+              Thời lượng dự kiến
+            </nz-form-label>
+            <div class="d-flex">
+              <nz-input-number class="w-100 bm-h-29px"
+                formControlName="EstDuration"
+                nzPlaceHolder="Nhập thời lượng dự kiến"
+                [nzMin]="1"
+                [nzStep]="1"
+                (ngModelChange)="durationTimeChange($event)">
+              </nz-input-number>
+              <div class="d-flex align-items-center bm-h-29px bm-px-12px bm-border-top-general bm-border-right-general bm-border-bottom-general">
+                Phút
+              </div>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div class="d-flex bm-mt-16px">
+        <nz-form-item class="bm-mb-0 bm-pr-6px w-65">
+          <nz-form-control [nzErrorTip]="'Phòng họp không thể để trống!'">
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'IdRoom'">
+              Phòng họp
+            </nz-form-label>
+            <nz-select [nzShowSearch]="true"
+              [nzServerSearch]="true"
+              [formControlName]="'IdRoom'"
+              [nzPlaceHolder]="'Chọn phòng họp'"
+              [nzNotFoundContent]="notFoundContentTemplate"
+              (nzOnSearch)="handlerSearchMeetingRoom($event)"
+              (nzScrollToBottom)="handlerScrollBottomMeetingRoom()">
+              <nz-option *ngFor="let item of listMeetingRoom"
+                [nzValue]="item.Id"
+                [nzLabel]="item.Code + ' - ' +item.Name"
+                [nzCustomContent]="true"
+                [nzDisabled]="item.CountMsDuplicate > 0">
+                <span class="bm-mr-8px">{{item.Code}} - {{item.Name}}</span>
+                <span nz-tooltip
+                  *ngIf="item.CountMsDuplicate > 0"
+                  [nzTooltipTitle]="msDuplicate"
+                  class="bm-color-ff5454">
+                  <span nz-icon
+                    nzType="exclamation-circle"
+                    nzTheme="outline"></span>
+                </span>
+                <ng-template #msDuplicate>
+                  <div class="bm-max-h-100px bm-overflow-auto bm-font-head-5">Phòng họp này đã có lịch họp trong khoảng thời gian bạn chọn.
+                    <span class="bm-cursor-pointer bm-font-head-5 bm-color-009cdb"
+                      (click)="handlerViewMsDuplicate($event, item.IdMsDuplicate)">Xem lịch trùng</span>
+                  </div>
+                </ng-template>
+              </nz-option>
+            </nz-select>
+            <ng-template #notFoundContentTemplate>
+              <div class="d-flex align-items-center justify-content-center">
+                <span *ngIf="!loadingMeetingRoom">{{paramsGetMeetingRoom.search ? 'Không có kết quả' : 'Chưa có phòng họp nào trong danh sách'}}</span>
+                <nz-spin *ngIf="loadingMeetingRoom"
+                  nzSimple></nz-spin>
+              </div>
+            </ng-template>
+          </nz-form-control>
+        </nz-form-item>
+        <nz-form-item class="bm-mb-0 bm-pl-6px w-35">
+          <nz-form-control>
+            <nz-form-label [nzNoColon]="true"
+              [nzFor]="'IsSyncGGCalendar'">
+              Đồng bộ lịch lên google calendar
+            </nz-form-label>
+            <nz-input-group>
+              <nz-switch class="bm-mt-4px"
+                formControlName="IsSyncGGCalendar"></nz-switch>
+              <span *ngIf="!isConnectGoogle"
+                class="bm-ml-8px">Bạn chưa kết nối với tài khoản google. <span class="bm-color-009cdb bm-cursor-pointer"
+                  (click)="handlerConnect($event)">Kết nối ngay tại đây.</span></span>
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <nz-form-item class="bm-mb-0 bm-mt-16px">
+        <nz-form-control>
+          <nz-form-label [nzNoColon]="true"
+            [nzFor]="'Content'">
+            Mô tả nội dung cuộc họp
+          </nz-form-label>
+          <nz-input-group>
+            <textarea nz-input
+              formControlName="Content"
+              placeholder="Nhập mô tả"
+              [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
+          </nz-input-group>
         </nz-form-control>
       </nz-form-item>
-      <ng-container *ngFor="let item of attendanceType">
-        <bm-meeting-schedule-dynamic_field #dynamicField
-          [formGroup]="meetingScheduleForm"
-          [meetingSchedule]="meetingSchedule"
-          [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuest:listPersonnelOther:keyFetch"
-          [item]="item"
-          [keyFetch]="keyFetch"
-          (selectedChange)="handlerSelectedChange($event, item)">
-        </bm-meeting-schedule-dynamic_field>
-      </ng-container>
+      <div class="bm-font-head-4s bm-mt-20px bm-pb-4px bm-mb-12px bm-border-bottom-general">Thông tin người tham gia</div>
+      <div class="grid-box">
+        <ng-container *ngFor="let item of attendanceType">
+          <bm-meeting-schedule-dynamic_field #dynamicField
+            [formGroup]="meetingScheduleForm"
+            [meetingSchedule]="meetingSchedule"
+            [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuest:listPersonnelOther:keyFetch"
+            [item]="item"
+            [keyFetch]="keyFetch"
+            (selectedChange)="handlerSelectedChange($event, item)">
+          </bm-meeting-schedule-dynamic_field>
+        </ng-container>
+      </div>
       <nz-form-item class="bm-mt-16px bm-mb-0">
         <nz-form-control>
           <nz-form-label [nzNoColon]="true">
@@ -243,34 +282,6 @@
               </div>
             </div>
           </div>
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item class="bm-mb-0 bm-mt-16px">
-        <nz-form-control>
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'Content'">
-            Mô tả nội dung cuộc họp
-          </nz-form-label>
-          <nz-input-group>
-            <textarea nz-input
-              formControlName="Content"
-              placeholder="Nhập mô tả"
-              [nzAutosize]="{ minRows: 8, maxRows: 8 }"></textarea>
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
-      <nz-form-item class="bm-mb-0 bm-mt-16px">
-        <nz-form-control>
-          <nz-form-label [nzNoColon]="true"
-            [nzFor]="'IsSyncGGCalendar'">
-            Đồng bộ lịch lên google calendar
-          </nz-form-label>
-          <nz-input-group>
-            <nz-switch formControlName="IsSyncGGCalendar"></nz-switch>
-            <span *ngIf="!isConnectGoogle"
-              class="bm-ml-8px">Bạn chưa kết nối với tài khoản google. <span class="bm-color-009cdb bm-cursor-pointer"
-                (click)="handlerConnect($event)">Kết nối ngay tại đây.</span></span>
-          </nz-input-group>
         </nz-form-control>
       </nz-form-item>
     </div>

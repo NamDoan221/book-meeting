@@ -30,7 +30,8 @@ import { BmMeetingScheduleDynamicFieldComponent } from '../dynamic-field/dynamic
 
 @Component({
   selector: 'bm-meeting-schedule-add_edit',
-  templateUrl: './add-edit.component.html'
+  templateUrl: './add-edit.component.html',
+  styleUrls: ['./add-edit.component.scss']
 })
 export class BmMeetingScheduleAddEditComponent implements OnInit {
 
@@ -101,7 +102,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
           numberDisableMinutes = 60;
         } else if (currentHours === hours) {
           numberDisableHours = hours;
-          if (minutes <= 59) {
+          if (minutes <= 60) {
             numberDisableMinutes = minutes;
           } else {
             numberDisableHours = hours + 1;
@@ -129,7 +130,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
         numberDisableMinutes = 60;
       } else if (currentHours === hours) {
         numberDisableHours = hours;
-        if (minutes <= 59) {
+        if (minutes <= 60) {
           numberDisableMinutes = minutes;
         } else {
           numberDisableHours = hours + 1;
@@ -139,11 +140,29 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
       if (this.startTime?.getHours() === currentHours) {
         const startTimeMinutes = this.startTime?.getMinutes() + 5;
         if (startTimeMinutes) {
-          if (startTimeMinutes < 59) {
+          if (startTimeMinutes < 60) {
             rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes)
           } else {
             rangeHourExtend = [this.startTime?.getHours()];
-            rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes - 59)
+            rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes - 60)
+          }
+        }
+      }
+    } else {
+      const startTimeMinutes = this.startTime?.getMinutes() + 5;
+      if (this.startTime?.getHours() === currentHours) {
+        if (startTimeMinutes) {
+          if (startTimeMinutes < 60) {
+            rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes)
+          } else {
+            rangeHourExtend = [this.startTime?.getHours()];
+            rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes - 60)
+          }
+        }
+      } else if (this.startTime?.getHours() < currentHours) {
+        if (startTimeMinutes) {
+          if (startTimeMinutes > 60) {
+            rangeMinutesExtend = this.range(0, 60).splice(0, startTimeMinutes - 60)
           }
         }
       }

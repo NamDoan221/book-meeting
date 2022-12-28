@@ -288,7 +288,7 @@ export class BmMeetingScheduleComponent implements OnInit, OnDestroy {
     this.drawerRefGlobal = this.drawerService.create<BmMeetingScheduleAddEditComponent>({
       nzBodyStyle: { overflow: 'auto' },
       nzMaskClosable: false,
-      nzWidth: '30vw',
+      nzWidth: '40vw',
       nzClosable: true,
       nzKeyboard: true,
       nzTitle: schedule ? `Sửa lịch họp` : 'Thêm lịch họp',

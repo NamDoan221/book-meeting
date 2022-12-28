@@ -144,7 +144,6 @@
         [ngClass]="{'bm-disable bm-pointer-events-none': !modeAdd}">
         <ng-container *ngFor="let item of attendanceType">
           <bm-meeting-schedule-dynamic_field [formGroup]="personnelJoinForm"
-            [ignoreMargin]="true"
             [meetingSchedule]="meetingSchedule"
             [item]="item"
             [ignorePersonal]="item | GetIgnorePersonnelPipe:listPersonnelGuestClone:listPersonnelOther:keyFetch"

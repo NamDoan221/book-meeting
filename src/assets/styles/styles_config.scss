@@ -8,11 +8,11 @@ $margin-or-padding: auto -20px -12px -10px -6px -4px 0 1px 2px 3px 4px 5px 6px 7
 $distance: -54px -35px -30px -20px -12px -4px 0 2px 4px 5px 6px 7px 8px 10px 12px 14px 15px 16px 20px 22px 28px 30px 36px
   40px 44px 46px 50px 55px 64px 60px 80px 120px;
 $text-align: left center right start end inherit initial justify unset;
-$heights: auto normal inherit 0px 1px 4px 6px 8px 10px 12px 14px 16px 18px 20px 21px 22px 24px 26px 28px 30px 32px 34px
-  35px 36px 37px 38px 40px 43px 44px 45px 46px 48px 50px 51px 54px 55px 56px 57px 60px 60vh 64px 70px 72px 73px 74px
-  75px 78px 80vh 85px 88px 91px 92px 95px 96px 98px 100px 104px 113px 120px 126px 128px 132px 140px 142px 146px 150px
-  158px 160px 168px 175px 212px 230px 260px 262px 275px 285px 300px 316px 327px 332px 335px 340px 350px 360px 407px
-  414px 432px 438px 487px 497px 507px 508px 519px 525px 540px 585px;
+$heights: auto normal inherit 0px 1px 4px 6px 8px 10px 12px 14px 16px 18px 20px 21px 22px 24px 26px 28px 29px 30px 32px
+  34px 35px 36px 37px 38px 40px 43px 44px 45px 46px 48px 50px 51px 54px 55px 56px 57px 60px 60vh 64px 70px 72px 73px
+  74px 75px 78px 80vh 85px 88px 91px 92px 95px 96px 98px 100px 104px 113px 120px 126px 128px 132px 140px 142px 146px
+  150px 158px 160px 168px 175px 212px 230px 260px 262px 275px 285px 300px 316px 327px 332px 335px 340px 350px 360px
+  407px 414px 432px 438px 487px 497px 507px 508px 519px 525px 540px 585px;
 $max-min-heights: auto 16px 18px 30px 35px 43px 45px 72px 78px 104px 132px 150px 160px 200px 212px 234px 280px 379px
   419px 450px 468px;
 $widths: auto 1px 6px 8px 10px 12px 14px 16px 18px 20px 22px 24px 28px 30px 32px 35px 36px 38px 40px 48px 50px 54px 60px
@@ -83,18 +83,23 @@ $text-transform: uppercase lowercase;
   font-size: 12px !important;
   height: 28px;
 }
+
 label {
   margin: 0 !important;
 }
+
 .ant-picker-input > input {
   font-size: 12px !important;
 }
+
 .ant-form-item-explain {
   min-height: auto !important;
 }
+
 .ant-drawer-close:focus {
   outline: none !important;
 }
+
 .ant-input,
 .ant-select-show-arrow,
 .ant-select-selection-placeholder,
@@ -111,6 +116,11 @@ a,
 p {
   font-size: 12px !important;
 }
+
+.ant-input-number-input {
+  height: 28px !important;
+}
+
 .#{$prefixCss}disable {
   pointer-events: none;
   cursor: default;
