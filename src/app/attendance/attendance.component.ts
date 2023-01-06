@@ -133,7 +133,7 @@ export class BmMeetingAttendanceComponent implements OnDestroy {
     this.handlerStopAttendance();
     const allDetection = [];
     for (let id of this.attendanceId) {
-      allDetection.push(this.meetingScheduleService.updateStatusAttendance(id));
+      // allDetection.push(this.meetingScheduleService.updateStatusAttendance(id));
     }
     try {
       await Promise.all(allDetection);

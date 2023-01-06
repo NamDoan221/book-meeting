@@ -15,7 +15,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Dictionary/types`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -28,7 +28,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Dictionary/type`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -43,7 +43,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Dictionary/${id}/type`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -56,7 +56,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.delete(`${this.domain}/Dictionary/${id}/type`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -69,7 +69,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Dictionary/${type}/type`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -82,7 +82,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Dictionary`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -97,7 +97,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Dictionary/${id}`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -110,7 +110,7 @@ export class DictionaryService extends BaseService {
     return new Promise((resolve, reject) => {
       this.delete(`${this.domain}/Dictionary/${id}`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

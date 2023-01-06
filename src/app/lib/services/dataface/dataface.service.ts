@@ -1,3 +1,4 @@
+import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../base.service';
 
@@ -14,7 +15,7 @@ export class DataFaceService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Dataface/${idPersonnel}`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -23,11 +24,11 @@ export class DataFaceService extends BaseService {
     });
   }
 
-  public addOrUpdateDataFace(idPersonnel: string, body: { dataTrain: string }): Promise<any> {
+  public addOrUpdateDataFace(idPersonnel: string, body: FormData): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.post(`${this.domain}/Dataface/${idPersonnel}`, body).subscribe({
+      this.postFormData(`${this.domain}/File/upload-data-face`, body, new HttpParams({ fromObject: { id: idPersonnel } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -40,7 +41,7 @@ export class DataFaceService extends BaseService {
     return new Promise((resolve, reject) => {
       this.delete(`${this.domain}/Dataface/${idPersonnel}`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

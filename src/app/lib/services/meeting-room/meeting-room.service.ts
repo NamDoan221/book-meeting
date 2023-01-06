@@ -16,7 +16,7 @@ export class MeetingRoomService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Room`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -29,7 +29,7 @@ export class MeetingRoomService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Room/check-free-time`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -42,7 +42,7 @@ export class MeetingRoomService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Room`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -57,7 +57,7 @@ export class MeetingRoomService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Room/${id}`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -70,7 +70,7 @@ export class MeetingRoomService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Room/${id}/toggle`, undefined).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

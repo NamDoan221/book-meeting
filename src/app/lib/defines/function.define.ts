@@ -40,3 +40,11 @@ export const viewMsDuplicate = async (notificationService: NzNotificationService
     }
   );
 }
+
+export const convertImageToFile = (image: HTMLCanvasElement, index: number) => {
+  return new Promise<File>(resolve => {
+    image.toBlob(blob => {
+      resolve(new File([blob], `image_${index}.jpg`, { type: 'image/jpeg' }));
+    });
+  });
+}

@@ -16,7 +16,7 @@ export class AttendanceTypeService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/AttendanceType`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -29,7 +29,7 @@ export class AttendanceTypeService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/AttendanceType/active`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -42,7 +42,7 @@ export class AttendanceTypeService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/AttendanceType`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -57,7 +57,7 @@ export class AttendanceTypeService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/AttendanceType/${id}`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -70,7 +70,7 @@ export class AttendanceTypeService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/AttendanceType/${id}/toggle`, undefined).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -83,7 +83,7 @@ export class AttendanceTypeService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/AttendanceType/indexs`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

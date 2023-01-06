@@ -16,7 +16,7 @@ export class DepartmentService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Department`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -29,7 +29,7 @@ export class DepartmentService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Department`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -44,7 +44,7 @@ export class DepartmentService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Department/${id}`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -57,7 +57,7 @@ export class DepartmentService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Department/${id}/toggle`, undefined).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

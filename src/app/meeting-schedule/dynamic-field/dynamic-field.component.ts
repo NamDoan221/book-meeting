@@ -31,6 +31,7 @@ export class BmMeetingScheduleDynamicFieldComponent implements OnInit, OnChanges
   @Input() formGroup: FormGroup;
   @Input() ignorePersonal: IPersonnel[];
   @Input() keyFetch: string;
+  @Input() disable: boolean;
 
   @Output() selectedChange = new EventEmitter<string>();
 

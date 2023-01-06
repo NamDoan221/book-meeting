@@ -16,7 +16,7 @@ export class RoleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Role`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -29,7 +29,7 @@ export class RoleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Role`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

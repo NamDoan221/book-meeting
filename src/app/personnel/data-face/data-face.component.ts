@@ -1,6 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Inject, Input, OnDestroy, Output, PLATFORM_ID, ViewChild } from '@angular/core';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { convertImageToFile } from 'src/app/lib/defines/function.define';
 import { DataFaceService } from 'src/app/lib/services/dataface/dataface.service';
 declare var faceapi: any;
 
@@ -18,6 +19,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
   canvas: any;
   interval: any;
   dataFace: HTMLCanvasElement[];
+  showResultImage: boolean;
 
   @Input() idPersonnel: string;
   @Input() modeEdit: boolean;
@@ -36,6 +38,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
     this.loading = false;
     this.modeStartCam = false;
     this.dataFace = [];
+    this.showResultImage = false;
     this.loadedFaceApi = false;
     this.isReStartDataFace = false;
   }
@@ -57,11 +60,14 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
     event.stopPropagation();
     if (!this.modeStartCam) {
       if (this.loadedFaceApi) {
+        this.showResultImage = false;
         this.startVideo();
       } else {
+        this.showResultImage = false;
         this.initModelsFaceApi();
       }
     } else {
+      this.showResultImage = false;
       this.stopDetectDataFace();
     }
     this.modeStartCam = !this.modeStartCam;
@@ -69,6 +75,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
 
   handlerReStart(event: Event) {
     event.stopPropagation();
+    this.showResultImage = false;
     this.dataFace = [];
     this.completeDetectFace = false;
     this.modeStartCam = true;
@@ -111,26 +118,25 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
           const detections = await faceapi
             .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
             .withFaceLandmarks()
-            .withFaceExpressions()
           const resizedDetections = faceapi.resizeResults(detections, displaySize);
           if (this.canvas) {
             this.canvas.getContext("2d").clearRect(0, 0, video.videoWidth, video.videoHeight);
             faceapi.draw.drawDetections(this.canvas, resizedDetections);
             faceapi.draw.drawFaceLandmarks(this.canvas, resizedDetections);
-            faceapi.draw.drawFaceExpressions(this.canvas, resizedDetections);
             const canvas_data = document.createElement("canvas");
             canvas_data
               .getContext("2d")
               .drawImage(video, 0, 0, canvas_data.width, canvas_data.height);
-            this.dataFace.push(canvas_data);
-            console.log(this.dataFace);
-
-            if (this.dataFace.length > 250) {
+            if (resizedDetections.length && resizedDetections[0].detection.score > 0.8) {
+              await this.extractFaceFromBox(video, resizedDetections[0].detection.box)
+            }
+            if (this.dataFace.length > 14) {
               this.nzMessageService.success('Thu thập dữ liệu thành công.');
               this.completeDetectFace = true;
               this.modeStartCam = false;
               this.isReStartDataFace = true;
               this.stopDetectDataFace();
+              this.showResultImage = true;
             }
           }
         }, 100)
@@ -138,27 +144,32 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
     }
   }
 
+  async extractFaceFromBox(inputImage: HTMLVideoElement, box: { x: number, y: number, width: number, height: number }) {
+    const regionsToExtract = [new faceapi.Rect(box.x, box.y, box.width, box.height)];
+    let faceImages = await faceapi.extractFaces(inputImage, regionsToExtract);
+    if (faceImages.length) {
+      faceImages.forEach(cnv => {
+        this.dataFace.push(cnv);
+      });
+    }
+  }
+
   async handlerSave(event: Event) {
     event.stopPropagation();
     try {
       this.loading = true;
-      const descriptors = [];
-      const allDetection = [];
-      for (let face of this.dataFace) {
-        allDetection.push(faceapi
-          .detectSingleFace(face)
-          .withFaceLandmarks()
-          .withFaceDescriptor());
-      }
-      const detectionFace = await Promise.all(allDetection);
-      detectionFace.forEach(detection => {
-        if (detection) {
-          descriptors.push(detection.descriptor);
-        }
-      })
-      const body = { dataTrain: JSON.stringify(descriptors) };
-      const result = await this.dataFaceService.addOrUpdateDataFace(this.idPersonnel, body);
-      if (result.success) {
+      const allPromiseConvert = [];
+      let formData = new FormData();
+      this.dataFace.forEach((face, index) => {
+        allPromiseConvert.push(convertImageToFile(face, index));
+      });
+      const resultDataFaceConvert = await Promise.all(allPromiseConvert);
+      resultDataFaceConvert.forEach(item => formData.append('files', item));
+      this.dataFace = [];
+      this.showResultImage = false;
+      this.completeDetectFace = false;
+      const result = await this.dataFaceService.addOrUpdateDataFace(this.idPersonnel, formData);
+      if (result.length) {
         this.saveSuccess.emit(true);
         this.dataFace = [];
         this.completeDetectFace = false;

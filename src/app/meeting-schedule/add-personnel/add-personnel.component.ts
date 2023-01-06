@@ -358,9 +358,10 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
 
   handlerRemovePersonnelJoin(event: Event, personnel: IPersonnel) {
     event.stopPropagation();
-    this.handlerDelete(personnel.Id);
+    // this.handlerDelete(personnel.Id);
     this.listPersonnelGuest = this.listPersonnelGuest.filter(item => item.IdAccount !== personnel.IdAccount);
-    this.listPersonnelGuestClone = cloneDeep(this.listPersonnelGuest)
+    const indexGuestClone = this.listPersonnelGuestClone.findIndex(item => item.IdAccount === personnel.IdAccount);
+    indexGuestClone > -1 && this.listPersonnelGuestClone.splice(indexGuestClone, 1);
   }
 
   async handlerDelete(id: string) {

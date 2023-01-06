@@ -495,13 +495,8 @@ export class BmMeetingScheduleComponent implements OnInit, OnDestroy {
     this.drawerRefGlobal.afterOpen.subscribe(() => {
       this.isOpenDrawAttendance = true;
       this.drawerRefGlobal.getContentComponent().saveSuccess.subscribe(data => {
-        this.isOpenDrawAttendance = false;
-        this.drawerRefGlobal.close();
-        if (meetingSchedule) {
-          Object.assign(meetingSchedule, data);
-          return;
-        }
-        this.listMeetingSchedule = [data, ...this.listMeetingSchedule];
+        Object.assign(meetingSchedule, data);
+        this.keyFetch = uuid();
       });
     });
 

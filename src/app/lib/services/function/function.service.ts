@@ -21,7 +21,7 @@ export class FunctionService extends BaseService {
       this.get(`Function`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
           !ignoreCache && this.cacheService.setKey(ConstantDefines.MENU_KEY, JSON.stringify(result));
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -34,7 +34,7 @@ export class FunctionService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`Function`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -49,7 +49,7 @@ export class FunctionService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`Function/${id}`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -62,7 +62,7 @@ export class FunctionService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`Function/${id}/toggle`, undefined).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

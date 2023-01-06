@@ -1,9 +1,9 @@
 @each $val in $cursor {
-    .#{$prefixCss}cursor-#{$val}{
-      cursor: $val !important;
-    }
+  .#{$prefixCss}cursor-#{$val} {
+    cursor: $val !important;
+  }
 }
 
-.#{$prefixCss}poiter-event-none{
+.#{$prefixCss}poiter-event-none {
   pointer-events: none;
 }

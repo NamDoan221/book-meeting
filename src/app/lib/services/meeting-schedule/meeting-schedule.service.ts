@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BaseService } from '../base.service';
-import { IBodyAddPersonnelToMeetingSchedule, IMeetingSchedule, IMeetingScheduleJoin, IParamsGetListMeetingSchedule } from './interfaces/meeting-schedule.interface';
+import { IBodyAddPersonnelToMeetingSchedule, IBodyUpdateStatusAttendance, IMeetingSchedule, IMeetingScheduleJoin, IParamsGetListMeetingSchedule } from './interfaces/meeting-schedule.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -16,7 +16,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Mschedule/filter`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -29,7 +29,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Mschedule/creator`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -42,7 +42,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Mschedule/personal`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -55,7 +55,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Mschedule`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -70,7 +70,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Mschedule/${id}`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -83,7 +83,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Mschedule/${id}/detail`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -96,7 +96,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Mschedule/${id}/detail-attendance`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -109,7 +109,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Mschedule/detail`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -120,9 +120,9 @@ export class MeetingScheduleService extends BaseService {
 
   public addListPersonnelToMeetingSchedule(body: IMeetingScheduleJoin[], idMeetingSchedule: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.post(`${this.domain}/Mschedule/detail-multiple`, body, new HttpParams({ fromObject: { IdMeetingSchedule: idMeetingSchedule } })).subscribe({
+      this.put(`${this.domain}/Mschedule/${idMeetingSchedule}/details`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -135,7 +135,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.delete(`${this.domain}/Mschedule/${id}/detail`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -148,7 +148,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Mschedule/detail-multiple`, ids).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -157,11 +157,11 @@ export class MeetingScheduleService extends BaseService {
     });
   }
 
-  public updateStatusAttendance(id: string): Promise<any> {
+  public updateStatusAttendance(id: string, body: IBodyUpdateStatusAttendance[]): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.put(`${this.domain}/Mschedule/${id}/detail-status`, {}, new HttpParams({ fromObject: { code: 'MSD_PRESENT' } })).subscribe({
+      this.put(`${this.domain}/Mschedule/${id}/detail-status-multiple`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -174,7 +174,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Mschedule/${id}/start`, {}).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -187,7 +187,7 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Mschedule/${id}/end`, {}).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -200,7 +200,20 @@ export class MeetingScheduleService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Mschedule/by-ids`, new HttpParams({ fromObject: { listId: ids } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
+        },
+        error: err => {
+          reject(err);
+        }
+      });
+    });
+  }
+
+  public attendanceByFaceImage(body: FormData): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.postFormData(`recog`, body, new HttpParams(), true).subscribe({
+        next: result => {
+          resolve(result);
         },
         error: err => {
           reject(err);

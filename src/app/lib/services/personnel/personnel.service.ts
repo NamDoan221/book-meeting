@@ -16,7 +16,7 @@ export class PersonnelService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Manager/filter`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -29,7 +29,7 @@ export class PersonnelService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Account/check-free-time`, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -42,7 +42,7 @@ export class PersonnelService extends BaseService {
     return new Promise((resolve, reject) => {
       this.get(`${this.domain}/Manager/${id}`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -55,7 +55,7 @@ export class PersonnelService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Manager`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -70,7 +70,7 @@ export class PersonnelService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Manager/${id}`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -83,7 +83,7 @@ export class PersonnelService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Manager/${id}/toggle-active`, undefined).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -96,7 +96,7 @@ export class PersonnelService extends BaseService {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Manager/${id}/reset-default-password`, undefined).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);

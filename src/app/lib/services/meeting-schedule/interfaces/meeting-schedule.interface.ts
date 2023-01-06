@@ -20,17 +20,18 @@ export interface IMeetingSchedule {
   RoomName?: string;
   IdCreator?: string;
   CreatorName?: string;
+  EndTime?: string;
+  StartTime?: string;
   EstStartTime?: string;
   EstEndTime?: string;
   EstDuration: number;
   IsSyncGGCalendar: boolean;
   IsGGMeetRoom: boolean;
-  Status?: string;
   StatusName?: string;
+  StatusCode?: string;
   DepartmentName?: string;
   CreateDate?: string;
   CreatorAvatar?: string;
-  StatusCode?: string;
   MeetingScheduleDtls?: IMeetingScheduleJoin[];
 }
 
@@ -42,4 +43,10 @@ export interface IMeetingScheduleJoin {
 export interface IBodyAddPersonnelToMeetingSchedule {
   IdAccount: string;
   IdMeetingSchedule: string;
+}
+
+export interface IBodyUpdateStatusAttendance {
+  IdAccount: string;
+  IdStatus: string;
+  AttendanceTime: string
 }

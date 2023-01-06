@@ -5,7 +5,8 @@
         [nzFor]="item.Code">
         {{item.Name}}
       </nz-form-label>
-      <nz-select [nzShowSearch]="true"
+      <nz-select [ngClass]="{'bm-pointer-events-none': disable}"
+        [nzShowSearch]="true"
         [nzServerSearch]="true"
         [formControlName]="item.Code"
         [nzPlaceHolder]="'Chọn nhân viên'"

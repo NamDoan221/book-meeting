@@ -1,11 +1,15 @@
 import { NgModule, Pipe, PipeTransform } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import * as dayjs from 'dayjs';
+import { IMeetingSchedule } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
 
 @Pipe({ name: 'CheckCanAttendanceMeetingSchedulePipe' })
 export class CheckCanAttendanceMeetingSchedulePipe implements PipeTransform {
-  transform(timeStart: string, duration: number, keyFetch: string) {
-    const compareTimeWithNow = dayjs(timeStart).diff(dayjs(), 'minute', false);
+  transform(item: IMeetingSchedule, duration: number, keyFetch: string) {
+    if (item.StatusCode === 'MS_COMPLETED') {
+      return false;
+    }
+    const compareTimeWithNow = dayjs(item.EstStartTime).diff(dayjs(), 'minute', false);
     if (compareTimeWithNow >= 0) {
       return true;
     }

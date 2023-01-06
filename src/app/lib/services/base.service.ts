@@ -2,8 +2,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
-import { DOMAIN_SITE } from '../defines/base-url.define';
+import { DOMAIN_SITE, DOMAIN_SITE_AI } from '../defines/base-url.define';
 import { ConstantDefines } from '../defines/constant.define';
 import { CacheService } from './cache.service';
 
@@ -53,6 +52,16 @@ export class BaseService {
     this.setRequestOptions(params);
     const url = `${this.apiUrl}${pathApi}`;
     return this.http.get(url, this.options);
+  }
+
+  protected postFormData(pathApi: string, body: FormData, params: HttpParams = new HttpParams(), basePathAI?: boolean): Observable<any> {
+    const header: any = {
+      'Client-Version': 'v1.0'
+    };
+    const headers = new HttpHeaders(header);
+    const options = { headers: headers, params: this.removeNullValuesFromHttpParams(params) };
+    const url = `${basePathAI ? DOMAIN_SITE_AI() : this.apiUrl}${pathApi}`;
+    return this.http.post(url, body, options);
   }
 
   protected post(pathApi: string, body: any, params: HttpParams = new HttpParams()): Observable<any> {

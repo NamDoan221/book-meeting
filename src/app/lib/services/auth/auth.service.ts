@@ -35,7 +35,7 @@ export class AuthService extends BaseService {
     return new Promise((resolve, reject) => {
       this.http.get(`${this.domain}/Account/${id}`).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -52,7 +52,7 @@ export class AuthService extends BaseService {
             return reject();
           }
           this.setToken(JSON.stringify(result.result));
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -65,7 +65,7 @@ export class AuthService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Auth/authenticate-gg`, undefined, new HttpParams({ fromObject: { ...params } })).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -79,7 +79,7 @@ export class AuthService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Account/revoke-token`, { Token: token }).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -92,7 +92,7 @@ export class AuthService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Auth/register`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -105,7 +105,7 @@ export class AuthService extends BaseService {
     return new Promise((resolve, reject) => {
       this.post(`${this.domain}/Auth/check-exist-account`, body).subscribe({
         next: result => {
-          return resolve(result);
+          resolve(result);
         },
         error: err => {
           reject(err);
@@ -117,7 +117,7 @@ export class AuthService extends BaseService {
   public changeAvatar(id: string, url: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Account/${id}/change-avatar`, undefined, new HttpParams({ fromObject: { url: url } })).subscribe(result => {
-        return resolve(result);
+        resolve(result);
       }, err => {
         reject(err);
       });
@@ -127,7 +127,7 @@ export class AuthService extends BaseService {
   public changePassword(id: string, body: IPassWord): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Account/${id}/change-password`, undefined, new HttpParams({ fromObject: { ...body } })).subscribe(result => {
-        return resolve(result);
+        resolve(result);
       }, err => {
         reject(err);
       });
@@ -137,7 +137,7 @@ export class AuthService extends BaseService {
   public changeInfo(body: IBodyChangeInfo, idAccount: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Account/${idAccount}`, body).subscribe(result => {
-        return resolve(result);
+        resolve(result);
       }, err => {
         reject(err);
       });
@@ -147,7 +147,7 @@ export class AuthService extends BaseService {
   public disconnectGoogle(idAccount: string): Promise<any> {
     return new Promise((resolve, reject) => {
       this.put(`${this.domain}/Account/${idAccount}/disconnect-google`, undefined).subscribe(result => {
-        return resolve(result);
+        resolve(result);
       }, err => {
         reject(err);
       });

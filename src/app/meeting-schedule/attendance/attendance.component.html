@@ -13,14 +13,16 @@
       <div class="d-flex">
         <button nzType="primary"
           *ngIf="!modeAttendance"
-          nz-button>Bắt đầu</button>
-        <button *ngIf="modeAttendance"
           nz-button
-          (click)="handlerBack($event)">Lưu</button>
+          (click)="handlerStartAttendance($event)">Bắt đầu</button>
+        <button *ngIf="modeAttendance"
+          nzType="primary"
+          nz-button
+          (click)="handlerSave($event)">Lưu</button>
         <button class="bm-ml-12px"
           *ngIf="modeAttendance"
           nz-button
-          (click)="handlerBack($event)">Huỷ bỏ</button>
+          (click)="handlerStopAttendance($event)">Huỷ bỏ</button>
       </div>
     </div>
     <div class="bm-mt-12px">
@@ -69,21 +71,21 @@
         <div class="w-100 h-100 position-relative">
           <div class="w-100 h-100 position-absolute bm-overflow-auto">
             <div *ngFor="let personnel of listPersonnelJoin; index as i"
+              #personnelRef
               class="bm-px-12px bm-py-6px bm-border-bottom-general d-flex align-items-center justify-content-between">
               <div class="d-flex flex-column">
-                <span>{{personnel.FullName}}
-                  <span nz-tooltip
-                    [nzTooltipTitle]="contentTemplate"
-                    [nzTooltipTitleContext]="{ $implicit: 'Thời gian điểm danh: ' + (personnel.AttendanceTime | date: 'dd/MM/YYYY HH:mm') }">
-                    <span nz-icon
-                      *ngIf="personnel.AttendanceTime"
-                      class="bm-color-6fd100 bm-ml-4px"
-                      nzType="check-circle"
-                      nzTheme="outline">
-                    </span>
-                  </span>
-                </span>
+                <span>{{personnel.FullName}} <span *ngIf="personnel.AttendanceTime"> - {{personnel.AttendanceTime | date: 'dd/MM/YYYY HH:mm'}}</span></span>
                 <span>Chức vụ: {{personnel.PositionName}} ({{personnel.DepartmentName}})</span>
+              </div>
+              <div>
+                <span nz-tooltip
+                  [nzTooltipTitle]="'Điểm danh'"
+                  [nzTooltipTitleContext]="{ $implicit: personnel}">
+                  <label nz-checkbox
+                    [nzDisabled]="!modeAttendance"
+                    [ngModel]="!!personnel.AttendanceTime"
+                    (ngModelChange)="handlerPersonAttend($event,personnel)"></label>
+                </span>
               </div>
             </div>
             <div class="h-100 w-100 d-flex align-items-center justify-content-center"
@@ -98,8 +100,19 @@
       </div>
     </div>
   </div>
-  <div class="h-100 w-65">
-
+  <div class="w-65 h-100">
+    <div *ngIf="!loadingCamera"
+      class="bm-mx-12px w-100 h-100 position-relative d-flex justify-content-center align-items-center"
+      #container>
+      <video #video
+        autoplay
+        muted></video>
+    </div>
+    <div *ngIf="loadingCamera"
+      class="w-100 h-100 d-flex justify-content-center align-items-center">
+      <nz-spin nzTip="Đang tải..."
+        nzSimple></nz-spin>
+    </div>
   </div>
 </div>
 

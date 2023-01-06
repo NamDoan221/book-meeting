@@ -32,6 +32,7 @@ import { GetIgnorePersonnelPipeModule } from './pipes/get-ignore-personnel.pipe'
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { CheckPersonnelGuestMeetingSchedulePipeModule } from './pipes/check-personel-guest.pipe';
 import { BmLibDropDownModule } from '../lib/dropdown/dropdown.module';
+import { GetPersonnelPipeModule } from './pipes/get-personnel.pipe';
 
 export const routes: Routes = [
   {
@@ -70,7 +71,8 @@ export const routes: Routes = [
     CheckCanAttendanceMeetingSchedulePipeModule,
     GetIgnorePersonnelPipeModule,
     CheckPersonnelGuestMeetingSchedulePipeModule,
-    BmLibDropDownModule
+    BmLibDropDownModule,
+    GetPersonnelPipeModule
   ],
   declarations: [
     BmMeetingScheduleComponent,
