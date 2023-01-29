@@ -1,7 +1,7 @@
 export const DOMAIN_SITE = (): string => {
-  return 'http://api.faceattendee.online/';
+  return 'https://api.faceattendee.online/';
 };
 
 export const DOMAIN_SITE_AI = (): string => {
-  return 'http://ai.faceattendee.online/';
+  return 'https://ai.faceattendee.online/';
 };

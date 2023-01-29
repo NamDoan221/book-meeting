@@ -8,16 +8,22 @@ export class CheckStatusMeetingSchedulePipe implements PipeTransform {
   transform(item: IMeetingSchedule, timeEnd: string, duration: number, keyFetch: string, tag: boolean = false) {
     const compareTimeStartWithNow = dayjs(item.EstStartTime).diff(dayjs(), 'minute', false);
     const compareTimeEndWithNow = dayjs(timeEnd).diff(dayjs(), 'minute', false);
-    if (item.StatusCode === 'MS_COMPLETED') {
-      return tag ? 3 : `Sự kiện này đã kết thúc ${this.buildText(item.StartTime, dayjs(), 0)} trước lúc ${dayjs(item.EndTime).format('HH:mm DD/MM/YYYY')}`;
-    }
-    if (item.StatusCode === 'MS_STARTED') {
-      return tag ? 2 : `Sự kiện này đã diễn ra ${this.buildText(item.StartTime, dayjs(), 0)} trước và sẽ kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
-    }
     if (compareTimeStartWithNow > 0) {
+      if (item.StatusCode === 'MS_COMPLETED') {
+        return tag ? 3 : `Sự kiện này đã kết thúc ${this.buildText(item.StartTime, dayjs(), 0)} trước lúc ${dayjs(item.EndTime).format('HH:mm DD/MM/YYYY')}`;
+      }
+      if (item.StatusCode === 'MS_STARTED') {
+        return tag ? 2 : `Sự kiện này đã diễn ra ${this.buildText(item.StartTime, dayjs(), 0)} trước và sẽ kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
+      }
       return tag ? 1 : `Sự kiện này sẽ diễn ra lúc ${dayjs(item.EstStartTime).format('HH:mm DD/MM/YYYY')} và kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
     }
     if (compareTimeStartWithNow <= 0 && -compareTimeStartWithNow <= duration) {
+      if (item.StatusCode === 'MS_COMPLETED') {
+        return tag ? 3 : `Sự kiện này đã kết thúc ${this.buildText(item.StartTime, dayjs(), 0)} trước lúc ${dayjs(item.EndTime).format('HH:mm DD/MM/YYYY')}`;
+      }
+      if (item.StatusCode === 'MS_STARTED') {
+        return tag ? 2 : `Sự kiện này đã diễn ra ${this.buildText(item.StartTime, dayjs(), 0)} trước và sẽ kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
+      }
       return tag ? 2 : `Sự kiện này đã diễn ra ${this.buildText(item.EstStartTime, dayjs(), compareTimeStartWithNow)} trước và sẽ kết thúc vào lúc ${dayjs(timeEnd).format('HH:mm DD/MM/YYYY')}`;
     }
     if (compareTimeEndWithNow < 0) {

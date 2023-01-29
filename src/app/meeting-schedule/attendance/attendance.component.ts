@@ -72,6 +72,7 @@ export class BmMeetingScheduleAttendanceComponent implements OnInit {
     try {
       const result = await this.meetingScheduleService.startAttendance(this.meetingSchedule.Id);
       this.meetingSchedule.StartTime = dayjs().format('YYYY-MM-DDTHH:mm:ss');
+      this.saveSuccess.emit({ ...this.meetingSchedule, StatusCode: 'MS_STARTED', StatusName: 'Đã bắt đầu' });
       this.modeAttendance = true;
     } catch (error) {
       console.log(error);
