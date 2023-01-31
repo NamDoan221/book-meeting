@@ -180,16 +180,14 @@
               {{!item.IsSyncGGCalendar ? 'Không đồng bộ' : !item.IdGGCalendar ? 'Đồng bộ thất bại' : 'Đồng bộ thành công'}}
               <span nz-tooltip
                 *ngIf="item.IsSyncGGCalendar && !item.IdGGCalendar"
-                [nzTooltipTitle]="reSyncTemplate"
+                [nzTooltipTitle]="contentTemplate"
+                [nzTooltipTitleContext]="{ $implicit: 'Đồng bộ lại' }"
                 (click)="handlerReSyncGoogleCalendar($event, item)"
                 class="bm-color-009cdb bm-cursor-pointer bm-ml-4px">
                 <span nz-icon
                   nzType="redo"
                   nzTheme="outline"></span>
               </span>
-              <ng-template #reSyncTemplate>
-                <div class="bm-max-h-100px bm-overflow-auto">Đồng bộ lại</div>
-              </ng-template>
             </td>
             <td>
               <div class="bm-overflow-hidden text-truncate">
