@@ -135,11 +135,11 @@ export class BmMeetingScheduleAttendanceComponent implements OnInit {
               body.append('image', imageToFiles);
               const result = await this.meetingScheduleService.attendanceByFaceImage(body);
               if (result.success) {
-                const personnelIndex = this.listPersonnelJoin.findIndex(item => item.IdAccount === result.result);
+                const personnelIndex = this.listPersonnelJoin.findIndex(item => item.IdAccount === result.result.toLocaleLowerCase());
                 if (personnelIndex > -1) {
-                  const personAttended = this.attendanceData.find(item => item.IdAccount === result.result);
+                  const personAttended = this.attendanceData.find(item => item.IdAccount === result.result.toLocaleLowerCase());
                   !personAttended && this.attendanceData.push({
-                    IdAccount: result.result,
+                    IdAccount: result.result.toLocaleLowerCase(),
                     IdStatus: this.listPersonnelJoin[personnelIndex].IdStatus,
                     AttendanceTime: dayjs().format('YYYY-MM-DDTHH:mm:ss')
                   });

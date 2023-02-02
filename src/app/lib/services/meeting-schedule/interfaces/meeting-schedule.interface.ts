@@ -33,6 +33,7 @@ export interface IMeetingSchedule {
   CreateDate?: string;
   CreatorAvatar?: string;
   MeetingScheduleDtls?: IMeetingScheduleJoin[];
+  IdGGCalendar?: string;
 }
 
 export interface IMeetingScheduleJoin {

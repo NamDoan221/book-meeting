@@ -516,6 +516,7 @@ export class BmMeetingScheduleComponent implements OnInit, OnDestroy {
       const result = await this.meetingScheduleService.updateMeetingSchedule(item);
       if (result.success) {
         this.nzMessageService.success('Thao tác thành công.');
+        item.IdGGCalendar = result.result.IdGGCalendar;
         return;
       }
       this.nzMessageService.error('Thao tác không thành công.');
