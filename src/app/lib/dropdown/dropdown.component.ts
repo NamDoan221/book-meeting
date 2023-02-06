@@ -3,7 +3,6 @@ import { FormGroup } from '@angular/forms';
 import * as dayjs from 'dayjs';
 import { Subject } from 'rxjs';
 import { debounceTime, filter } from 'rxjs/operators';
-import { IDataItemGetByTypeDictionary } from '../services/dictionary/interfaces/dictionary.interface';
 import { IMeetingRoom, IParamsGetListMeetingRoomFreeTime } from '../services/meeting-room/interfaces/room.interface';
 import { MeetingRoomService } from '../services/meeting-room/meeting-room.service';
 import { IMeetingSchedule } from '../services/meeting-schedule/interfaces/meeting-schedule.interface';
@@ -25,7 +24,7 @@ export class BmLibDropDownComponent implements OnInit {
   @Input() formGroup: FormGroup;
   @Input() formControlName: string;
 
-  @Output() selectedChange = new EventEmitter<string>();
+  @Output() selectedChange = new EventEmitter<IMeetingRoom>();
 
   constructor(
     private meetingRoomService: MeetingRoomService
@@ -95,8 +94,8 @@ export class BmLibDropDownComponent implements OnInit {
   }
 
   handlerChangeSelected(event: string) {
-    const roomName = this.listMeetingRoom.find(item => item.Id === event)?.Name;
-    this.selectedChange.emit(roomName);
+    const room = this.listMeetingRoom.find(item => item.Id === event);
+    this.selectedChange.emit(room);
   }
 
 }

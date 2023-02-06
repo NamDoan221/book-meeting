@@ -384,7 +384,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     }
   }
 
-  async handlerUpdate(event: Event) {
+  async handlerSave(event: Event) {
     event.stopPropagation();
     if (!this.meetingScheduleForm.valid) {
       Object.values(this.meetingScheduleForm.controls).forEach(control => {
@@ -398,6 +398,7 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     this.loading = true;
     const estStartTime = dayjs(this.meetingScheduleForm.value.RangeTime[0]).format('YYYY-MM-DDTHH:mm:ss');
     const estEndTime = dayjs(this.meetingScheduleForm.value.RangeTime[1]).format('YYYY-MM-DDTHH:mm:ss');
+    const rangeTime = this.meetingScheduleForm.value.RangeTime;
     delete this.meetingScheduleForm.value.RangeTime;
     const body: IMeetingSchedule = {
       ...this.meetingScheduleForm.value,
@@ -416,6 +417,13 @@ export class BmMeetingScheduleAddEditComponent implements OnInit {
     })
     if (this.modeEdit) {
       body.Id = this.meetingSchedule.Id;
+    }
+    const maxPersonalInRoom = this.listMeetingRoom.find(item => item.Id === body.IdRoom).AmountSlot;
+    if (body.MeetingScheduleDtls.length > maxPersonalInRoom) {
+      this.nzMessageService.error('Số lượng người tham gia vượt quá sức chứa của phòng họp.');
+      this.loading = false;
+      this.meetingScheduleForm.value.RangeTime = rangeTime;
+      return;
     }
     try {
       const result = await this.meetingScheduleService[this.modeEdit ? 'updateMeetingSchedule' : 'createMeetingSchedule'](body);

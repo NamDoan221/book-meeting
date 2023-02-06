@@ -14,6 +14,8 @@ import { AuthService } from 'src/app/lib/services/auth/auth.service';
 import { DepartmentService } from 'src/app/lib/services/department/department.service';
 import { IDepartment, IParamsGetListDepartment } from 'src/app/lib/services/department/interfaces/department.interface';
 import { GlobalEventService } from 'src/app/lib/services/global-event.service';
+import { IMeetingRoom } from 'src/app/lib/services/meeting-room/interfaces/room.interface';
+import { MeetingRoomService } from 'src/app/lib/services/meeting-room/meeting-room.service';
 import { IMeetingSchedule, IMeetingScheduleJoin } from 'src/app/lib/services/meeting-schedule/interfaces/meeting-schedule.interface';
 import { MeetingScheduleService } from 'src/app/lib/services/meeting-schedule/meeting-schedule.service';
 import { IParamsGetListPersonnelFreeTime, IPersonnel } from 'src/app/lib/services/personnel/interfaces/personnel.interface';
@@ -79,6 +81,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
   isConnectGoogle: boolean;
 
   roomName: string;
+  maxPersonalInRoom: number;
 
   @Input() meetingSchedule: IMeetingSchedule;
 
@@ -97,7 +100,8 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
     private router: Router,
     private globalEventService: GlobalEventService,
     private attendanceTypeService: AttendanceTypeService,
-    private notificationService: NzNotificationService
+    private notificationService: NzNotificationService,
+    private meetingRoomService: MeetingRoomService
   ) {
     this.modeAdd = false;
     this.listPersonnelGuest = [];
@@ -146,6 +150,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
     }
     this.keyFetchStatus = '';
     this.intervalSub = interval(300000).subscribe(() => this.keyFetchStatus = uuid());
+    this.maxPersonalInRoom = 0;
   }
 
   async ngOnInit(): Promise<void> {
@@ -156,6 +161,7 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
       this.paramsGetPersonnel.to = dayjs(this.meetingSchedule.EstEndTime).format('YYYY-MM-DDTHH:mm:ss')
     }
     this.roomName = this.meetingSchedule.RoomName;
+    this.getMaxPersonalInRoom();
     this.isConnectGoogle = this.authService.decodeToken().IsConnectedGG;
     this.meetingScheduleForm = this.fb.group({
       Title: [this.meetingSchedule?.Title || '', [Validators.required]],
@@ -185,6 +191,20 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
     this.getListPosition();
     await this.getDetailMeetingSchedule();
     this.getListPersonnel();
+  }
+
+  async getMaxPersonalInRoom() {
+    try {
+      const result = await this.meetingRoomService.getListMeetingRoom({
+        page: 1,
+        pageSize: 100,
+        active: true,
+        search: ''
+      });
+      this.maxPersonalInRoom = result.Value.find(item => item.Id === this.meetingSchedule.IdRoom).AmountSlot;
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async getAttendanceType(dataDetail: IPersonnel[]) {
@@ -358,7 +378,6 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
 
   handlerRemovePersonnelJoin(event: Event, personnel: IPersonnel) {
     event.stopPropagation();
-    // this.handlerDelete(personnel.Id);
     this.listPersonnelGuest = this.listPersonnelGuest.filter(item => item.IdAccount !== personnel.IdAccount);
     const indexGuestClone = this.listPersonnelGuestClone.findIndex(item => item.IdAccount === personnel.IdAccount);
     indexGuestClone > -1 && this.listPersonnelGuestClone.splice(indexGuestClone, 1);
@@ -521,6 +540,11 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
         const data = { IdAccount: item.IdAccount, IdAttendanceType: undefined };
         body.push(data);
       });
+      if (body.length > this.maxPersonalInRoom) {
+        this.nzMessageService.error('Số lượng người tham gia vượt quá sức chứa của phòng họp.');
+        this.loading = false;
+        return;
+      }
       const dataPromise = [];
       const ids = []
       this.allPersonnelJoin.forEach(item => {
@@ -562,8 +586,9 @@ export class BmMeetingScheduleAddPersonnelComponent implements OnInit, OnDestroy
     this.close.emit();
   }
 
-  handlerRoomChange(event: string) {
-    this.roomName = event;
+  handlerRoomChange(event: IMeetingRoom) {
+    this.roomName = event.Name;
+    this.maxPersonalInRoom = event.AmountSlot;
   }
 
   handlerViewMsDuplicate(event: Event, idMsDuplicate: string) {
