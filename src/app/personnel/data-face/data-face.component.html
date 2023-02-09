@@ -31,7 +31,7 @@
   </div>
   <div *ngIf="showResultImage">
     <div class="bm-mb-4px">Dữ liệu thu được</div>
-    <img *ngFor="let face of dataFace"
+    <img *ngFor="let face of dataFaceView"
       class="bm-mr-6px"
       [src]="face.toDataURL()"
       alt=""

@@ -19,6 +19,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
   canvas: any;
   interval: any;
   dataFace: HTMLCanvasElement[];
+  dataFaceView: HTMLCanvasElement[];
   showResultImage: boolean;
 
   @Input() idPersonnel: string;
@@ -38,6 +39,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
     this.loading = false;
     this.modeStartCam = false;
     this.dataFace = [];
+    this.dataFaceView = [];
     this.showResultImage = false;
     this.loadedFaceApi = false;
     this.isReStartDataFace = false;
@@ -99,6 +101,8 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
   }
 
   startVideo() {
+    this.dataFace = [];
+    this.dataFaceView = [];
     this.loadedFaceApi = true;
     this.loadingCamera = false;
     if (isPlatformBrowser(this.platform) && 'mediaDevices' in navigator) {
@@ -129,6 +133,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
               .drawImage(video, 0, 0, canvas_data.width, canvas_data.height);
             if (resizedDetections.length && resizedDetections[0].detection.score > 0.8) {
               await this.extractFaceFromBox(video, resizedDetections[0].detection.box)
+              this.dataFace.push(canvas_data);
             }
             if (this.dataFace.length > 14) {
               this.nzMessageService.success('Thu thập dữ liệu thành công.');
@@ -139,7 +144,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
               this.showResultImage = true;
             }
           }
-        }, 100)
+        }, 250)
       })
     }
   }
@@ -149,7 +154,7 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
     let faceImages = await faceapi.extractFaces(inputImage, regionsToExtract);
     if (faceImages.length) {
       faceImages.forEach(cnv => {
-        this.dataFace.push(cnv);
+        this.dataFaceView.push(cnv);
       });
     }
   }
@@ -165,13 +170,12 @@ export class BmPersonnelDataFaceComponent implements OnDestroy {
       });
       const resultDataFaceConvert = await Promise.all(allPromiseConvert);
       resultDataFaceConvert.forEach(item => formData.append('files', item));
-      this.dataFace = [];
-      this.showResultImage = false;
-      this.completeDetectFace = false;
       const result = await this.dataFaceService.addOrUpdateDataFace(this.idPersonnel, formData);
       if (result.length) {
         this.saveSuccess.emit(true);
         this.dataFace = [];
+        this.dataFaceView = [];
+        this.showResultImage = false;
         this.completeDetectFace = false;
         this.nzMessageService.success('Thao tác thành công.');
         return;
